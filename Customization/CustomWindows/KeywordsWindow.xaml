@@ -1,0 +1,12 @@
+﻿<local:AcadWindow2 x:Class="IgorKL.ACAD3.Customization.CustomWindows.KeywordsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:IgorKL.ACAD3.Customization.CustomWindows"
+        mc:Ignorable="d"
+        Title="KeywordsWindow" Height="300" Width="300">
+    <Grid>
+        
+    </Grid>
+</local:AcadWindow2>
