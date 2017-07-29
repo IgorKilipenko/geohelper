@@ -1,0 +1,41 @@
+﻿<UserControl x:Class="IgorKL.ACAD3.Model.Drawing.Views.EntitiesRandomEditorView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" Height="185.367" Width="142.499" MinWidth="142.499" MinHeight="185.367">
+    <UserControl.Background>
+        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+            <GradientStop Color="#FFD8E8F7"/>
+            <GradientStop Color="White" Offset="1"/>
+        </LinearGradientBrush>
+    </UserControl.Background>
+    <Grid>
+        <Rectangle Height="171" Margin="4,4,10,0" Stroke="#FFD65F5F" VerticalAlignment="Top">
+            <Rectangle.Effect>
+                <DropShadowEffect/>
+            </Rectangle.Effect>
+        </Rectangle>
+        <TextBox x:Name="_textBox_BottomTolerance" Height="24" Margin="42,28,53,0" TextWrapping="Wrap" Text="-0.005" VerticalAlignment="Top"/>
+        <Label Content=", м" HorizontalAlignment="Right" Margin="0,26,29,0" VerticalAlignment="Top"/>
+        <Label Content="Допуск:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,0,0,0">
+            <Label.Effect>
+                <DropShadowEffect/>
+            </Label.Effect>
+        </Label>
+        <Label Content="От:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,26,0,0"/>
+        <TextBox x:Name="_textBox_TopTolerance" Height="22" Margin="42,60,53,0" TextWrapping="Wrap" Text="0.005" VerticalAlignment="Top"/>
+        <Label Content=", м" Margin="0,58,29,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="24"/>
+        <Label Content="До:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,58,0,0"/>
+        <CheckBox x:Name="_checkBox_UseDefineFormat" Content="" Margin="0,115,22,0" VerticalAlignment="Top" Height="16" HorizontalAlignment="Right" Width="15" IsChecked="True" Checked="_checkBox_UseDefineFormat_Checked" Unchecked="_checkBox_UseDefineFormat_Unchecked"/>
+        <Label Content="Формат:" HorizontalAlignment="Left" Margin="10,90,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="_button_Complete" Content="ОК" Margin="0,150,22,0" VerticalAlignment="Top" Opacity="0.7" HorizontalAlignment="Right" Width="51" Click="ok_Button_Click"/>
+        <ComboBox x:Name="_comboBox_Format" Margin="10,112,50,0" VerticalAlignment="Top" SelectedIndex="2" SelectionChanged="_comboBox_Format_SelectionChanged">
+            <ListBoxItem Content="#0"/>
+            <ListBoxItem Content="#0.0"/>
+            <ListBoxItem Content="#0.00"/>
+            <ListBoxItem Content="#0.000"/>
+        </ComboBox>
+        <CheckBox x:Name="_checkBox_UseMinTolerance" Content="" HorizontalAlignment="Left" Margin="113,63,0,0" VerticalAlignment="Top" Width="19" IsChecked="True" Unchecked="_checkBox_UseMinTolerance_Unchecked" Checked="_checkBox_UseMinTolerance_Checked"/>
+    </Grid>
+</UserControl>

@@ -1,0 +1,307 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0D50CC5B-3089-44B3-9C2B-A9D76DC873BC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>IgorKL.ACAD3.Model</RootNamespace>
+    <AssemblyName>IgorKL.ACAD3.Model</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="accoremgd, Version=20.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2017\accoremgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AcCui, Version=20.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2017\AcCui.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="acdbmgd, Version=20.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2017\acdbmgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="acmgd, Version=20.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2017\acmgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AecBaseMgd, Version=7.7.49.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2017\AecBaseMgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AeccDbMgd, Version=10.4.524.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2017\C3D\AeccDbMgd.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AcadBlocks\BlockTools.cs" />
+    <Compile Include="AcadPoints\PointFactory.cs" />
+    <Compile Include="AutocadVersionNotSupportException.cs" />
+    <Compile Include="CivilSurfaces\Views\FormSelect.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CivilSurfaces\Views\FormSelect.Designer.cs">
+      <DependentUpon>FormSelect.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CivilSurfaces\Views\SurfaceSelectorUserControl.xaml.cs">
+      <DependentUpon>SurfaceSelectorUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CommandExecutor.cs" />
+    <Compile Include="Commands\BlockCmd.cs" />
+    <Compile Include="Commands\CivilSurfaceCmd.cs" />
+    <Compile Include="Commands\CoordinateSystemCmd.cs" />
+    <Compile Include="Commands\DimensionCmd.cs" />
+    <Compile Include="Commands\MLeaderCmd.cs" />
+    <Compile Include="Commands\PointsCmd.cs" />
+    <Compile Include="Commands\PointsCmdDebug.cs" />
+    <Compile Include="Commands\PointsCmdHelpers.cs" />
+    <Compile Include="Commands\TestCmd.cs" />
+    <Compile Include="Commands\ToolsCmd.cs" />
+    <Compile Include="Commands\VectorsTestCmd.cs" />
+    <Compile Include="CoordinateGeometry\AllowableTolerance.cs" />
+    <Compile Include="CoordinateGeometry\Helper.cs" />
+    <Compile Include="CoordinateSystem\CoordinateTools.cs" />
+    <Compile Include="CustomObjects\EntityDrawer.cs" />
+    <Compile Include="CustomObjects\Helpers\CustomObjectSerializer.cs" />
+    <Compile Include="CustomObjects\Helpers\XRecordTools.cs" />
+    <Compile Include="CustomObjects\MultiEntity.cs" />
+    <Compile Include="CustomObjects\EntityOverride.cs" />
+    <Compile Include="CustomObjects\SimpleEntityOverrideEx.cs" />
+    <Compile Include="CustomObjects\SimpleEntityOverride.cs" />
+    <Compile Include="CustomWindows\AcadWindow.cs" />
+    <Compile Include="CustomWindows\KeywordWindow.cs" />
+    <Compile Include="Drawing\AnchorArrow.cs" />
+    <Compile Include="Drawing\Arrows\ValueArrow.cs" />
+    <Compile Include="Drawing\CogoPointsRandomEditor.cs" />
+    <Compile Include="Drawing\CoordinatesGrid.cs" />
+    <Compile Include="Drawing\DrawElevationLeader.cs" />
+    <Compile Include="Drawing\DrawingTools.cs" />
+    <Compile Include="Drawing\EntitiesRandomEditor.cs" />
+    <Compile Include="Drawing\Helpers\Arrow.cs" />
+    <Compile Include="Drawing\Helpers\HostProvider.cs" />
+    <Compile Include="Drawing\Helpers\ScreenZoomer.cs" />
+    <Compile Include="Drawing\SingleArrow.cs" />
+    <Compile Include="Drawing\OneArrow.cs" />
+    <Compile Include="Drawing\PerpendicularVectorJigView.cs" />
+    <Compile Include="Drawing\PolyGrid.cs" />
+    <Compile Include="Drawing\SimpleGride.cs" />
+    <Compile Include="Drawing\SlopeLines.cs" />
+    <Compile Include="Drawing\TransientGraphicsTools.cs" />
+    <Compile Include="Drawing\VerticalDeviationArrow.cs" />
+    <Compile Include="Drawing\Views\AnchorArrowView.xaml.cs">
+      <DependentUpon>AnchorArrowView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Drawing\Views\AnchorDeviationsCmdFormEx.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Drawing\Views\AnchorDeviationsCmdFormEx.Designer.cs">
+      <DependentUpon>AnchorDeviationsCmdFormEx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Drawing\Views\AnchorDeviationsCmdFormOld.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Drawing\Views\AnchorDeviationsCmdFormOld.Designer.cs">
+      <DependentUpon>AnchorDeviationsCmdFormOld.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Drawing\Views\AnchorDeviationsCmdForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Drawing\Views\AnchorDeviationsCmdForm.Designer.cs">
+      <DependentUpon>AnchorDeviationsCmdForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Drawing\Views\EntitiesRandomEditorView.xaml.cs">
+      <DependentUpon>EntitiesRandomEditorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Drawing\WallDeviationArrows.cs" />
+    <Compile Include="Drawing\WallDeviationArrows2.cs" />
+    <Compile Include="Drawing\Сartogramma2.cs" />
+    <Compile Include="Drawing\Сartogramma.cs" />
+    <Compile Include="Extensions\AcadCollectionExtensions.cs" />
+    <Compile Include="Extensions\ArcExtensions.cs" />
+    <Compile Include="Extensions\BlockExtensions.cs" />
+    <Compile Include="Extensions\CivilSurfaceExtensions.cs" />
+    <Compile Include="Extensions\CurveExtension.cs" />
+    <Compile Include="Extensions\DBObjectExtensions.cs" />
+    <Compile Include="Extensions\DBTextExtensions.cs" />
+    <Compile Include="Extensions\EntityExtensions.cs" />
+    <Compile Include="Extensions\GemotryExtentsions.cs" />
+    <Compile Include="Extensions\PointExtensions.cs" />
+    <Compile Include="Extensions\PolylineExtensions.cs" />
+    <Compile Include="Extensions\RectangleExtensions.cs" />
+    <Compile Include="Extensions\ToolsExtensions.cs" />
+    <Compile Include="CogoPoints\CogoPointEditor.cs" />
+    <Compile Include="CogoPoints\CogoPointFactory.cs" />
+    <Compile Include="CogoPoints\Views\PointStylesSelectorControl.xaml.cs">
+      <DependentUpon>PointStylesSelectorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\Display\DynamicTransient.cs" />
+    <Compile Include="Helpers\Display\SimpleDynamicTransient.cs" />
+    <Compile Include="Helpers\Geometry\Intersects.cs" />
+    <Compile Include="Helpers\Math\Calculator.cs" />
+    <Compile Include="Helpers\Math\Randoms.cs" />
+    <Compile Include="Helpers\Math\Statistical.cs" />
+    <Compile Include="Helpers\SdrFormat\SdrReader.cs" />
+    <Compile Include="Helpers\SdrFormat\SdrWriter.cs" />
+    <Compile Include="Helpers\Service\DemandLoader.cs" />
+    <Compile Include="Layers\LayerTools.cs" />
+    <Compile Include="MainMenu\MainDataHost.cs" />
+    <Compile Include="MainMenu\MainPaletteSet.cs" />
+    <Compile Include="MLeaders\MLeaderTools.cs" />
+    <Compile Include="ObjectCollector.cs" />
+    <Compile Include="CivilSurfaces\SurfaceTools.cs" />
+    <Compile Include="ObjectIdNamedCollection.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="RibbonButtonAttribute.cs" />
+    <Compile Include="RibbonPanelCategories.cs" />
+    <Compile Include="ToHelpOthers\Grotesk_PerpendicularToEntity.cs" />
+    <Compile Include="Tools.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VisualAcadPropertyAttribute.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="CivilProfiles\" />
+    <Folder Include="Commands\Views\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CivilSurfaces\Views\FormSelect.resx">
+      <DependentUpon>FormSelect.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Drawing\Views\AnchorDeviationsCmdFormEx.resx">
+      <DependentUpon>AnchorDeviationsCmdFormEx.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Drawing\Views\AnchorDeviationsCmdFormOld.resx">
+      <DependentUpon>AnchorDeviationsCmdFormOld.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Drawing\Views\AnchorDeviationsCmdForm.resx">
+      <DependentUpon>AnchorDeviationsCmdForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="CivilSurfaces\Views\SurfaceSelectorUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Drawing\Views\AnchorArrowView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Drawing\Views\EntitiesRandomEditorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CogoPoints\Views\PointStylesSelectorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
