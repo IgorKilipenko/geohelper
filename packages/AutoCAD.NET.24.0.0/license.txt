@@ -1,0 +1,33 @@
+License & Download
+For ObjectARX® for AutoCAD® 2021, 2020 and 2019
+ 
+NOTICE TO USER:
+ 
+THIS IS A CONTRACT. BY INSTALLING THIS SOFTWARE YOU ACCEPT ALL THE TERMS AND CONDITIONS OF THIS AGREEMENT.
+ 
+This Autodesk, Inc. ("Autodesk") License Agreement for ObjectARX® for AutoCAD® 2021, AutoCAD® 2020 and AutoCAD® 2019 software ("Agreement") accompanies an Autodesk® ObjectARX software product and related explanatory materials ("Software"). The term "Software" shall also include any upgrades, modified versions, or updates of the Software licensed to you by Autodesk. Please read this Agreement carefully.
+ 
+Autodesk grants to you a nonexclusive limited license to use and copy the Software, provided that you agree to the following:
+ 
+1. Use of the Software
+You may install the Software in a single location on a single hard disk or other storage device, install and use the Software on a file server for use on a network for the purpose of installation onto hard disks or other storage devices or use the Software over such network, and make backup copies of the Software. You may make unlimited copies of the Software and give copies to other persons or entities so long as (i) all such copies are used to develop applications for Autodesk products based on the AutoCAD® platform and excluding AutoCAD LT®, DWG TrueConvert™, and DWG TrueView™ and (ii) all such copies contain this Agreement and the same copyright and other proprietary notices that appear on or in the Software. As set forth above, You may not use the Software to develop applications for AutoCAD LT®, DWG TrueConvert™, and DWG TrueView™ software, as the aforementioned products are nonextensible applications and the use of the Software to develop applications for these products is expressly prohibited by this Agreement.
+ 
+2. Copyright
+Autodesk and its licensors retain title to and ownership of the Software and all copies thereof, and all other rights and interest, including, without limitation, patents, copyrights, trademarks, trade secrets, and other intellectual property rights, in and to the Software and any copies thereof. You have only the limited rights with respect to the Software expressly set forth in this Agreement and You have no other rights, implied or otherwise. The structure, organization, and code of the Software are valuable trade secrets of Autodesk and its licensors and You shall keep such trade secrets confidential. You may use trademarks only to identify printed output produced by the Software, in accordance with accepted trademark practice, including identification of trademark owner's name. Such use of any trademark does not give you any rights of ownership in that trademark. Except as stated above, this Agreement does not grant you any intellectual property rights in the Software.
+ 
+3. No Warranty
+The Software is provided to you "AS IS," and you acknowledge that it may contain errors. Autodesk disclaims any warranty or liability obligations to you of any kind.
+EXCEPT FOR THE EXPRESS LIMITED WARRANTIES PROVIDED IN SECTION 3 (IF ANY) HEREOF, AUTODESK AND ITS LICENSORS MAKE AND YOU RECEIVE NO WARRANTIES, EXPRESS OR IMPLIED WITH RESPECT TO THE SOFTWARE. ANY STATEMENTS OR REPRESENTATIONS ABOUT THE SOFTWARE AND ITS FUNCTIONALITY IN THE USER DOCUMENTATION OR ANY COMMUNICATION WITH YOU CONSTITUTE TECHNICAL INFORMATION AND NOT AN EXPRESS WARRANTY OR GUARANTEE. IN ADDITION, AUTODESK AND ITS LICENSORS SPECIFICALLY DISCLAIM ANY OTHER WARRANTY INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. WITHOUT LIMITING THE FOREGOING, AUTODESK DOES NOT WARRANT THAT THE OPERATION OF THE SOFTWARE WILL BE UNINTERRUPTED OR ERROR FREE.
+ 
+4. Limitation of Liability
+IN NO EVENT SHALL AUTODESK OR ITS LICENSORS HAVE ANY LIABILITY FOR ANY INCIDENTAL, SPECIAL, INDIRECT, OR CONSEQUENTIAL DAMAGES; LOSS OF PROFITS, REVENUE, OR DATA; BUSINESS INTERRUPTION, OR COST OF COVER. IN ADDITION, IN NO EVENT SHALL THE LIABILITY OF AUTODESK OR ITS LICENSORS FOR ANY DAMAGES ARISING OUT OF OR IN CONNECTION WITH THE SOFTWARE, USER DOCUMENTATION, OR THIS AGREEMENT EXCEED THE AMOUNT PAID OR PAYABLE BY YOU FOR THE SOFTWARE DIRECTLY RESPONSIBLE FOR SUCH DAMAGES. THE LIMITATIONS OF LIABILITY IN THIS SECTION 7 SHALL APPLY TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW TO ANY DAMAGES, HOWEVER CAUSED AND REGARDLESS OF THE THEORY OF LIABILITY, WHETHER DERIVED FROM CONTRACT, TORT (INCLUDING, BUT NOT LIMITED TO, NEGLIGENCE) OR OTHERWISE, EVEN IF AUTODESK HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES AND REGARDLESS OF WHETHER THE LIMITED REMEDIES AVAILABLE HEREUNDER FAIL OF THEIR ESSENTIAL PURPOSE.
+AUTODESK SHALL HAVE NO RESPONSIBILITY OR LIABILITY WHATSOEVER ARISING FROM LOSS OR THEFT OF THE SOFTWARE OR THE MEDIA ON WHICH THE SOFTWARE IS FURNISHED TO YOU. AUTODESK SHALL NOT BE OBLIGATED TO REPLACE ANY LOST OR STOLEN SOFTWARE OR SOFTWARE MEDIA. YOU ARE SOLELY RESPONSIBLE FOR SAFEGUARDING THE SOFTWARE AND THE MEDIA ON WHICH THE SOFTWARE IS FURNISHED AND FOR BACKING UP ANY DATA.
+ 
+5. Governing Law and General Provisions
+This Agreement will be governed by the laws of the State of California, U.S.A., excluding the application of its conflicts of law rules. This Agreement will not be governed by the United Nations Convention on Contracts for the International Sale of Goods, the application of which is expressly excluded. If any part of this Agreement is found void and unenforceable, it will not affect the validity of the balance of the Agreement, which shall remain valid and enforceable according to its terms. You agree that the Software will not be shipped, transferred, or exported into any country or used in any manner prohibited by the United States Export Administration Act or any other export laws, restrictions, or regulations. This Agreement shall automatically terminate upon failure by you to comply with its terms.
+ 
+6. Notice to Government End Users
+All Software provided to the U.S. Government is provided with the same commercial license rights and restrictions described elsewhere herein.
+ 
+7. Entire Agreement
+This Agreement constitutes the entire agreement between us and supersedes any other previous or contemporaneous communications, agreements, representations, warranties or advertising with respect to the Software. Any modifications to this Agreement shall be invalid, unless made in writing and signed by a duly authorized representative of Autodesk.

@@ -4,7 +4,7 @@
 library
 C#
 .cs
-C:\Users\Игорь\Source\Repos\IgorKL.ACAD3.Model\IgorKL.ACAD3.Model\obj\Debug\
+C:\Users\Igor\Source\Repos\IgorKilipenko\AutoCad\IgorKL.ACAD3.Model\obj\Debug\
 IgorKL.ACAD3.Model
 none
 false
@@ -12,8 +12,8 @@ DEBUG;TRACE
 
 462094529
 
-1032082003385
-21886994719
+101-1024696100
+301823191742
 CivilSurfaces\Views\SurfaceSelectorUserControl.xaml;Drawing\Views\AnchorArrowView.xaml;Drawing\Views\EntitiesRandomEditorView.xaml;CogoPoints\Views\PointStylesSelectorControl.xaml;
 
 False
