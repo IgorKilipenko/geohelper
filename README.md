@@ -83,7 +83,7 @@
 > 
 > [![iCmd_EditDimensionValueRandom](https://img.youtube.com/vi/iGd4-en1noQ/0.jpg)](https://www.youtube.com/watch?v=iGd4-en1noQ)
 
-> ## ```iCmd_EditCogoPointLocation
+> ## ```iCmd_EditCogoPointLocation```
 > редактирует в случайном порядке плановое положение COGO точек.
 > 
 > [![iCmd_EditDimensionValueRandom](https://img.youtube.com/vi/qD-tybn6gs8/0.jpg)](https://www.youtube.com/watch?v=qD-tybn6gs8)
