@@ -88,6 +88,3 @@
 > 
 > [![iCmd_EditDimensionValueRandom](https://img.youtube.com/vi/qD-tybn6gs8/0.jpg)](https://www.youtube.com/watch?v=qD-tybn6gs8)
 
-### Требования к системе:
-1. Autocad (Civil) 2013/2014/2015/2016 x64
-2. Установленный .Net Framework версии 4.5.2 
