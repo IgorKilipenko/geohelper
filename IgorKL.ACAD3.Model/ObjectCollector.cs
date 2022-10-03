@@ -1,22 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.Geometry;
+using System;
+using System.Collections.Generic;
 
-namespace IgorKL.ACAD3.Model
-{
-    public static class ObjectCollector
-    {
+namespace IgorKL.ACAD3.Model {
+    public static class ObjectCollector {
         public static bool TrySelectObjects<T>(out List<T> selectedSet, string message = "\nВыберите объект: ")
-            where T : DBObject
-        {
+            where T : DBObject {
             selectedSet = new List<T>();
             Editor ed = Tools.GetAcadEditor();
 
@@ -31,10 +21,8 @@ namespace IgorKL.ACAD3.Model
             if (psr.Status != PromptStatus.OK)
                 return false;
 
-            using (Transaction trans = Tools.StartTransaction())
-            {
-                foreach (SelectedObject so in psr.Value)
-                {
+            using (Transaction trans = Tools.StartTransaction()) {
+                foreach (SelectedObject so in psr.Value) {
                     T obj = trans.GetObject(so.ObjectId, OpenMode.ForRead) as T;
                     if (obj != null)
                         selectedSet.Add(obj);
@@ -44,8 +32,7 @@ namespace IgorKL.ACAD3.Model
         }
 
         public static bool TrySelectAllowedClassObject<TAllowedType>(out TAllowedType result, string message = "\nВыберите объект: ")
-            where TAllowedType : DBObject
-        {
+            where TAllowedType : DBObject {
             result = null;
 
             Editor ed = Tools.GetAcadEditor();
@@ -58,16 +45,14 @@ namespace IgorKL.ACAD3.Model
             if (per.Status != PromptStatus.OK)
                 return false;
 
-            using (Transaction trans = Tools.StartTransaction())
-            {
+            using (Transaction trans = Tools.StartTransaction()) {
                 result = (TAllowedType)trans.GetObject(per.ObjectId, OpenMode.ForRead);
                 return true;
             }
         }
 
-        public static bool TrySelectAllowedClassObject<TAllowedType>(out TAllowedType result, KeywordCollection keys, Func<PromptEntityResult, PromptStatus> keywordCollBack ,string message = "\nВыберите объект: ")
-            where TAllowedType : DBObject
-        {
+        public static bool TrySelectAllowedClassObject<TAllowedType>(out TAllowedType result, KeywordCollection keys, Func<PromptEntityResult, PromptStatus> keywordCollBack, string message = "\nВыберите объект: ")
+            where TAllowedType : DBObject {
             result = null;
 
             Editor ed = Tools.GetAcadEditor();
@@ -83,11 +68,9 @@ namespace IgorKL.ACAD3.Model
             if (per.Status != PromptStatus.OK && per.Status != PromptStatus.Keyword)
                 return false;
 
-            if (per.Status == PromptStatus.Keyword)
-            {
+            if (per.Status == PromptStatus.Keyword) {
                 if (keywordCollBack(per) == PromptStatus.OK)
-                    while ((per = ed.GetEntity(peo)).Status == PromptStatus.Keyword)
-                    {
+                    while ((per = ed.GetEntity(peo)).Status == PromptStatus.Keyword) {
                         if (keywordCollBack(per) != PromptStatus.OK)
                             return false;
                     }
@@ -98,16 +81,14 @@ namespace IgorKL.ACAD3.Model
                     return false;
             }
 
-            using (Transaction trans = Tools.StartTransaction())
-            {
+            using (Transaction trans = Tools.StartTransaction()) {
                 result = (TAllowedType)trans.GetObject(per.ObjectId, OpenMode.ForRead);
                 return true;
             }
         }
 
         public static ObjectId SelectAllowedClassObject<TAllowedType>(string message, string rejectMessage)
-            where TAllowedType : DBObject
-        {
+            where TAllowedType : DBObject {
             Editor ed = Tools.GetAcadEditor();
             var peo = new PromptEntityOptions(message);
             peo.SetRejectMessage(rejectMessage);
@@ -121,8 +102,7 @@ namespace IgorKL.ACAD3.Model
                 return per.ObjectId;
         }
         public static ObjectId SelectAllowedClassObject<TAllowedType>()
-            where TAllowedType : DBObject
-        {
+            where TAllowedType : DBObject {
             string msg = string.Format("\nSelect a {0}: ", typeof(TAllowedType).Name);
             string rejMsg = string.Format("\nThe selected object is not a {0}.", typeof(TAllowedType).Name);
 

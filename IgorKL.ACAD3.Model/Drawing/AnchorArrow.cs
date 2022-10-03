@@ -12,10 +12,8 @@ using Autodesk.AutoCAD.EditorInput;
 using display = IgorKL.ACAD3.Model.Helpers.Display;
 using IgorKL.ACAD3.Model.Extensions;
 
-namespace IgorKL.ACAD3.Model.Drawing
-{
-    public class AnchorArrow:CustomObjects.SimpleEntityOverride
-    {
+namespace IgorKL.ACAD3.Model.Drawing {
+    public class AnchorArrow : CustomObjects.SimpleEntityOverride {
         private Point3d _insertPoint;
         private Point3d _destPoint;
         private Arrow _arrow;
@@ -26,22 +24,19 @@ namespace IgorKL.ACAD3.Model.Drawing
         private static MainMenu.HostProvider _dataHost = new MainMenu.HostProvider(new AnchorArrow());
 
         public AnchorArrow()
-            :this(Point3d.Origin)
-        { }
+            : this(Point3d.Origin) { }
         public AnchorArrow(Point3d origin)
-            :base(origin, new List<Entity>(), Matrix3d.Identity)
-        {
+            : base(origin, new List<Entity>(), Matrix3d.Identity) {
             if (_dataHost == null)
                 _dataHost = new MainMenu.HostProvider(this);
             _tolerance = _dataHost.Read("tolerance", 0.005d);
         }
 
         //[Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_DrawArrows", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public void DrawArrowsEx()
-        {
+        public void DrawArrowsEx() {
             _ucs = CoordinateSystem.CoordinateTools.GetCurrentUcs();
             PromptPointOptions ppo = new PromptPointOptions("\nУкажите проектное положение");
-            
+
             PromptPointResult ppr = Tools.GetAcadEditor().GetPoint(ppo);
             if (ppr.Status != PromptStatus.OK)
                 return;
@@ -63,8 +58,7 @@ namespace IgorKL.ACAD3.Model.Drawing
         }
 
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_DrawArrows", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public static void DrawArrows()
-        {
+        public static void DrawArrows() {
             AnchorArrow mainBlock = new AnchorArrow();
 
             mainBlock._ucs = CoordinateSystem.CoordinateTools.GetCurrentUcs();
@@ -75,16 +69,12 @@ namespace IgorKL.ACAD3.Model.Drawing
 
             PromptPointResult ppr = null;
             while ((ppr = Tools.GetAcadEditor().GetPoint(ppo)).Status == PromptStatus.OK
-                || ppr.Status == PromptStatus.Keyword)
-            {
-                if (ppr.Status == PromptStatus.Keyword)
-                {
-                    switch (ppr.StringResult)
-                    {
-                        case "Exit":
-                            {
-                                return;
-                            }
+                || ppr.Status == PromptStatus.Keyword) {
+                if (ppr.Status == PromptStatus.Keyword) {
+                    switch (ppr.StringResult) {
+                        case "Exit": {
+                            return;
+                        }
                     }
                 }
                 /*if (ppr.Status != PromptStatus.OK)
@@ -99,8 +89,7 @@ namespace IgorKL.ACAD3.Model.Drawing
 
         [RibbonCommandButton("Анкера рандом", "Стрелки")]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_DrawArrowsRandom", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public static void DrawArrowsRandom()
-        {
+        public static void DrawArrowsRandom() {
             AnchorArrow mainBlock = new AnchorArrow();
             mainBlock._ucs = CoordinateSystem.CoordinateTools.GetCurrentUcs();
             mainBlock._tolerance = _dataHost.Read("tolerance", mainBlock._tolerance);
@@ -114,37 +103,32 @@ namespace IgorKL.ACAD3.Model.Drawing
 
             PromptPointResult ppr = null;
             while ((ppr = Tools.GetAcadEditor().GetPoint(ppo)).Status == PromptStatus.OK
-                || ppr.Status == PromptStatus.Keyword)
-            {
-                if (ppr.Status == PromptStatus.Keyword)
-                {
-                    switch (ppr.StringResult)
-                    {
-                        case "Exit":
-                            {
+                || ppr.Status == PromptStatus.Keyword) {
+                if (ppr.Status == PromptStatus.Keyword) {
+                    switch (ppr.StringResult) {
+                        case "Exit": {
+                            return;
+                        }
+                        case "Tolerance": {
+                            PromptDoubleOptions pdo = new PromptDoubleOptions("\nУкажите допуск в плане, м: ");
+                            pdo.AllowArbitraryInput = false;
+                            pdo.AllowNegative = false;
+                            pdo.AllowNone = false;
+                            pdo.UseDefaultValue = true;
+                            pdo.DefaultValue = mainBlock._tolerance;
+
+                            PromptDoubleResult pdr = Tools.GetAcadEditor().GetDouble(pdo);
+                            if (pdr.Status != PromptStatus.OK)
                                 return;
-                            }
-                        case "Tolerance":
-                            {
-                                PromptDoubleOptions pdo = new PromptDoubleOptions("\nУкажите допуск в плане, м: ");
-                                pdo.AllowArbitraryInput = false;
-                                pdo.AllowNegative = false;
-                                pdo.AllowNone = false;
-                                pdo.UseDefaultValue = true;
-                                pdo.DefaultValue = mainBlock._tolerance;
 
-                                PromptDoubleResult pdr = Tools.GetAcadEditor().GetDouble(pdo);
-                                if (pdr.Status != PromptStatus.OK)
-                                    return;
+                            mainBlock._tolerance = pdr.Value;
+                            _dataHost.Write("tolerance", mainBlock._tolerance);
 
-                                mainBlock._tolerance = pdr.Value;
-                                _dataHost.Write("tolerance", mainBlock._tolerance);
-
-                                ppr = Tools.GetAcadEditor().GetPoint(ppo);
-                                if (ppr.Status != PromptStatus.OK)
-                                    return;
-                                break;
-                            }
+                            ppr = Tools.GetAcadEditor().GetPoint(ppo);
+                            if (ppr.Status != PromptStatus.OK)
+                                return;
+                            break;
+                        }
                     }
                 }
 
@@ -160,40 +144,34 @@ namespace IgorKL.ACAD3.Model.Drawing
             }
         }
 
-        public virtual void DisplayAtBlock(Point3d position, Dictionary<string, string> attributeInfoSet)
-        {
+        public virtual void DisplayAtBlock(Point3d position, Dictionary<string, string> attributeInfoSet) {
             if (_transient == null)
                 _transient = new display.DynamicTransient();
 
             ObjectId btrId = AcadBlocks.BlockTools.CreateBlockTableRecordEx(Origin, "*U", Entities, AnnotativeStates.True);
             BlockReference br = new BlockReference(position, btrId);
 
-            foreach (var ent in Entities)
-            {
+            foreach (var ent in Entities) {
                 _transient.AddMarker((Entity)ent.Clone());
             }
 
             _transient.Display();
         }
 
-        protected override bool WorldDraw(Autodesk.AutoCAD.GraphicsInterface.WorldDraw draw)
-        {
-            lock (Entities)
-            {
-                
+        protected override bool WorldDraw(Autodesk.AutoCAD.GraphicsInterface.WorldDraw draw) {
+            lock (Entities) {
+
                 Entities.Clear();
-                Entities.AddRange(_arrow.Explode().Select(x =>
-                {
+                Entities.AddRange(_arrow.Explode().Select(x => {
                     if (x is DBText)
                         return _convertToAttribute((DBText)x);
                     return x;
                 }));
 
-                ObjectId btrId = AcadBlocks.BlockTools.CreateBlockTableRecordEx(_insertPoint,"*U", Entities.Select(x => (Entity)x.Clone()).ToList(), AnnotativeStates.True);
+                ObjectId btrId = AcadBlocks.BlockTools.CreateBlockTableRecordEx(_insertPoint, "*U", Entities.Select(x => (Entity)x.Clone()).ToList(), AnnotativeStates.True);
                 ObjectId brId = AcadBlocks.BlockTools.AddBlockRefToModelSpace(btrId, null, _insertPoint, _ucs);
 
-                Tools.StartTransaction(() =>
-                {
+                Tools.StartTransaction(() => {
                     BlockReference br = brId.GetObjectForWrite<BlockReference>();
                     br.SetDatabaseDefaults(HostApplicationServices.WorkingDatabase);
                     br.RecordGraphicsModified(true);
@@ -204,18 +182,16 @@ namespace IgorKL.ACAD3.Model.Drawing
                     var btr = br.BlockTableRecord.GetObjectForWrite<BlockTableRecord>();
                     br.Erase();
                     btr.EraseBolckTableRecord();
-                    inMemoryEntity.Dispose(); 
+                    inMemoryEntity.Dispose();
                 });
             }
 
             return true;
         }
 
-        protected override SamplerStatus Sampler(JigPrompts prompts)
-        {
+        protected override SamplerStatus Sampler(JigPrompts prompts) {
             JigPromptPointOptions ppo = new JigPromptPointOptions("\nУкажите фактическое положение");
-            if (!_jigSelected)
-            {
+            if (!_jigSelected) {
                 ppo.Keywords.Add("Exit", "ВЫХод", "ВЫХод", true, true);
                 ppo.BasePoint = _insertPoint.TransformBy(_ucs);
 
@@ -225,28 +201,23 @@ namespace IgorKL.ACAD3.Model.Drawing
 
                 if (ppr.Status != PromptStatus.OK)
                     return SamplerStatus.Cancel;
-                if (ppr.Status == PromptStatus.Keyword)
-                {
-                    switch (ppr.StringResult)
-                    {
-                        case "Exit":
-                            {
-                                return SamplerStatus.Cancel;
-                            }
+                if (ppr.Status == PromptStatus.Keyword) {
+                    switch (ppr.StringResult) {
+                        case "Exit": {
+                            return SamplerStatus.Cancel;
+                        }
                     }
                 }
 
                 _destPoint = ppr.Value.TransformBy(_ucs.Inverse());
                 _jigDestPoint = _destPoint;
 
-                
+
 
                 _arrow.Calculate(_destPoint);
 
                 return SamplerStatus.OK;
-            }
-            else
-            {
+            } else {
                 ppo = new JigPromptPointOptions("\nУкажите сторону отрисовки");
                 ppo.UseBasePoint = true;
                 ppo.BasePoint = _insertPoint.TransformBy(_ucs);
@@ -258,12 +229,10 @@ namespace IgorKL.ACAD3.Model.Drawing
                 if (ppr.Status != PromptStatus.OK)
                     return SamplerStatus.Cancel;
                 {
-                    switch (ppr.StringResult)
-                    {
-                        case "Exit":
-                            {
-                                return SamplerStatus.Cancel;
-                            }
+                    switch (ppr.StringResult) {
+                        case "Exit": {
+                            return SamplerStatus.Cancel;
+                        }
                     }
                 }
                 //Tools.GetAcadEditor().DrawVector(ppo.BasePoint, ppr.Value, 1, true);
@@ -279,40 +248,33 @@ namespace IgorKL.ACAD3.Model.Drawing
             }
         }
 
-        public override PromptStatus JigDraw()
-        {
+        public override PromptStatus JigDraw() {
             _jigSelected = false;
             var promptStatus = base.JigDraw();
-            if (promptStatus == PromptStatus.OK)
-            {
+            if (promptStatus == PromptStatus.OK) {
                 _jigSelected = true;
                 base.JigDraw();
             }
             return promptStatus;
         }
 
-        public PromptStatus JigDraw(bool isDestPointSelected)
-        {
+        public PromptStatus JigDraw(bool isDestPointSelected) {
             PromptStatus promptStatus = PromptStatus.OK;
-            if (!isDestPointSelected)
-            {
+            if (!isDestPointSelected) {
                 _jigSelected = false;
                 promptStatus = base.JigDraw();
             }
-            if (promptStatus == PromptStatus.OK)
-            {
+            if (promptStatus == PromptStatus.OK) {
                 _jigSelected = true;
                 base.JigDraw();
             }
             return promptStatus;
         }
 
-        public void SaveToDatabase()
-        {
+        public void SaveToDatabase() {
             ObjectId btrId = AcadBlocks.BlockTools.CreateBlockTableRecordEx(_insertPoint, "*U", Entities, AnnotativeStates.True);
             ObjectId brId = AcadBlocks.BlockTools.AddBlockRefToModelSpace(btrId, null, _insertPoint, _ucs);
-            Tools.StartTransaction(() =>
-            {
+            Tools.StartTransaction(() => {
                 BlockReference br = brId.GetObjectForWrite<BlockReference>();
                 br.SetDatabaseDefaults(HostApplicationServices.WorkingDatabase);
                 br.RecordGraphicsModified(true);
@@ -334,8 +296,7 @@ namespace IgorKL.ACAD3.Model.Drawing
             });
         }
 
-        private AttributeDefinition _convertToAttribute(DBText text)
-        {
+        private AttributeDefinition _convertToAttribute(DBText text) {
             AttributeDefinition ad = new AttributeDefinition();
             ad.SetDatabaseDefaults(HostApplicationServices.WorkingDatabase);
             ad.TextString = text.TextString;
@@ -355,16 +316,14 @@ namespace IgorKL.ACAD3.Model.Drawing
             return ad;
         }
 
-        private void _showSettingMenu()
-        {
+        private void _showSettingMenu() {
             var menu = MainMenu.MainPaletteSet.CreatedInstance;
             var arrowControl = new Views.AnchorArrowView();
             menu.AddControl("Анкера (настройки)", arrowControl);
             menu.Show();
         }
 
-        public class Arrow : DrawJig
-        {
+        public class Arrow : DrawJig {
             private double _length;
             private double _arrowBlug;
             private double _arrowLength;
@@ -393,8 +352,7 @@ namespace IgorKL.ACAD3.Model.Drawing
             public Point3d InsertPoint { get { return _position; } }
 
             public Arrow(Point3d position, Matrix3d ucs)
-                : base()
-            {
+                : base() {
                 _initDefValues();
 
                 _numFormat = "#0" + (_digitalCount > 0 ? "0".TakeWhile((x, i) => i++ < _digitalCount) : "");
@@ -407,8 +365,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                 _safeObject = new SafeObject(this);
             }
 
-            private void _initDefValues()
-            {
+            private void _initDefValues() {
                 _length = 3.5d;
                 _arrowBlug = 0.7d;
                 _arrowLength = 1.5d;
@@ -418,8 +375,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                 _digitalCount = 0;
             }
 
-            private void _createPLine(Point3d origin)
-            {
+            private void _createPLine(Point3d origin) {
                 Polyline pline = new Polyline(3);
                 pline.AddVertexAt(0, new Point3d(origin.X + _spaceLength, origin.Y, 0), 0, 0, 0);
                 pline.AddVertexAt(1, new Point2d(pline.GetPoint2dAt(0).X + _length, pline.GetPoint2dAt(0).Y), 0, _arrowBlug, 0);
@@ -431,8 +387,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                     Matrix3d.Rotation(Math.PI / 2, Matrix3d.Identity.CoordinateSystem3d.Zaxis, origin));
             }
 
-            public void Calculate(Point3d destPoint)
-            {
+            public void Calculate(Point3d destPoint) {
                 _createPLine(_origin);
                 _createText();
 
@@ -466,8 +421,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                 _transformThisBy(Matrix3d.Identity.PostMultiplyBy(Matrix3d.Displacement(_position - _origin)));
             }
 
-            public void Redirect(Point3d jigPoint)
-            {
+            public void Redirect(Point3d jigPoint) {
                 if (_jigPoint != jigPoint)
                     _jigPoint = jigPoint;
 
@@ -498,8 +452,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                 _verticalText.AdjustAlignment(HostApplicationServices.WorkingDatabase);
             }
 
-            private void _createText()
-            {
+            private void _createText() {
                 DBText hText = new DBText();
                 hText.SetDatabaseDefaults(HostApplicationServices.WorkingDatabase);
                 hText.Annotative = AnnotativeStates.False;
@@ -535,8 +488,7 @@ namespace IgorKL.ACAD3.Model.Drawing
             }
 
 
-            private void _transformThisBy(Matrix3d transform)
-            {
+            private void _transformThisBy(Matrix3d transform) {
                 _horizontPline.TransformBy(transform);
                 _verticalPline.TransformBy(transform);
 
@@ -548,17 +500,14 @@ namespace IgorKL.ACAD3.Model.Drawing
             }
 
 
-            protected override bool WorldDraw(Autodesk.AutoCAD.GraphicsInterface.WorldDraw draw)
-            {
+            protected override bool WorldDraw(Autodesk.AutoCAD.GraphicsInterface.WorldDraw draw) {
                 List<Entity> inMemorySet = Explode();
 
-                foreach (var ent in inMemorySet)
-                {
+                foreach (var ent in inMemorySet) {
                     draw.Geometry.Draw(ent);
                 }
 
-                foreach (var ent in inMemorySet)
-                {
+                foreach (var ent in inMemorySet) {
                     ent.Dispose();
                 }
 
@@ -567,8 +516,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                 return true;
             }
 
-            public List<Entity> Explode()
-            {
+            public List<Entity> Explode() {
                 List<Entity> inMemorySet = new List<Entity>();
 
                 inMemorySet.Add((Entity)_horizontPline.Clone());
@@ -579,10 +527,8 @@ namespace IgorKL.ACAD3.Model.Drawing
                 return inMemorySet;
             }
 
-            protected override SamplerStatus Sampler(JigPrompts prompts)
-            {
-                if (!_pasted)
-                {
+            protected override SamplerStatus Sampler(JigPrompts prompts) {
+                if (!_pasted) {
                     JigPromptPointOptions ppo = new JigPromptPointOptions("\nУкажите фактическое положение");
                     ppo.UseBasePoint = true;
                     ppo.BasePoint = _position;
@@ -602,9 +548,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                     Calculate(_destPoint);
 
                     return SamplerStatus.OK;
-                }
-                else
-                {
+                } else {
                     JigPromptPointOptions ppo = new JigPromptPointOptions("\nУкажите положение отрисовки");
                     ppo.UseBasePoint = true;
                     ppo.BasePoint = _position;
@@ -627,12 +571,10 @@ namespace IgorKL.ACAD3.Model.Drawing
                 }
             }
 
-            public PromptStatus DrawJig()
-            {
+            public PromptStatus DrawJig() {
                 _pasted = false;
                 PromptResult promptResult = Tools.GetAcadEditor().Drag(this);
-                if (promptResult.Status == PromptStatus.OK)
-                {
+                if (promptResult.Status == PromptStatus.OK) {
                     _pasted = true;
                     promptResult = Tools.GetAcadEditor().Drag(this);
 
@@ -640,27 +582,22 @@ namespace IgorKL.ACAD3.Model.Drawing
                 return promptResult.Status;
             }
 
-            public void SerializeTo(Entity ent)
-            {
+            public void SerializeTo(Entity ent) {
                 _safeObject.SaveToEntity(ent);
             }
 
             [Serializable]
-            public class SafeObject : CustomObjects.Helpers.CustomObjectSerializer
-            {
+            public class SafeObject : CustomObjects.Helpers.CustomObjectSerializer {
                 private Arrow _arrow;
-                public SafeObject(Arrow arrow)
-                {
+                public SafeObject(Arrow arrow) {
                     _arrow = arrow;
                 }
 
-                public static string AppName
-                {
+                public static string AppName {
                     get { return "ICmdExtensions_AnchorArrow"; }
                 }
 
-                public override string ApplicationName
-                {
+                public override string ApplicationName {
                     get { return AppName; }
                 }
 
@@ -668,8 +605,7 @@ namespace IgorKL.ACAD3.Model.Drawing
 
                 [System.Security.Permissions.SecurityPermission(System.Security.Permissions.SecurityAction.LinkDemand,
                 Flags = System.Security.Permissions.SecurityPermissionFlag.SerializationFormatter)]
-                public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
-                {
+                public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) {
                     info.AddValue("Ucs", _arrow._ucs.ToArray());
                     info.AddValue("DestPoint", _arrow._destPoint.ToArray());
                     info.AddValue("InsertPoint", _arrow.InsertPoint.ToArray());
@@ -682,8 +618,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                 }
 
                 protected SafeObject(
-              System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
-                {
+              System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) {
                     if (info == null)
                         throw new System.ArgumentNullException("info");
 
@@ -692,7 +627,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                     _arrow = new Arrow(position, ucs);
                     _arrow._destPoint = new Point3d((double[])info.GetValue("DestPoint", typeof(double[])));
                     _arrow._jigPoint = new Point3d((double[])info.GetValue("JigPoint", typeof(double[])));
-                    
+
                     /*_arrow._horizontPline.EditPolylineIneertPoints(
                         ((double[][])info.GetValue("HorizontPline", typeof(double[][]))).Select<double[],Point3d>(arr =>
                         
@@ -710,6 +645,6 @@ namespace IgorKL.ACAD3.Model.Drawing
                 }
             }
         }
-            
+
     }
 }

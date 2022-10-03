@@ -14,13 +14,10 @@ using Autodesk.Civil.DatabaseServices;
 using IgorKL.ACAD3.Model.Helpers.SdrFormat;
 using wnd = System.Windows.Forms;
 
-namespace IgorKL.ACAD3.Model.Commands
-{
-    public partial class DimensionCmd
-    {
+namespace IgorKL.ACAD3.Model.Commands {
+    public partial class DimensionCmd {
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_EditDimensionValueRandom", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public void EditDimensionValueRandom()
-        {
+        public void EditDimensionValueRandom() {
             var keywords = new { PositiveOnly = "PositiveOnly", NegativeOnly = "NegativeOnly", Both = "Both" };
 
             List<Dimension> dimensions;
@@ -57,10 +54,8 @@ namespace IgorKL.ACAD3.Model.Commands
 
             Random random = new Random(DateTime.Now.Second);
 
-            using (Transaction trans = Tools.StartTransaction())
-            {
-                foreach (Dimension d in dimensions)
-                {
+            using (Transaction trans = Tools.StartTransaction()) {
+                foreach (Dimension d in dimensions) {
                     Dimension dbObj = trans.GetObject(d.Id, OpenMode.ForRead) as Dimension;
                     if (dbObj == null)
                         continue;
@@ -77,8 +72,7 @@ namespace IgorKL.ACAD3.Model.Commands
                     }*/
 
                     string format = "#0";
-                    if (dbObj.Dimdec > 0)
-                    {
+                    if (dbObj.Dimdec > 0) {
                         format += ".";
                         for (int i = 0; i < dbObj.Dimdec; i++)
                             format += "0";
@@ -94,8 +88,7 @@ namespace IgorKL.ACAD3.Model.Commands
         }
 
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_AddDimensionValueRandom", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public void AddDimensionValueRandom()
-        {
+        public void AddDimensionValueRandom() {
             var keywords = new { PositiveOnly = "PositiveOnly", NegativeOnly = "NegativeOnly", Both = "Both" };
 
             List<Dimension> dimensions;
@@ -132,10 +125,8 @@ namespace IgorKL.ACAD3.Model.Commands
 
             Random random = new Random(DateTime.Now.Second);
 
-            using (Transaction trans = Tools.StartTransaction())
-            {
-                foreach (Dimension d in dimensions)
-                {
+            using (Transaction trans = Tools.StartTransaction()) {
+                foreach (Dimension d in dimensions) {
                     Dimension dbObj = trans.GetObject(d.Id, OpenMode.ForRead) as Dimension;
                     if (dbObj == null)
                         continue;
@@ -149,8 +140,7 @@ namespace IgorKL.ACAD3.Model.Commands
                         continue;
 
                     string format = "#0";
-                    if (dbObj.Dimdec > 0)
-                    {
+                    if (dbObj.Dimdec > 0) {
                         format += ".";
                         for (int i = 0; i < dbObj.Dimdec; i++)
                             format += "0";

@@ -1,20 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.EditorInput;
-
 using IgorKL.ACAD3.Model.Extensions;
+using System;
+using System.Linq;
 
-namespace IgorKL.ACAD3.Model.Drawing
-{
-    public class SimpleGride
-    {
+namespace IgorKL.ACAD3.Model.Drawing {
+    public class SimpleGride {
         private Rectangle3d _firstRectg;
         private Vector3d _toLeftUpVector;
         private Vector3d _toRightLowVector;
@@ -25,11 +16,10 @@ namespace IgorKL.ACAD3.Model.Drawing
         public double VerticalStep { get { return _verticalStep; } }
         public double HorizontalStep { get { return _horizontalStep; } }
 
-        public SimpleGride(Rectangle3d firstRectg)
-        {
+        public SimpleGride(Rectangle3d firstRectg) {
             _firstRectg = firstRectg;
             _insertPoint = _firstRectg.LowerLeft;
-            
+
             _toRightLowVector = firstRectg.LowerRight - firstRectg.LowerLeft;
             _toLeftUpVector = firstRectg.UpperLeft - firstRectg.LowerLeft;
 
@@ -40,11 +30,10 @@ namespace IgorKL.ACAD3.Model.Drawing
             _toLeftUpVector = _toLeftUpVector.Normalize();
         }
 
-        public SimpleGride(Point3d insertPoint, Vector3d toLeftUpVector, Vector3d toRightLowVector, double verticalStep, double horizontalStep)
-        {
+        public SimpleGride(Point3d insertPoint, Vector3d toLeftUpVector, Vector3d toRightLowVector, double verticalStep, double horizontalStep) {
             _toRightLowVector = toRightLowVector.Normalize();
             _toLeftUpVector = toLeftUpVector.Normalize();
-            
+
             _verticalStep = verticalStep;
             _horizontalStep = horizontalStep;
 
@@ -63,34 +52,29 @@ namespace IgorKL.ACAD3.Model.Drawing
         }
 
 
-        public Vector3d HorizontalVector
-        {
+        public Vector3d HorizontalVector {
             get { return _firstRectg.LowerRight - _firstRectg.LowerLeft; }
         }
 
-        public Vector3d VerticalVector
-        {
+        public Vector3d VerticalVector {
             get { return _firstRectg.UpperLeft - _firstRectg.LowerLeft; }
         }
 
-        public Polyline CalculateRectagle(int rowNumber, int columnNumber)
-        {
-            Matrix3d mat = Matrix3d.Displacement(_toRightLowVector.MultiplyBy(columnNumber*_horizontalStep));
-            mat = mat.PreMultiplyBy(Matrix3d.Displacement(_toLeftUpVector.MultiplyBy(rowNumber*_verticalStep)));
+        public Polyline CalculateRectagle(int rowNumber, int columnNumber) {
+            Matrix3d mat = Matrix3d.Displacement(_toRightLowVector.MultiplyBy(columnNumber * _horizontalStep));
+            mat = mat.PreMultiplyBy(Matrix3d.Displacement(_toLeftUpVector.MultiplyBy(rowNumber * _verticalStep)));
 
             Polyline pline = _firstRectg.ConvertToPolyline(mat);
             return pline;
         }
-        public Polyline CalculateRectagle(int rowNumber, int columnNumber, Polyline polygon, bool allowInnerInside)
-        {
+        public Polyline CalculateRectagle(int rowNumber, int columnNumber, Polyline polygon, bool allowInnerInside) {
             Matrix3d mat = Matrix3d.Displacement(_toRightLowVector.MultiplyBy(columnNumber * _horizontalStep));
             mat = mat.PreMultiplyBy(Matrix3d.Displacement(_toLeftUpVector.MultiplyBy(rowNumber * _verticalStep)));
 
             Polyline pline = _firstRectg.ConvertToPolyline(mat);
 
             var points = pline.GetPoints().ToEnumerable();
-            if (!points.Any(p => polygon.IsInsidePolygon(p)))
-            {
+            if (!points.Any(p => polygon.IsInsidePolygon(p))) {
                 if (!allowInnerInside)
                     return null;
                 else if (!polygon.GetPoints().ToEnumerable().Any(p => pline.IsInsidePolygon(p)))
@@ -99,8 +83,7 @@ namespace IgorKL.ACAD3.Model.Drawing
             return pline;
         }
 
-        public Point3d CalculateGridPoint(int rowNumber, int columnNumber)
-        {
+        public Point3d CalculateGridPoint(int rowNumber, int columnNumber) {
             Matrix3d mat = Matrix3d.Displacement(_toRightLowVector.MultiplyBy(columnNumber * _horizontalStep));
             mat = mat.PreMultiplyBy(Matrix3d.Displacement(_toLeftUpVector.MultiplyBy(rowNumber * _verticalStep)));
 
@@ -108,8 +91,7 @@ namespace IgorKL.ACAD3.Model.Drawing
             return point;
         }
 
-        public int GetRowNumber(Point3d point)
-        {
+        public int GetRowNumber(Point3d point) {
             if (point.IsEqualTo(_insertPoint, Tolerance.Global))
                 return 0;
 
@@ -118,8 +100,7 @@ namespace IgorKL.ACAD3.Model.Drawing
             return (int)(yval / _verticalStep);
         }
 
-        public int GetColumnNumber(Point3d point)
-        {
+        public int GetColumnNumber(Point3d point) {
             if (point.IsEqualTo(_insertPoint, Tolerance.Global))
                 return 0;
 
@@ -128,10 +109,9 @@ namespace IgorKL.ACAD3.Model.Drawing
             return (int)(xval / _horizontalStep);
         }
 
-        public static Rectangle3d CreateRectangle(Point3d leftLowPoint, Point3d rightHighPoint, CoordinateSystem3d cs)
-        {
-            Vector3d verticalVector = cs.Yaxis.MultiplyBy((rightHighPoint-leftLowPoint).Y);
-            Vector3d horizontalVector = cs.Xaxis.MultiplyBy((rightHighPoint-leftLowPoint).X);
+        public static Rectangle3d CreateRectangle(Point3d leftLowPoint, Point3d rightHighPoint, CoordinateSystem3d cs) {
+            Vector3d verticalVector = cs.Yaxis.MultiplyBy((rightHighPoint - leftLowPoint).Y);
+            Vector3d horizontalVector = cs.Xaxis.MultiplyBy((rightHighPoint - leftLowPoint).X);
 
             Point3d lowerLeft = leftLowPoint;
             Point3d lowerRight = leftLowPoint.Add(horizontalVector);
@@ -148,8 +128,7 @@ namespace IgorKL.ACAD3.Model.Drawing
             return rectg;
         }
 
-        public static int CalculateCeilingCount(Vector3d vector, double step)
-        {
+        public static int CalculateCeilingCount(Vector3d vector, double step) {
             return (int)Math.Ceiling(vector.Length / step);
         }
     }

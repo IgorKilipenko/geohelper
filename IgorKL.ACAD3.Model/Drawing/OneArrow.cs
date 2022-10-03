@@ -1,38 +1,27 @@
-﻿using System;
+﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Geometry;
+using IgorKL.ACAD3.Model.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.EditorInput;
+namespace IgorKL.ACAD3.Model.Drawing {
+    public class OneArrow {
 
-using display = IgorKL.ACAD3.Model.Helpers.Display;
-using IgorKL.ACAD3.Model.Extensions;
-
-namespace IgorKL.ACAD3.Model.Drawing
-{
-    public class OneArrow
-    {
-        
 #if DEBUG
         [RibbonCommandButton("Одна стрелка", "Стрелки")]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmdTest_DrawOneArrow", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public static void DrawOneArrow()
-        {
+        public static void DrawOneArrow() {
             Curve curve = PromptCurve();
             if (curve == null)
                 return;
             Polyline pline = null;
-            Tools.StartTransaction(() =>
-            {
+            Tools.StartTransaction(() => {
                 pline = curve.ConvertToPolyline();
             });
             PromptStatus res = PromptStatus.OK;
-            while (res == PromptStatus.OK)
-            {
+            while (res == PromptStatus.OK) {
                 var pos = PromptPosition();
                 //var vec = PromptVector();
                 if (!pos.HasValue)
@@ -45,10 +34,8 @@ namespace IgorKL.ACAD3.Model.Drawing
 
                 Arrow arrow = new Arrow(pos.Value, vec, Matrix3d.Identity);
 
-                Tools.StartTransaction(() =>
-                {
-                    if ((res = arrow.DrawJig()) == PromptStatus.OK)
-                    {
+                Tools.StartTransaction(() => {
+                    if ((res = arrow.DrawJig()) == PromptStatus.OK) {
                         arrow.SaveToDatabase();
                     }
                 });
@@ -56,8 +43,7 @@ namespace IgorKL.ACAD3.Model.Drawing
         }
 #endif
 
-        public static Vector3d? PromptVector()
-        {
+        public static Vector3d? PromptVector() {
             Curve curve;
             if (!ObjectCollector.TrySelectAllowedClassObject(out curve))
                 return null;
@@ -65,8 +51,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                 return curve.EndPoint - curve.StartPoint;
         }
 
-        public static Curve PromptCurve()
-        {
+        public static Curve PromptCurve() {
             Curve curve;
             if (!ObjectCollector.TrySelectAllowedClassObject(out curve))
                 return null;
@@ -74,8 +59,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                 return curve;
         }
 
-        public static Point3d? PromptPosition(KeywordCollection keywords = null, ObjectCollector.PromptAction promptAction = null)
-        {
+        public static Point3d? PromptPosition(KeywordCollection keywords = null, ObjectCollector.PromptAction promptAction = null) {
             PromptPointOptions ppo = new PromptPointOptions("\nУкажите проектное положение: ");
             ppo.UseBasePoint = false;
             if (keywords != null)
@@ -83,10 +67,8 @@ namespace IgorKL.ACAD3.Model.Drawing
                     ppo.Keywords.Add(key.GlobalName, key.LocalName, key.DisplayName, key.Visible, key.Enabled);
 
             var ppr = Tools.GetAcadEditor().GetPoint(ppo);
-            if (ppr.Status == PromptStatus.Keyword)
-            {
-                if (promptAction != null)
-                {
+            if (ppr.Status == PromptStatus.Keyword) {
+                if (promptAction != null) {
                     PromptStatus res = promptAction(ppr);
                     if (res != PromptStatus.OK)
                         return null;
@@ -100,8 +82,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                 return ppr.Value;
         }
 
-        public class Arrow : DrawJig
-        {
+        public class Arrow : DrawJig {
             private double _length;
             private double _arrowBlug;
             private double _arrowLength;
@@ -110,7 +91,7 @@ namespace IgorKL.ACAD3.Model.Drawing
             private int _unitScale;
             private int _digitalCount;
             private string _numFormat;
-            
+
             private Polyline _pline;
             private DBText _text;
             private Point3d _position;
@@ -122,8 +103,7 @@ namespace IgorKL.ACAD3.Model.Drawing
 
             List<Entity> _inMemorySet;
 
-            public Arrow(Point3d position, Vector3d vector, Matrix3d ucs)
-            {
+            public Arrow(Point3d position, Vector3d vector, Matrix3d ucs) {
                 _initDefValues();
                 _numFormat = "#0" + (_digitalCount > 0 ? "0".TakeWhile((x, i) => i++ < _digitalCount) : "");
                 _position = position;
@@ -133,9 +113,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                 _inMemorySet = new List<Entity>();
             }
 
-
-            private void _initDefValues()
-            {
+            private void _initDefValues() {
                 _length = 3.5d;
                 _arrowBlug = 0.7d;
                 _arrowLength = 1.5d;
@@ -145,8 +123,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                 _digitalCount = 0;
             }
 
-            private void _createPLine(Point3d origin)
-            {
+            private void _createPLine(Point3d origin) {
                 Polyline pline = new Polyline(3);
                 pline.AddVertexAt(0, new Point3d(origin.X + _spaceLength, origin.Y, 0), 0, 0, 0);
                 pline.AddVertexAt(1, new Point2d(pline.GetPoint2dAt(0).X + _length, pline.GetPoint2dAt(0).Y), 0, _arrowBlug, 0);
@@ -156,8 +133,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                 _pline = pline;
             }
 
-            public void Calculate(Point3d destPoint)
-            {
+            public void Calculate(Point3d destPoint) {
                 _createPLine(Point3d.Origin);
                 _createText();
 
@@ -187,11 +163,10 @@ namespace IgorKL.ACAD3.Model.Drawing
                 _transformThisBy(Matrix3d.Identity.PostMultiplyBy(Matrix3d.Displacement(_position - Point3d.Origin)));
             }
 
-            public void Redirect(Point3d jigPoint)
-            {
+            public void Redirect(Point3d jigPoint) {
                 if (_jigPoint != jigPoint)
                     _jigPoint = jigPoint;
-                
+
                 double ang = Vector3d.YAxis.GetAngle2d(_vector);
                 Matrix3d hMat = Matrix3d.Identity;
                 Vector3d vector = jigPoint - _position;
@@ -212,8 +187,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                 _text.AdjustAlignment(HostApplicationServices.WorkingDatabase);
             }
 
-            private void _createText()
-            {
+            private void _createText() {
                 DBText hText = new DBText();
                 hText.SetDatabaseDefaults(HostApplicationServices.WorkingDatabase);
                 hText.Annotative = AnnotativeStates.False;
@@ -228,23 +202,19 @@ namespace IgorKL.ACAD3.Model.Drawing
                 _text.AdjustAlignment(HostApplicationServices.WorkingDatabase);
             }
 
-            private void _transformThisBy(Matrix3d transform)
-            {
+            private void _transformThisBy(Matrix3d transform) {
                 _pline.TransformBy(transform);
                 _text.TransformBy(transform);
                 _text.AdjustAlignment(HostApplicationServices.WorkingDatabase);
             }
 
-            protected override bool WorldDraw(Autodesk.AutoCAD.GraphicsInterface.WorldDraw draw)
-            {
+            protected override bool WorldDraw(Autodesk.AutoCAD.GraphicsInterface.WorldDraw draw) {
                 _inMemorySet.Add(_setToBlock(Explode()));
-                foreach (var ent in _inMemorySet)
-                {
+                foreach (var ent in _inMemorySet) {
                     draw.Geometry.Draw(ent);
                 }
 
-                foreach (var ent in _inMemorySet)
-                {
+                foreach (var ent in _inMemorySet) {
                     /*ent.Dispose();*/
                     var btrId = ((BlockReference)ent).BlockTableRecord;
                     BlockTableRecord btr = btrId.GetObjectForRead<BlockTableRecord>();
@@ -254,8 +224,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                     ent.DowngradeOpen();
 
                     //btr.UpgradeOpen();
-                    foreach (var item in btr)
-                    {
+                    foreach (var item in btr) {
                         DBObject obj = item.GetObjectForWrite<DBObject>();
                         obj.Erase(true);
                     }
@@ -265,8 +234,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                 return true;
             }
 
-            public List<Entity> Explode()
-            {
+            public List<Entity> Explode() {
                 List<Entity> inMemorySet = new List<Entity>();
 
                 inMemorySet.Add((Entity)_pline.Clone());
@@ -275,10 +243,8 @@ namespace IgorKL.ACAD3.Model.Drawing
                 return inMemorySet;
             }
 
-            protected override SamplerStatus Sampler(JigPrompts prompts)
-            {
-                if (!_pasted)
-                {
+            protected override SamplerStatus Sampler(JigPrompts prompts) {
+                if (!_pasted) {
                     JigPromptPointOptions ppo = new JigPromptPointOptions("\nУкажите фактическое положение");
                     ppo.UseBasePoint = true;
                     ppo.BasePoint = _position;
@@ -298,9 +264,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                     Calculate(_destPoint);
 
                     return SamplerStatus.OK;
-                }
-                else
-                {
+                } else {
                     JigPromptPointOptions ppo = new JigPromptPointOptions("\nУкажите положение отрисовки");
                     ppo.UseBasePoint = true;
                     ppo.BasePoint = _position;
@@ -324,12 +288,10 @@ namespace IgorKL.ACAD3.Model.Drawing
             }
 
 
-            public PromptStatus DrawJig()
-            {
+            public PromptStatus DrawJig() {
                 _pasted = false;
                 PromptResult promptResult = Tools.GetAcadEditor().Drag(this);
-                if (promptResult.Status == PromptStatus.OK)
-                {
+                if (promptResult.Status == PromptStatus.OK) {
                     _pasted = true;
                     promptResult = Tools.GetAcadEditor().Drag(this);
 
@@ -338,8 +300,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                 return promptResult.Status;
             }
 
-            private AttributeDefinition _convertToAttribute(DBText text)
-            {
+            private AttributeDefinition _convertToAttribute(DBText text) {
                 AttributeDefinition ad = new AttributeDefinition();
                 ad.SetDatabaseDefaults(HostApplicationServices.WorkingDatabase);
                 ad.TextString = text.TextString;
@@ -359,31 +320,25 @@ namespace IgorKL.ACAD3.Model.Drawing
                 return ad;
             }
 
-            public void SaveToDatabase()
-            {
+            public void SaveToDatabase() {
                 List<Entity> entities = new List<Entity>();
                 var items = Explode();
                 entities.AddRange(items);
                 _setToBlock(entities);
             }
 
-            private BlockReference _setToBlock(IEnumerable<Entity> entities)
-            {
+            private BlockReference _setToBlock(IEnumerable<Entity> entities) {
                 List<Entity> ents = new List<Entity>(entities.Count());
                 var text = entities.FirstOrDefault(x => x is DBText);
-                if (text != null)
-                {
+                if (text != null) {
                     var attr = _convertToAttribute((DBText)text);
-                    foreach (var e in entities)
-                    {
-                        if (e  != text)
+                    foreach (var e in entities) {
+                        if (e != text)
                             ents.Add(e);
                         else
                             ents.Add(attr);
                     }
-                }
-                else
-                {
+                } else {
                     ents.AddRange(entities);
                 }
 

@@ -12,9 +12,7 @@ using Autodesk.AutoCAD.Geometry;
 using IgorKL.ACAD3.Model.AcadBlocks;
 using wnd = System.Windows.Forms;
 
-namespace IgorKL.ACAD3.Model.Commands
-{
-    public class CoordinateSystemCmd
-    {
+namespace IgorKL.ACAD3.Model.Commands {
+    public class CoordinateSystemCmd {
     }
 }

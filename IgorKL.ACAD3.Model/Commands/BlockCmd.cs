@@ -8,17 +8,14 @@ using Autodesk.AutoCAD.EditorInput;
 using IgorKL.ACAD3.Model.AcadBlocks;
 using IgorKL.ACAD3.Model.Extensions;
 
-namespace IgorKL.ACAD3.Model.Commands
-{
-    public class BlockCmd
-    {
+namespace IgorKL.ACAD3.Model.Commands {
+    public class BlockCmd {
 #if DEBUG
 
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmdTest_TestAnonyBlock", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public void TestAnonyBlock()
-        {
+        public void TestAnonyBlock() {
             Polyline pline = new Polyline(3);
-            pline.AddVertexAt(0, new Point2d(0,0), 0, 0, 0);
+            pline.AddVertexAt(0, new Point2d(0, 0), 0, 0, 0);
             pline.AddVertexAt(1, new Point2d(pline.GetPoint2dAt(0).X + 3, pline.GetPoint2dAt(0).Y), 0, 0.4, 0);
             pline.AddVertexAt(2, new Point2d(pline.GetPoint2dAt(1).X + 1.5, pline.GetPoint2dAt(1).Y), 0, 0, 0);
             pline.LineWeight = LineWeight.LineWeight020;
@@ -27,26 +24,24 @@ namespace IgorKL.ACAD3.Model.Commands
 
             Matrix3d ucs = CoordinateSystem.CoordinateTools.GetCurrentUcs();
 
-            var btrId = BlockTools.CreateBlockTableRecordEx(Point3d.Origin ,"test11111", new[] { (Entity)pline, (Entity)ad }.ToList(), AnnotativeStates.True);
-            var brId = BlockTools.AddBlockRefToModelSpace(btrId, new[] {"3"}.ToList(), new Point3d(10, 10, 10), ucs);
+            var btrId = BlockTools.CreateBlockTableRecordEx(Point3d.Origin, "test11111", new[] { (Entity)pline, (Entity)ad }.ToList(), AnnotativeStates.True);
+            var brId = BlockTools.AddBlockRefToModelSpace(btrId, new[] { "3" }.ToList(), new Point3d(10, 10, 10), ucs);
 
-            using (Transaction trans = Tools.StartTransaction())
-            {
+            using (Transaction trans = Tools.StartTransaction()) {
                 BlockReference br = (BlockReference)brId.GetObject(OpenMode.ForRead, false, true);
                 br.UpgradeOpen();
-                br.TransformBy(Matrix3d.Rotation(Math.PI/2d, ucs.CoordinateSystem3d.Zaxis, br.Position));
+                br.TransformBy(Matrix3d.Rotation(Math.PI / 2d, ucs.CoordinateSystem3d.Zaxis, br.Position));
                 //br.Erase(true);
                 trans.Commit();
             }
 
             AttributeReference ar;
-            using (Transaction trans = Tools.StartTransaction())
-            {
+            using (Transaction trans = Tools.StartTransaction()) {
                 BlockReference br = (BlockReference)brId.GetObject(OpenMode.ForRead, true, true);
                 ar = br.GetAttributeByTag(ad.Tag, trans);
-                ar = (AttributeReference)ar.Id.GetObject(OpenMode.ForRead, true,true);
+                ar = (AttributeReference)ar.Id.GetObject(OpenMode.ForRead, true, true);
                 var anBtrId = BlockTools.GetAnonymCopy(brId, trans, false);
-                var anBrId = BlockTools.AddBlockRefToModelSpace(anBtrId, new[] {ar.TextString}.ToList(), new Point3d(0, 0, 0), ucs);
+                var anBrId = BlockTools.AddBlockRefToModelSpace(anBtrId, new[] { ar.TextString }.ToList(), new Point3d(0, 0, 0), ucs);
 
                 trans.Commit();
             }
@@ -54,9 +49,8 @@ namespace IgorKL.ACAD3.Model.Commands
 
 
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmdTest_TestAnonyBlock2", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public void TestAnonyBlock2()
-        {
-            
+        public void TestAnonyBlock2() {
+
 
             Matrix3d ucs = CoordinateSystem.CoordinateTools.GetCurrentUcs();
             ArrowDirectional2 adHorizontal = new ArrowDirectional2(ucs, ArrowDirectional2.DirectionMode.Horizontal);
@@ -82,15 +76,13 @@ namespace IgorKL.ACAD3.Model.Commands
             ppr = Tools.GetAcadEditor().GetPoint(ppo);
             if (ppr.Status != PromptStatus.OK)
                 return;
-            
+
             BlockReference br = null;
-            Tools.StartTransaction(() =>
-            {
+            Tools.StartTransaction(() => {
                 br = res.ArrowId.GetObjectForRead<BlockReference>();
                 BlockReference cloneBr = adHorizontal.GetRedirectBlockReferenceCopy(br, ppr.Value);
                 var id = br.GetAnonymClone(cloneBr.Position);
-                if (cloneBr != null)
-                {
+                if (cloneBr != null) {
                     br.UpgradeOpen();
                     br.Erase(true);
                     br = cloneBr;
@@ -102,8 +94,7 @@ namespace IgorKL.ACAD3.Model.Commands
                 Tools.AppendEntityEx(br);
         }
 
-        private AttributeDefinition _createAttribute(Point3d position, Polyline pline)
-        {
+        private AttributeDefinition _createAttribute(Point3d position, Polyline pline) {
             AttributeDefinition acAttDef = new AttributeDefinition();
 
             acAttDef.Verifiable = true;
@@ -124,8 +115,7 @@ namespace IgorKL.ACAD3.Model.Commands
         }
 
 
-        public class ArrowDirectional2
-        {
+        public class ArrowDirectional2 {
             private double defLength = 3d;
             private double defArrowBlug = 0.4d;
             private double defArrowLength = 1.5d;
@@ -145,8 +135,7 @@ namespace IgorKL.ACAD3.Model.Commands
             public ObjectId ArrowId { get; private set; }
 
             public ArrowDirectional2(Matrix3d matrix, DirectionMode mode, double angle = 0d)
-                : base()
-            {
+                : base() {
                 this.BlockTableRecordId = ObjectId.Null;
                 this.Origin = new Point3d(0, 0, 0);
                 this.UcsMatrix = matrix;
@@ -157,27 +146,24 @@ namespace IgorKL.ACAD3.Model.Commands
                 _blockTransform = Matrix3d.Identity;
             }
 
-            private Polyline _createPLine(Point3d origin)
-            {
+            private Polyline _createPLine(Point3d origin) {
                 Polyline pline = new Polyline(3);
                 pline.AddVertexAt(0, origin, 0, 0, 0);
                 pline.AddVertexAt(1, new Point2d(pline.GetPoint2dAt(0).X + (defLength), pline.GetPoint2dAt(0).Y), 0, defArrowBlug, 0);
                 pline.AddVertexAt(2, new Point2d(pline.GetPoint2dAt(1).X + (defArrowLength), pline.GetPoint2dAt(1).Y), 0, 0, 0);
                 pline.LineWeight = LineWeight.LineWeight020;
 
-                if (Mode == DirectionMode.Vertical)
-                {
+                if (Mode == DirectionMode.Vertical) {
                     Matrix3d mat = Matrix3d.Rotation(Math.PI / 2, new Vector3d(0, 0, 1), this.Origin);
                     pline.TransformBy(mat);
                 }
 
                 _entities.Add(pline);
-                
+
                 return pline;
             }
 
-            private AttributeDefinition _createAttribute(Point3d position)
-            {
+            private AttributeDefinition _createAttribute(Point3d position) {
                 AttributeDefinition acAttDef = new AttributeDefinition();
 
                 acAttDef.Verifiable = true;
@@ -209,8 +195,7 @@ namespace IgorKL.ACAD3.Model.Commands
                 return acAttDef;
             }
 
-            private ObjectId _createBlockRecord()
-            {
+            private ObjectId _createBlockRecord() {
                 this._eraseBolckTableRecord();
 
                 this.ArrowLine = _createPLine(new Point3d(this.Origin.X + defSpaceLength, this.Origin.Y, this.Origin.Z));
@@ -224,16 +209,14 @@ namespace IgorKL.ACAD3.Model.Commands
             }
 
 
-            public ArrowDirectional2 PastNewArrowItem(Point3d position, Point3d valuePoint)
-            {
+            public ArrowDirectional2 PastNewArrowItem(Point3d position, Point3d valuePoint) {
                 _createBlockRecord();
 
                 double value = Mode == DirectionMode.Horizontal ?
                     _calcValue(position, valuePoint).X :
                     _calcValue(position, valuePoint).Y;
 
-                if (value < 0)
-                {
+                if (value < 0) {
                     _mirror();
                 }
 
@@ -273,8 +256,7 @@ namespace IgorKL.ACAD3.Model.Commands
                 return this;
             }
 
-            private Vector3d _calcValue(Point3d nomPoint, Point3d factPoint)
-            {
+            private Vector3d _calcValue(Point3d nomPoint, Point3d factPoint) {
                 nomPoint.TransformBy(this.UcsMatrix);
                 factPoint.TransformBy(this.UcsMatrix);
 
@@ -282,8 +264,7 @@ namespace IgorKL.ACAD3.Model.Commands
                 return res;
             }
 
-            private void _mirror()
-            {
+            private void _mirror() {
                 Matrix3d mat;
                 if (Mode == DirectionMode.Horizontal)
                     mat = Matrix3d.Mirroring(new Plane(this.Origin, this.UcsMatrix.CoordinateSystem3d.Yaxis, this.UcsMatrix.CoordinateSystem3d.Zaxis));
@@ -293,10 +274,8 @@ namespace IgorKL.ACAD3.Model.Commands
             }
 
 
-            public BlockReference GetRedirectBlockReferenceCopy(BlockReference br, Point3d directionPoint)
-            {
-                using (Transaction trans = Tools.StartTransaction())
-                {
+            public BlockReference GetRedirectBlockReferenceCopy(BlockReference br, Point3d directionPoint) {
+                using (Transaction trans = Tools.StartTransaction()) {
                     br = (BlockReference)br.Id.GetObject(OpenMode.ForRead, true, true);
                     double ang = 0d;
                     if (Mode == DirectionMode.Horizontal)
@@ -313,11 +292,9 @@ namespace IgorKL.ACAD3.Model.Commands
                     arrow.TransformBy(br.BlockTransform);
 
 
-                    if (Math.Abs(ang) > Math.PI / 2d)
-                    {
+                    if (Math.Abs(ang) > Math.PI / 2d) {
                         Matrix3d mat;
-                        if (this.Mode == DirectionMode.Horizontal)
-                        {
+                        if (this.Mode == DirectionMode.Horizontal) {
                             Vector3d vector;
                             if (br.BlockTransform.CoordinateSystem3d.Xaxis.X >= 0)
                                 vector = br.Position - arrow.EndPoint;
@@ -326,8 +303,7 @@ namespace IgorKL.ACAD3.Model.Commands
                             mat = Matrix3d.Displacement(vector.MultiplyBy(br.BlockTransform.CoordinateSystem3d.Xaxis.X));
                             _transformBy(mat);
                         }
-                        else
-                        {
+                        else {
                             Vector3d vector;
                             if (br.BlockTransform.CoordinateSystem3d.Yaxis.Y >= 0)
                                 vector = br.Position - arrow.EndPoint;
@@ -339,35 +315,28 @@ namespace IgorKL.ACAD3.Model.Commands
 
                         return (BlockReference)br.Clone();
                     }
-                    else
-                    {
+                    else {
                         return null;
                     }
 
                 }
             }
 
-            public enum DirectionMode
-            {
+            public enum DirectionMode {
                 Horizontal = 0,
                 Vertical = 1
             }
 
-            private void _transformBy(Matrix3d matrix, Transaction trans, bool commit)
-            {
-                for (int i = 0; i < _entities.Count; i++)
-                {
+            private void _transformBy(Matrix3d matrix, Transaction trans, bool commit) {
+                for (int i = 0; i < _entities.Count; i++) {
                     Entity ent = _entities[i];
-                    if (ent.ObjectId != ObjectId.Null)
-                    {
+                    if (ent.ObjectId != ObjectId.Null) {
                         ent = (Entity)ent.Id.GetObject(OpenMode.ForWrite, false, true);
                     }
-                    
+
                     ent.TransformBy(matrix);
-                    if (ent is AttributeDefinition)
-                    {
-                        try
-                        {
+                    if (ent is AttributeDefinition) {
+                        try {
                             AttributeDefinition ad = (AttributeDefinition)ent;
                             //_appenedAttriuteDef(ref ad);
                             ad.AdjustAlignment(Tools.GetAcadDatabase());
@@ -375,8 +344,7 @@ namespace IgorKL.ACAD3.Model.Commands
                         catch { }
                     }
                 }
-                if (commit)
-                {
+                if (commit) {
                     /*BlockTableRecord btr = null;
                     if (this.BlockTableRecordId != ObjectId.Null)
                     {
@@ -391,40 +359,30 @@ namespace IgorKL.ACAD3.Model.Commands
                 }
             }
 
-            private void _transformBy(Matrix3d matrix)
-            {
-                using (Transaction trans = Tools.StartTransaction())
-                {
+            private void _transformBy(Matrix3d matrix) {
+                using (Transaction trans = Tools.StartTransaction()) {
                     _transformBy(matrix, trans, true);
                 }
             }
 
-            private Matrix3d _fromUcskToBlock()
-            {
+            private Matrix3d _fromUcskToBlock() {
                 Matrix3d mat = _blockTransform.PreMultiplyBy(this.UcsMatrix);
                 return mat;
             }
 
-            private Matrix3d _fromBlockToUcs()
-            {
+            private Matrix3d _fromBlockToUcs() {
                 Matrix3d mat = this.UcsMatrix.PreMultiplyBy(_blockTransform);
                 return mat;
             }
 
-            private void _eraseBolckTableRecord()
-            {
-                using (Transaction trans = Tools.StartTransaction())
-                {
-                    if (this.BlockTableRecordId != ObjectId.Null)
-                    {
+            private void _eraseBolckTableRecord() {
+                using (Transaction trans = Tools.StartTransaction()) {
+                    if (this.BlockTableRecordId != ObjectId.Null) {
                         BlockTableRecord btr = (BlockTableRecord)this.BlockTableRecordId.GetObject(OpenMode.ForRead, true, true);
-                        if (!btr.IsErased)
-                        {
+                        if (!btr.IsErased) {
                             btr.UpgradeOpen();
-                            using (BlockTableRecordEnumerator enumerator = btr.GetEnumerator())
-                            {
-                                while (enumerator.MoveNext())
-                                {
+                            using (BlockTableRecordEnumerator enumerator = btr.GetEnumerator()) {
+                                while (enumerator.MoveNext()) {
                                     enumerator.Current.GetObject((OpenMode)OpenMode.ForWrite).Erase();
                                 }
                             }
@@ -435,15 +393,12 @@ namespace IgorKL.ACAD3.Model.Commands
                 }
             }
 
-            private void _appenedAttriuteDef(ref AttributeDefinition acAttDef)
-            {
-                if (Mode == DirectionMode.Horizontal)
-                {
+            private void _appenedAttriuteDef(ref AttributeDefinition acAttDef) {
+                if (Mode == DirectionMode.Horizontal) {
                     acAttDef.HorizontalMode = TextHorizontalMode.TextCenter;
                     acAttDef.VerticalMode = TextVerticalMode.TextBase;
                 }
-                else
-                {
+                else {
                     acAttDef.HorizontalMode = TextHorizontalMode.TextRight;
                     acAttDef.VerticalMode = TextVerticalMode.TextVerticalMid;
                 }
@@ -457,20 +412,18 @@ namespace IgorKL.ACAD3.Model.Commands
 
 
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmdTest_TransTest1", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public static void TransTest1()
-        {
-            Point3d startPoint = new Point3d(0,0,0);
+        public static void TransTest1() {
+            Point3d startPoint = new Point3d(0, 0, 0);
             double x = startPoint.X + Helpers.Math.Randoms.RandomGen.Next(20);
             double y = startPoint.Y + Helpers.Math.Randoms.RandomGen.Next(20);
-            
-            Line line = new Line(startPoint, new Point3d(x,y,0d));
 
-            IgorKL.ACAD3.Model.Drawing.TransientGraphicsTools.SelectableTransient st = new Drawing.TransientGraphicsTools.SelectableTransient(new List<Entity>(new[] {line}));
+            Line line = new Line(startPoint, new Point3d(x, y, 0d));
+
+            IgorKL.ACAD3.Model.Drawing.TransientGraphicsTools.SelectableTransient st = new Drawing.TransientGraphicsTools.SelectableTransient(new List<Entity>(new[] { line }));
             st.Display();
 
-            System.Threading.Timer timer =new System.Threading.Timer(
-                delegate(object state)
-                {
+            System.Threading.Timer timer = new System.Threading.Timer(
+                delegate (object state) {
                     line.EndPoint = new Point3d(startPoint.X + Helpers.Math.Randoms.RandomGen.Next(20),
                         startPoint.Y + Helpers.Math.Randoms.RandomGen.Next(20), 0);
                     Autodesk.AutoCAD.GraphicsInterface.TransientManager.CurrentTransientManager.UpdateTransient(
@@ -483,8 +436,7 @@ namespace IgorKL.ACAD3.Model.Commands
 
 
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmdTest_TransTest2", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public static void TransTest2()
-        {
+        public static void TransTest2() {
             Point3d startPoint = new Point3d(0, 0, 0);
             double x = startPoint.X + Helpers.Math.Randoms.RandomGen.Next(20);
             double y = startPoint.Y + Helpers.Math.Randoms.RandomGen.Next(20);
@@ -492,18 +444,15 @@ namespace IgorKL.ACAD3.Model.Commands
             Line line = new Line(startPoint, new Point3d(x, y, 0d));
 
             Matrix3d ucs = CoordinateSystem.CoordinateTools.GetCurrentUcs();
-            CustomObjects.SimpleEntityOverrideEx block = new CustomObjects.SimpleEntityOverrideEx(new Point3d(0,0,0), AnnotativeStates.True, new[] {(Entity)line}.ToList(), ucs);
+            CustomObjects.SimpleEntityOverrideEx block = new CustomObjects.SimpleEntityOverrideEx(new Point3d(0, 0, 0), AnnotativeStates.True, new[] { (Entity)line }.ToList(), ucs);
             //block.AppendEntity(line);
             BlockReference br = block.GetObject(startPoint, null);
             //Tools.AppendEntity(br);
 
             System.Threading.Timer timer = new System.Threading.Timer(
-                delegate(object state)
-                {
-                    using (Transaction trans = Tools.StartTransaction())
-                    {
-                        lock (trans)
-                        {
+                delegate (object state) {
+                    using (Transaction trans = Tools.StartTransaction()) {
+                        lock (trans) {
                             line = line.Id.GetObjectForRead<Line>(false);
                             /*line.UpgradeOpen();
                             line.EndPoint = new Point3d(startPoint.X + Helpers.Math.Randoms.RandomGen.Next(20),

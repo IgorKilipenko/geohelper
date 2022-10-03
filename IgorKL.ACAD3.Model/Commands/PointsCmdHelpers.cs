@@ -13,12 +13,9 @@ using Autodesk.AutoCAD.Colors;
 using IgorKL.ACAD3.Model.Helpers.SdrFormat;
 using wnd = System.Windows.Forms;
 
-namespace IgorKL.ACAD3.Model.Commands
-{
-    public partial class PointsCmd
-    {
-        private string _getDbTextString(string msg, string rmsg)
-        {
+namespace IgorKL.ACAD3.Model.Commands {
+    public partial class PointsCmd {
+        private string _getDbTextString(string msg, string rmsg) {
             PromptEntityOptions entOpt = new PromptEntityOptions(msg);
             entOpt.SetRejectMessage(rmsg);
             entOpt.AllowNone = false;
@@ -30,8 +27,7 @@ namespace IgorKL.ACAD3.Model.Commands
             var id = entRes.ObjectId;
             if (id.IsNull)
                 return null;
-            using (Transaction trans = Tools.StartTransaction())
-            {
+            using (Transaction trans = Tools.StartTransaction()) {
                 string data = ((DBText)trans.GetObject(id, OpenMode.ForRead)).TextString;
                 return data;
             }
@@ -40,8 +36,7 @@ namespace IgorKL.ACAD3.Model.Commands
 
         [Obsolete("Не работает")]
         private string _getTextFromEntity<T>(string msg, string rmsg)
-            where T : DBObject
-        {
+            where T : DBObject {
             PromptEntityOptions entOpt = new PromptEntityOptions(msg);
             entOpt.SetRejectMessage(rmsg);
             entOpt.AllowNone = false;
@@ -53,8 +48,7 @@ namespace IgorKL.ACAD3.Model.Commands
             var id = entRes.ObjectId;
             if (id.IsNull)
                 return null;
-            using (Transaction trans = Tools.StartTransaction())
-            {
+            using (Transaction trans = Tools.StartTransaction()) {
                 System.Reflection.MethodInfo mi = typeof(T).GetMethod("TextString");
                 Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage(mi.ReturnParameter.Name);
                 object obj = trans.GetObject(id, OpenMode.ForRead);
@@ -65,8 +59,7 @@ namespace IgorKL.ACAD3.Model.Commands
 
 
         #region Text factory Helpers
-        public DBText _CreateText(Point3d position, string data, string lname, double scale)
-        {
+        public DBText _CreateText(Point3d position, string data, string lname, double scale) {
             // Create a single-line text object
             DBText acText = new DBText();
             acText.SetDatabaseDefaults();
@@ -82,8 +75,7 @@ namespace IgorKL.ACAD3.Model.Commands
             return acText;
         }
 
-        public DBText _CreateText(Point3d position, string data, double scale)
-        {
+        public DBText _CreateText(Point3d position, string data, double scale) {
             // Create a single-line text object
             DBText acText = new DBText();
             acText.SetDatabaseDefaults();
@@ -98,8 +90,7 @@ namespace IgorKL.ACAD3.Model.Commands
             return acText;
         }
 
-        public DBText _CreateText(DBText elevation, string data, string lname, double scale)
-        {
+        public DBText _CreateText(DBText elevation, string data, string lname, double scale) {
             // Create a single-line text object
             DBText acText = new DBText();
             acText.SetDatabaseDefaults();
@@ -121,8 +112,7 @@ namespace IgorKL.ACAD3.Model.Commands
         #region Prompt select Helpers
 
         public static bool TrySelectObjects<T>(out IList<T> objCollection, OpenMode openMode, string msg, Transaction transaction)
-where T : DBObject
-        {
+where T : DBObject {
             Editor ed = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor;
             SelectionSet set = null;
             objCollection = null;
@@ -130,14 +120,11 @@ where T : DBObject
             opt.AllowDuplicates = false;
 
             PromptSelectionResult res = ed.GetSelection(opt);
-            if (res.Status == PromptStatus.OK)
-            {
-                if ((set = res.Value) != null)
-                {
+            if (res.Status == PromptStatus.OK) {
+                if ((set = res.Value) != null) {
                     ObjectId[] ids = set.GetObjectIds();
                     objCollection = new List<T>(set.Count);
-                    foreach (ObjectId id in ids)
-                    {
+                    foreach (ObjectId id in ids) {
                         DBObject dbobj = transaction.GetObject(id, openMode, true);
                         T val = dbobj as T;
                         if (val != null)
@@ -151,8 +138,7 @@ where T : DBObject
             return false;
         }
 
-        public static bool TrySelectObjects(out SelectionSet set, OpenMode openMode, string msg)
-        {
+        public static bool TrySelectObjects(out SelectionSet set, OpenMode openMode, string msg) {
             Editor ed = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor;
             set = null;
 
@@ -160,10 +146,8 @@ where T : DBObject
             opt.AllowDuplicates = false;
 
             PromptSelectionResult res = ed.GetSelection(opt);
-            if (res.Status == PromptStatus.OK)
-            {
-                if ((set = res.Value) != null)
-                {
+            if (res.Status == PromptStatus.OK) {
+                if ((set = res.Value) != null) {
                     return true;
                 }
             }
@@ -171,23 +155,19 @@ where T : DBObject
         }
 
         public static bool TrySelectObjects<T>(out IList<T> objCollection, OpenMode openMode, string msg)
-            where T : DBObject
-        {
+            where T : DBObject {
             Editor ed = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor;
             Transaction transaction = null;
-            try
-            {
+            try {
                 return TrySelectObjects<T>(out objCollection, openMode, msg, out transaction);
             }
-            finally
-            {
+            finally {
                 if (transaction != null && !transaction.IsDisposed)
                     transaction.Dispose();
             }
         }
         public static bool TrySelectObjects<T>(out IList<T> objCollection, OpenMode openMode, string msg, out Transaction transaction)
-            where T : DBObject
-        {
+            where T : DBObject {
             Editor ed = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor;
             transaction = null;
             SelectionSet set = null;
@@ -196,17 +176,13 @@ where T : DBObject
             opt.AllowDuplicates = false;
 
             PromptSelectionResult res = ed.GetSelection(opt);
-            if (res.Status == PromptStatus.OK)
-            {
-                if ((set = res.Value) != null)
-                {
+            if (res.Status == PromptStatus.OK) {
+                if ((set = res.Value) != null) {
                     ObjectId[] ids = set.GetObjectIds();
                     objCollection = new List<T>(set.Count);
-                    try
-                    {
+                    try {
                         transaction = Tools.StartTransaction();
-                        foreach (ObjectId id in ids)
-                        {
+                        foreach (ObjectId id in ids) {
                             DBObject dbobj = transaction.GetObject(id, openMode, true);
                             T val = dbobj as T;
                             if (val != null)
@@ -216,8 +192,7 @@ where T : DBObject
                         ed.WriteMessage(string.Format("\n{0} selected points", objCollection.Count));
                         return true;
                     }
-                    catch (Exception ex)
-                    {
+                    catch (Exception ex) {
                         ed.WriteMessage("\nError selected object.\nMsg : {0}\nTrace : {1}", ex.Message, ex.StackTrace);
                         return false;
                     }

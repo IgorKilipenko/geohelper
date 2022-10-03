@@ -1,20 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Geometry;
 
-namespace IgorKL.ACAD3.Model.Drawing.Helpers
-{
-    public class Zoomer
-    {
-        public static void Zoom(Point3d pMin, Point3d pMax, Point3d pCenter, double dFactor)
-        {
+namespace IgorKL.ACAD3.Model.Drawing.Helpers {
+    public class Zoomer {
+        public static void Zoom(Point3d pMin, Point3d pMax, Point3d pCenter, double dFactor) {
             // Get the current document and database
             Document acDoc = Application.DocumentManager.MdiActiveDocument;
             Database acCurDb = acDoc.Database;
@@ -24,34 +15,25 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
             // Get the extents of the current space when no points 
             // or only a center point is provided
             // Check to see if Model space is current
-            if (acCurDb.TileMode == true)
-            {
+            if (acCurDb.TileMode == true) {
                 if (pMin.Equals(new Point3d()) == true &&
-                    pMax.Equals(new Point3d()) == true)
-                {
+                    pMax.Equals(new Point3d()) == true) {
                     pMin = acCurDb.Extmin;
                     pMax = acCurDb.Extmax;
                 }
-            }
-            else
-            {
+            } else {
                 // Check to see if Paper space is current
-                if (nCurVport == 1)
-                {
+                if (nCurVport == 1) {
                     // Get the extents of Paper space
                     if (pMin.Equals(new Point3d()) == true &&
-                        pMax.Equals(new Point3d()) == true)
-                    {
+                        pMax.Equals(new Point3d()) == true) {
                         pMin = acCurDb.Pextmin;
                         pMax = acCurDb.Pextmax;
                     }
-                }
-                else
-                {
+                } else {
                     // Get the extents of Model space
                     if (pMin.Equals(new Point3d()) == true &&
-                        pMax.Equals(new Point3d()) == true)
-                    {
+                        pMax.Equals(new Point3d()) == true) {
                         pMin = acCurDb.Extmin;
                         pMax = acCurDb.Extmax;
                     }
@@ -59,11 +41,9 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
             }
 
             // Start a transaction
-            using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction())
-            {
+            using (Transaction acTrans = acCurDb.TransactionManager.StartTransaction()) {
                 // Get the current view
-                using (ViewTableRecord acView = acDoc.Editor.GetCurrentView())
-                {
+                using (ViewTableRecord acView = acDoc.Editor.GetCurrentView()) {
                     Extents3d eExtents;
 
                     // Translate WCS coordinates to DCS
@@ -77,8 +57,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
                     // If a center point is specified, define the min and max 
                     // point of the extents
                     // for Center and Scale modes
-                    if (pCenter.DistanceTo(Point3d.Origin) != 0)
-                    {
+                    if (pCenter.DistanceTo(Point3d.Origin) != 0) {
                         pMin = new Point3d(pCenter.X - (acView.Width / 2),
                                             pCenter.Y - (acView.Height / 2), 0);
 
@@ -87,8 +66,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
                     }
 
                     // Create an extents object using a line
-                    using (Line acLine = new Line(pMin, pMax))
-                    {
+                    using (Line acLine = new Line(pMin, pMax)) {
                         eExtents = new Extents3d(acLine.Bounds.Value.MinPoint,
                                                     acLine.Bounds.Value.MaxPoint);
                     }
@@ -106,20 +84,17 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
                     Point2d pNewCentPt;
 
                     // Check to see if a center point was provided (Center and Scale modes)
-                    if (pCenter.DistanceTo(Point3d.Origin) != 0)
-                    {
+                    if (pCenter.DistanceTo(Point3d.Origin) != 0) {
                         dWidth = acView.Width;
                         dHeight = acView.Height;
 
-                        if (dFactor == 0)
-                        {
+                        if (dFactor == 0) {
                             pCenter = pCenter.TransformBy(matWCS2DCS);
                         }
 
                         pNewCentPt = new Point2d(pCenter.X, pCenter.Y);
-                    }
-                    else // Working in Window, Extents and Limits mode
-                    {
+                    } else // Working in Window, Extents and Limits mode
+                      {
                         // Calculate the new width and height of the current view
                         dWidth = eExtents.MaxPoint.X - eExtents.MinPoint.X;
                         dHeight = eExtents.MaxPoint.Y - eExtents.MinPoint.Y;
@@ -130,11 +105,11 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
                     }
 
                     // Check to see if the new width fits in current window
-                    if (dWidth > (dHeight * dViewRatio)) dHeight = dWidth / dViewRatio;
+                    if (dWidth > (dHeight * dViewRatio))
+                        dHeight = dWidth / dViewRatio;
 
                     // Resize and scale the view
-                    if (dFactor != 0)
-                    {
+                    if (dFactor != 0) {
                         acView.Height = dHeight * dFactor;
                         acView.Width = dWidth * dFactor;
                     }

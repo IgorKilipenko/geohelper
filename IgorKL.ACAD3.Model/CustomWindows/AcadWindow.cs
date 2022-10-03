@@ -13,10 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Runtime.InteropServices;
 
-namespace IgorKL.ACAD3.Model.CustomWindows
-{
-    public class AcadWindow : Window
-    {
+namespace IgorKL.ACAD3.Model.CustomWindows {
+    public class AcadWindow : Window {
         private const int border = 8;
         private const int header = 23;
 
@@ -30,8 +28,7 @@ namespace IgorKL.ACAD3.Model.CustomWindows
 
 
 
-        protected internal AcadWindow()
-        {
+        protected internal AcadWindow() {
             this.Title = "AcadWindow";
             this.Width = 300;
             this.Height = 300;
@@ -44,8 +41,7 @@ namespace IgorKL.ACAD3.Model.CustomWindows
         }
 
         public AcadWindow(Autodesk.AutoCAD.Windows.Window win, Dock dockPos)
-            :this()
-        {
+            : this() {
             _win = win;
             DockPosition = dockPos;
 
@@ -58,8 +54,7 @@ namespace IgorKL.ACAD3.Model.CustomWindows
 
         private void OnSizeChanged(
           object sender, SizeChangedEventArgs e
-        )
-        {
+        ) {
             var p = GetPosition(this.DesiredSize);
             this.Left = p.X;
             this.Top = p.Y;
@@ -67,13 +62,11 @@ namespace IgorKL.ACAD3.Model.CustomWindows
             GiveAutoCADFocus();
         }
 
-        private void OnMouseLeave(object sender, MouseEventArgs e)
-        {
+        private void OnMouseLeave(object sender, MouseEventArgs e) {
             GiveAutoCADFocus();
         }
 
-        public static void GiveAutoCADFocus()
-        {
+        public static void GiveAutoCADFocus() {
             var doc = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument;
             if (doc != null)
                 doc.Window.Focus();
@@ -82,8 +75,7 @@ namespace IgorKL.ACAD3.Model.CustomWindows
         }
 
 
-        protected Point PointOnScreen(Point pt)
-        {
+        protected Point PointOnScreen(Point pt) {
             return
               Point.Add(
                 _win.DeviceIndependentLocation,
@@ -94,28 +86,23 @@ namespace IgorKL.ACAD3.Model.CustomWindows
               );
         }
 
-        internal void StartDragging()
-        {
-            if (!this.IsDragging)
-            {
+        internal void StartDragging() {
+            if (!this.IsDragging) {
                 this.IsDragging = true;
                 this.MouseMove += OnMouseMove;
                 this.MouseRightButtonUp += OnMouseRightButtonUp;
             }
         }
 
-        internal void StopDragging()
-        {
-            if (this.IsDragging)
-            {
+        internal void StopDragging() {
+            if (this.IsDragging) {
                 this.MouseMove -= OnMouseMove;
                 this.MouseRightButtonUp -= OnMouseRightButtonUp;
                 this.IsDragging = false;
             }
         }
 
-        private void OnLoaded(object sender, RoutedEventArgs e)
-        {
+        private void OnLoaded(object sender, RoutedEventArgs e) {
             var wndHelper = new System.Windows.Interop.WindowInteropHelper(this);
 
             int exStyle =
@@ -133,8 +120,7 @@ namespace IgorKL.ACAD3.Model.CustomWindows
             );
         }
 
-        private void OnMouseRightClick(object s, MouseButtonEventArgs e)
-        {
+        private void OnMouseRightClick(object s, MouseButtonEventArgs e) {
             // Swap the cursor (would be nice to get the pan cursor)
 
             this.Cursor = Cursors.ScrollAll;
@@ -158,8 +144,7 @@ namespace IgorKL.ACAD3.Model.CustomWindows
             StartDragging();
         }
 
-        private void OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
-        {
+        private void OnMouseRightButtonUp(object sender, MouseButtonEventArgs e) {
             // Reset the cursor
 
             this.Cursor = Cursors.Arrow;
@@ -178,8 +163,7 @@ namespace IgorKL.ACAD3.Model.CustomWindows
             this.CustomPosition = ScreenToPoint(new Point(this.Left, this.Top));
         }
 
-        private void OnMouseMove(object sender, MouseEventArgs e)
-        {
+        private void OnMouseMove(object sender, MouseEventArgs e) {
             // Move our dialog relative to the mouse movement
 
             var pos = this.PointToScreen(e.GetPosition(this));
@@ -187,14 +171,12 @@ namespace IgorKL.ACAD3.Model.CustomWindows
             this.Top = _start.Y + pos.Y;
         }
 
-        private Point ScreenToPoint(Point pt)
-        {
+        private Point ScreenToPoint(Point pt) {
             return
               Point.Subtract(pt, (Vector)PointOnScreen(new Point(0, 0)));
         }
 
-        protected Point GetPosition(Size sz)
-        {
+        protected Point GetPosition(Size sz) {
             // If at a custom (non-docked) location...
 
             if (DockPosition == Dock.Custom)
@@ -224,8 +206,7 @@ namespace IgorKL.ACAD3.Model.CustomWindows
             return new System.Windows.Point((int)x, (int)y);
         }
 
-        public enum Dock
-        {
+        public enum Dock {
             None,
             Custom,
             TopLeft,
@@ -234,18 +215,15 @@ namespace IgorKL.ACAD3.Model.CustomWindows
             BottomRight
         };
 
-        public static class AcadWindowStyles
-        {
+        public static class AcadWindowStyles {
             [Flags]
-            public enum ExtendedWindowStyles
-            {
+            public enum ExtendedWindowStyles {
                 // ...
                 WS_EX_TOOLWINDOW = 0x00000080,
                 // ...
             }
 
-            public enum GetWindowLongFields
-            {
+            public enum GetWindowLongFields {
                 // ...
                 GWL_EXSTYLE = (-20),
                 // ...
@@ -258,8 +236,7 @@ namespace IgorKL.ACAD3.Model.CustomWindows
 
             public static IntPtr SetWindowLong(
               IntPtr hWnd, int nIndex, IntPtr dwNewLong
-            )
-            {
+            ) {
                 int error = 0;
                 IntPtr result = IntPtr.Zero;
 
@@ -267,24 +244,20 @@ namespace IgorKL.ACAD3.Model.CustomWindows
 
                 SetLastError(0);
 
-                if (IntPtr.Size == 4)
-                {
+                if (IntPtr.Size == 4) {
                     // Use SetWindowLong
 
                     Int32 tempResult =
                       IntSetWindowLong(hWnd, nIndex, IntPtrToInt32(dwNewLong));
                     error = Marshal.GetLastWin32Error();
                     result = new IntPtr(tempResult);
-                }
-                else
-                {
+                } else {
                     // use SetWindowLongPtr
                     result = IntSetWindowLongPtr(hWnd, nIndex, dwNewLong);
                     error = Marshal.GetLastWin32Error();
                 }
 
-                if ((result == IntPtr.Zero) && (error != 0))
-                {
+                if ((result == IntPtr.Zero) && (error != 0)) {
                     throw new System.ComponentModel.Win32Exception(error);
                 }
 
@@ -305,8 +278,7 @@ namespace IgorKL.ACAD3.Model.CustomWindows
               IntPtr hWnd, int nIndex, Int32 dwNewLong
             );
 
-            private static int IntPtrToInt32(IntPtr intPtr)
-            {
+            private static int IntPtrToInt32(IntPtr intPtr) {
                 return unchecked((int)intPtr.ToInt64());
             }
 

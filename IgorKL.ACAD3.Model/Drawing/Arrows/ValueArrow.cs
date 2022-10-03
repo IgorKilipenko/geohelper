@@ -12,10 +12,8 @@ using Autodesk.AutoCAD.EditorInput;
 using display = IgorKL.ACAD3.Model.Helpers.Display;
 using IgorKL.ACAD3.Model.Extensions;
 
-namespace IgorKL.ACAD3.Model.Drawing.Arrows
-{
-    public class ValueArrow : CustomObjects.EntityDrawer
-    {
+namespace IgorKL.ACAD3.Model.Drawing.Arrows {
+    public class ValueArrow : CustomObjects.EntityDrawer {
 
 
         private static MainMenu.HostProvider _dataProvider = new MainMenu.HostProvider(new ValueArrow());
@@ -36,12 +34,10 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
 
         #region Cotors
         public ValueArrow()
-            : this(Matrix3d.Identity.CoordinateSystem3d.Xaxis, Matrix3d.Identity)
-        {
+            : this(Matrix3d.Identity.CoordinateSystem3d.Xaxis, Matrix3d.Identity) {
         }
         public ValueArrow(Vector3d axisVector, Matrix3d ucs)
-            :base(new List<Entity>(), AnnotativeStates.True, ucs)
-        {
+            : base(new List<Entity>(), AnnotativeStates.True, ucs) {
             _axisVector = axisVector;
 
             if (_dataProvider == null)
@@ -52,15 +48,13 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
         #endregion
 
         #region Properties
-        public Matrix3d TransformToArrowBlock
-        {
+        public Matrix3d TransformToArrowBlock {
             get { return Ucs.PreMultiplyBy(Matrix3d.Displacement(Point3d.Origin - _insertPointUcs.TransformBy(Ucs))); }
         }
         /// <summary>
         /// Определяет метод отрисовки стрелок, если значение ИСТИНА величина отклонений будет ограничена допустимым пределом
         /// </summary>
-        public bool IsToleranceOnly
-        {
+        public bool IsToleranceOnly {
             get { return _isToleranceOnly; }
         }
         #endregion
@@ -68,8 +62,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
         #region Commands
         [RibbonCommandButton("Стрелки отклонения", "Стрелки")]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_DrawWallValueArrows", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public static void DrawWallArrows()
-        {
+        public static void DrawWallArrows() {
             Matrix3d ucs = CoordinateSystem.CoordinateTools.GetCurrentUcs();
 
             Point3d[] axisVectorPoints = GetAxisVectorCmd(ucs.CoordinateSystem3d);
@@ -83,8 +76,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
             axisVector = _calculateVector(axisVector, ucs.Inverse(), false);
             Point3d[] transientPoints = _vectorToScreen(axisVectorPoints[0], axisVector);
 
-            using (CustomObjects.EntityDrawer grphic = new ValueArrow())
-            {
+            using (CustomObjects.EntityDrawer grphic = new ValueArrow()) {
                 //grphic.TrasientDisplay(new[] { new Line(axisVectorPoints[0], axisVectorPoints[1]) });
                 if (transientPoints != null && transientPoints.Length >= 2)
                     grphic.TrasientDisplay(new[] { new Line(transientPoints[0], transientPoints[1]) });
@@ -152,18 +144,15 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
         /// <param name="ucs">Текущая ПСК</param>
         /// <param name="onlyOnce">ИСТИНА если нужно выполнить только раз, иначе цикл</param>
         /// <returns></returns>
-        public static PromptStatus DrawWallArrows(Vector3d axisVector, Matrix3d ucs, bool onlyOnce = false, bool mirrorText = false)
-        {
+        public static PromptStatus DrawWallArrows(Vector3d axisVector, Matrix3d ucs, bool onlyOnce = false, bool mirrorText = false) {
             double toleranceBottom = /*0.005;*/ _dataProvider.Read("tolerance", 0.005d);
             bool isToleranceOnly = /*false;*/ _dataProvider.Read("isToleranceOnly", false);
             object mirrorTextValue = null;
             if (mirrorText)
                 mirrorTextValue = SetMirrorTextValue(1);
-            try
-            {
+            try {
                 Point3d? insertPoint = Point3d.Origin;
-                while ((insertPoint = GetInsertPoint(axisVector, ucs, ref toleranceBottom, ref isToleranceOnly)).HasValue)
-                {
+                while ((insertPoint = GetInsertPoint(axisVector, ucs, ref toleranceBottom, ref isToleranceOnly)).HasValue) {
                     PromptStatus res = PromptStatus.Cancel;
 
                     ValueArrow mainBlock = new ValueArrow(axisVector, ucs);
@@ -183,13 +172,11 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
 
                 return PromptStatus.OK;
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 Tools.GetAcadEditor().WriteMessage(ex.Message);
                 return PromptStatus.Error;
             }
-            finally
-            {
+            finally {
                 if (mirrorText)
                     SetMirrorTextValue(mirrorTextValue);
             }
@@ -198,22 +185,18 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
         /// <summary>
         /// Основной метод расчета
         /// </summary>
-        public override void Calculate()
-        {
+        public override void Calculate() {
             _clearEntities();
 
-            if (!_destLowerPointComplete)
-            {
+            if (!_destLowerPointComplete) {
                 DisplayArrow(_destLowerPointUcs);
             }
-            else if (!_jigLowerPointComplete)
-            {
+            else if (!_jigLowerPointComplete) {
                 DisplayRedirectedArrow(_jigLowerPointUcs);
             }
         }
 
-        public void DisplayArrow(Point3d destationPointUcs)
-        {
+        public void DisplayArrow(Point3d destationPointUcs) {
             _arrow = new WallDeviationArrows.Arrow(_axisVector, 5, 0.5);
 
             double value = _arrow.Calculate(destationPointUcs.TransformBy(TransformToArrowBlock));
@@ -223,11 +206,8 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
 
             symbs.Add((Entity)_arrow.ArrowLine.Clone());
 
-
-            if (Math.Abs(value) > _toleranceBottom)
-            {
-                if (_isToleranceOnly)
-                {
+            if (Math.Abs(value) > _toleranceBottom) {
+                if (_isToleranceOnly) {
                     value = (double)Math.Sign(value) * _toleranceBottom;
                     _arrow.LastValue = value;
                 }
@@ -239,8 +219,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
             _setEntitiesToBlock(_insertPointUcs, symbs, attrInfo, true);
         }
 
-        public void DisplayRedirectedArrow(Point3d jigPointUcs)
-        {
+        public void DisplayRedirectedArrow(Point3d jigPointUcs) {
             _arrow.Redirect(jigPointUcs.TransformBy(TransformToArrowBlock));
             var symbs = _createAttribute(_arrow.ArrowLine.GetCenterPoint(), null, _arrow.LineTarnsform).ToList();
             symbs.Add((Entity)_arrow.ArrowLine.Clone());
@@ -251,15 +230,13 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
         }
 
         #region JigDrawing
-        protected override SamplerStatus Sampler(JigPrompts prompts)
-        {
+        protected override SamplerStatus Sampler(JigPrompts prompts) {
             JigPromptPointOptions ppo = new JigPromptPointOptions("\nУкажите фактическое положение:");
             ppo.UseBasePoint = true;
             ppo.BasePoint = _insertPointUcs.TransformBy(_ucs);
             ppo.UserInputControls = UserInputControls.NoZeroResponseAccepted;
 
-            if (!_destLowerPointComplete)
-            {
+            if (!_destLowerPointComplete) {
                 PromptPointResult ppr = prompts.AcquirePoint(ppo);
                 if (ppr.Status != PromptStatus.OK)
                     return SamplerStatus.Cancel;
@@ -268,10 +245,8 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
                 return SamplerStatus.OK;
             }
 
-            else
-            {
-                if (!_jigLowerPointComplete)
-                {
+            else {
+                if (!_jigLowerPointComplete) {
                     ppo.Message = "\nУкажите место отрисовки";
                     PromptPointResult ppr = prompts.AcquirePoint(ppo);
                     if (ppr.Status != PromptStatus.OK)
@@ -280,8 +255,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
                     _jigLowerPointUcs = ppr.Value.TransformBy(_ucs.Inverse());
                     return SamplerStatus.OK;
                 }
-                else
-                {
+                else {
                     return SamplerStatus.Cancel;
 
                 }
@@ -290,16 +264,13 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
 
         }
 
-        public override PromptStatus JigDraw()
-        {
-            if (!_destLowerPointComplete)
-            {
+        public override PromptStatus JigDraw() {
+            if (!_destLowerPointComplete) {
                 if (base.JigDraw() != PromptStatus.OK)
                     return PromptStatus.Cancel;
                 _destLowerPointComplete = true;
             }
-            if (!_jigLowerPointComplete)
-            {
+            if (!_jigLowerPointComplete) {
                 if (base.JigDraw() != PromptStatus.OK)
                     return PromptStatus.Cancel;
                 _jigLowerPointComplete = true;
@@ -320,8 +291,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
         /// </summary>
         /// <param name="ucs"></param>
         /// <returns></returns>
-        public static Point3d[] GetAxisVectorCmd(CoordinateSystem3d ucs)
-        {
+        public static Point3d[] GetAxisVectorCmd(CoordinateSystem3d ucs) {
             PromptPointOptions ppo = new PromptPointOptions("\nУкажите точку на проектной оси/грани [ОсьХ/ОсьУ/Указать/Выход]<X>:");
             ppo.Keywords.Add("Xaxis", "ХОсь", "ХОсь", true, true);
             ppo.Keywords.Add("Yaxis", "УОсь", "УОсь", true, true);
@@ -330,29 +300,23 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
             ppo.AllowArbitraryInput = true;
 
             PromptPointResult ppr = Tools.GetAcadEditor().GetPoint(ppo);
-            if (ppr.Status == PromptStatus.Keyword)
-            {
-                switch (ppr.StringResult)
-                {
-                    case "Xaxis":
-                        {
-                            return _vectorToScreen(ucs.Xaxis);
-                        }
-                    case "Yaxis":
-                        {
-                            return _vectorToScreen(ucs.Yaxis);
-                        }
-                    case "Enter":
-                        {
-                            ppr = Tools.GetAcadEditor().GetPoint(ppo);
-                            if (ppr.Status != PromptStatus.OK)
-                                return null;
-                            break;
-                        }
-                    case "Exit":
-                        {
+            if (ppr.Status == PromptStatus.Keyword) {
+                switch (ppr.StringResult) {
+                    case "Xaxis": {
+                        return _vectorToScreen(ucs.Xaxis);
+                    }
+                    case "Yaxis": {
+                        return _vectorToScreen(ucs.Yaxis);
+                    }
+                    case "Enter": {
+                        ppr = Tools.GetAcadEditor().GetPoint(ppo);
+                        if (ppr.Status != PromptStatus.OK)
                             return null;
-                        }
+                        break;
+                    }
+                    case "Exit": {
+                        return null;
+                    }
                 }
             }
 
@@ -378,8 +342,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
         /// <param name="isTopMaxTolerance">Определяет метод определения допуска отклонения по верху вертикального сооружения</param>
         /// <param name="isToleranceOnly">Определяет метод отрисовки стрелок, если значение ИСТИНА величина отклонений будет ограничена допустимым пределом</param>
         /// <returns>Точка вставки, если NULL - выход</returns>
-        public static Point3d? GetInsertPoint(Vector3d axisVector, Matrix3d ucs, ref double bottomTolerance, ref bool isToleranceOnly)
-        {
+        public static Point3d? GetInsertPoint(Vector3d axisVector, Matrix3d ucs, ref double bottomTolerance, ref bool isToleranceOnly) {
             PromptPointOptions ppo = new PromptPointOptions("\nУкажите точку вставки/проектное положение");
             //ppo.Keywords.Add("Perpendicular", "Перпендикуляр", "Перпендикуляр", true, true);
             ppo.Keywords.Add("Tolerance", "ДОПуск", "ДОПуск", true, true);
@@ -389,40 +352,34 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
             ppo.AllowArbitraryInput = true;
 
             PromptPointResult ppr = Tools.GetAcadEditor().GetPoint(ppo);
-            while (ppr.Status == PromptStatus.Keyword)
-            {
-                switch (ppr.StringResult)
-                {
+            while (ppr.Status == PromptStatus.Keyword) {
+                switch (ppr.StringResult) {
                     /*case "Perpendicular":
                         {
                             if (DrawWallArrows(_calculateVector(axisVector, ucs, true), ucs, true) == PromptStatus.OK)
                                 ppr = Tools.GetAcadEditor().GetPoint(ppo);
                             break;
                         }*/
-                    case "Tolerance":
-                        {
-                            double? toleranse = _promptTolerance("\nУкажите допуск по низу от оси, м", bottomTolerance);
-                            if (toleranse.HasValue)
-                                bottomTolerance = toleranse.Value;
-                            ppr = Tools.GetAcadEditor().GetPoint(ppo);
-                            break;
-                        }
-                    case "IsToleranceOnlyTrue":
-                        {
-                            isToleranceOnly = true;
-                            ppr = Tools.GetAcadEditor().GetPoint(ppo);
-                            break;
-                        }
-                    case "IsToleranceOnlyFalse":
-                        {
-                            isToleranceOnly = false;
-                            ppr = Tools.GetAcadEditor().GetPoint(ppo);
-                            break;
-                        }
-                    case "Exit":
-                        {
-                            return null;
-                        }
+                    case "Tolerance": {
+                        double? toleranse = _promptTolerance("\nУкажите допуск по низу от оси, м", bottomTolerance);
+                        if (toleranse.HasValue)
+                            bottomTolerance = toleranse.Value;
+                        ppr = Tools.GetAcadEditor().GetPoint(ppo);
+                        break;
+                    }
+                    case "IsToleranceOnlyTrue": {
+                        isToleranceOnly = true;
+                        ppr = Tools.GetAcadEditor().GetPoint(ppo);
+                        break;
+                    }
+                    case "IsToleranceOnlyFalse": {
+                        isToleranceOnly = false;
+                        ppr = Tools.GetAcadEditor().GetPoint(ppo);
+                        break;
+                    }
+                    case "Exit": {
+                        return null;
+                    }
                 }
             }
             if (ppr.Status != PromptStatus.OK)
@@ -437,18 +394,15 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
         /// <param name="ucs">Система координат определяющая положительные направления осей</param>
         /// <param name="getNormal">Получить ось до правой</param>
         /// <returns>Вектор по направлению сонаправленный с одной из осей системы ucs</returns>
-        protected static Vector3d _calculateVector(Vector3d vector, Matrix3d ucs, bool getNormal)
-        {
+        protected static Vector3d _calculateVector(Vector3d vector, Matrix3d ucs, bool getNormal) {
             double angle = vector.GetAngleTo(ucs.CoordinateSystem3d.Xaxis, ucs.CoordinateSystem3d.Zaxis.Negate());
             Vector3d resVector = vector;
-            if (angle >= Math.PI)
-            {
+            if (angle >= Math.PI) {
                 Matrix3d rot = Matrix3d.Rotation(-Math.PI, ucs.CoordinateSystem3d.Zaxis, ucs.CoordinateSystem3d.Origin);
                 resVector = resVector.TransformBy(rot);
                 angle = angle - Math.PI;
             }
-            if (getNormal)
-            {
+            if (getNormal) {
                 if (angle > Math.PI / 2d)
                     angle = -Math.PI / 2d;
                 else
@@ -464,8 +418,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
 
 
         #region Prompts
-        protected static double? _promptTolerance(string msg, double defaultValue)
-        {
+        protected static double? _promptTolerance(string msg, double defaultValue) {
             PromptDoubleOptions pdo = new PromptDoubleOptions(msg);
             pdo.AllowNone = false;
             pdo.AllowNegative = false;
@@ -482,14 +435,13 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
 
         #region Helpers
 
-        
+
         /// <summary>
         /// Включает/выключает механизм аввтоматического преобразовании текста при зеркальном отражении (0 - вкл / 1 - выкл)
         /// </summary>
         /// <param name="value">0 - вкл / 1 - выкл</param>
         /// <returns>значение предопределенное в среде</returns>
-        public static object SetMirrorTextValue(object value)
-        {
+        public static object SetMirrorTextValue(object value) {
             const string MIRRTEXT = "MIRRTEXT";
             object defVal = Application.GetSystemVariable(MIRRTEXT);
             Application.SetSystemVariable(MIRRTEXT, value);
@@ -499,10 +451,8 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
         /// <summary>
         /// Очищает список приметивов
         /// </summary>
-        protected void _clearEntities()
-        {
-            Tools.StartTransaction(() =>
-            {
+        protected void _clearEntities() {
+            Tools.StartTransaction(() => {
                 if (Entities.FirstOrDefault(ent => ent is BlockReference) != null)
                     ((BlockReference)Entities.First()).BlockTableRecord.GetObjectForWrite<BlockTableRecord>().DeepErase(true);
             });
@@ -510,13 +460,11 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
             Entities.Clear();
         }
 
-        private void _setEntitiesToBlock(Point3d insertPointUcs, IEnumerable<Entity> entities, Dictionary<string, string> attrInfo, bool erase)
-        {
+        private void _setEntitiesToBlock(Point3d insertPointUcs, IEnumerable<Entity> entities, Dictionary<string, string> attrInfo, bool erase) {
             ObjectId btrId = AcadBlocks.BlockTools.CreateBlockTableRecord("*U", Point3d.Origin, entities, Annotative);
             ObjectId brId = AcadBlocks.BlockTools.AppendBlockItem(insertPointUcs.TransformBy(Ucs), btrId, attrInfo);
 
-            Tools.StartTransaction(() =>
-            {
+            Tools.StartTransaction(() => {
                 BlockReference br = brId.GetObjectForRead<BlockReference>();
                 br.UpgradeOpen();
                 if (_arrow != null)
@@ -524,8 +472,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
                 br.RecordGraphicsModified(true);
 
                 Entities.Add((Entity)br.Clone());
-                if (erase)
-                {
+                if (erase) {
                     br.Erase(true);
                 }
             });
@@ -533,14 +480,11 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
         }
 
         [Obsolete("Требует доработки, изменить механизм используя XLine")]
-        private static Point3d[] _vectorToScreen(Point3d point, Vector3d vector)
-        {
+        private static Point3d[] _vectorToScreen(Point3d point, Vector3d vector) {
             //int nCurVport = System.Convert.ToInt32(Application.GetSystemVariable("CVPORT"));
             Point3d[] res = null;
-            Tools.StartTransaction(() =>
-            {
-                using (var view = Tools.GetAcadEditor().GetCurrentView())
-                {
+            Tools.StartTransaction(() => {
+                using (var view = Tools.GetAcadEditor().GetCurrentView()) {
 
                     Vector3d viewDirection = view.ViewDirection;
                     Point2d viewCenter = view.CenterPoint;
@@ -586,14 +530,11 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
         }
 
         [Obsolete("Требует доработки, изменить механизм используя XLine")]
-        private static Point3d[] _vectorToScreen(Vector3d vector)
-        {
+        private static Point3d[] _vectorToScreen(Vector3d vector) {
             //int nCurVport = System.Convert.ToInt32(Application.GetSystemVariable("CVPORT"));
             Point3d[] res = null;
-            Tools.StartTransaction(() =>
-            {
-                using (var view = Tools.GetAcadEditor().GetCurrentView())
-                {
+            Tools.StartTransaction(() => {
+                using (var view = Tools.GetAcadEditor().GetCurrentView()) {
 
                     Vector3d viewDirection = view.ViewDirection;
                     Point2d viewCenter = view.CenterPoint;
@@ -635,9 +576,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
             return res;
         }
 
-        
-        private IEnumerable<Entity> _createAttribute(Point3d alignmentPoint, string prefix, Matrix3d transform)
-        {
+        private IEnumerable<Entity> _createAttribute(Point3d alignmentPoint, string prefix, Matrix3d transform) {
             alignmentPoint = alignmentPoint.TransformBy(Matrix3d.Displacement(transform.CoordinateSystem3d.Yaxis.MultiplyBy(2.0d * 0.2)));
 
             AttributeDefinition ad = new AttributeDefinition();
@@ -658,8 +597,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
 
             DBText adPrefix = new DBText();
             Polyline bound = new Polyline(5);
-            if (!string.IsNullOrWhiteSpace(prefix))
-            {
+            if (!string.IsNullOrWhiteSpace(prefix)) {
                 //DBText adPrefix = new DBText();
                 adPrefix.SetDatabaseDefaults(Tools.GetAcadDatabase());
                 adPrefix.TextString = prefix;
@@ -681,8 +619,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
                 bound.AddVertexAt(4, rectg.Value.LowerLeft.Add((rectg.Value.UpperLeft - rectg.Value.LowerLeft).Normalize().Negate().MultiplyBy(adPrefix.Height * 0.1)));
 
                 Vector3d vector = rectg.Value.LowerRight - rectg.Value.LowerLeft;
-                if (!transform.CoordinateSystem3d.Xaxis.IsCodirectionalTo(vector))
-                {
+                if (!transform.CoordinateSystem3d.Xaxis.IsCodirectionalTo(vector)) {
                     Plane plane = new Plane(alignmentPoint, transform.CoordinateSystem3d.Yaxis, transform.CoordinateSystem3d.Zaxis);
                     Matrix3d mat = Matrix3d.Mirroring(plane);
                     ad.TransformBy(mat);
@@ -703,16 +640,13 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows
 
             }
             yield return ad;
-            if (!string.IsNullOrWhiteSpace(prefix))
-            {
+            if (!string.IsNullOrWhiteSpace(prefix)) {
                 yield return adPrefix;
                 yield return bound;
             }
         }
-        
+
 
         #endregion
     }
-
-
 }

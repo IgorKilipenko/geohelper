@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace IgorKL.ACAD3.Model
-{
-    public class ObjectIdNamedCollection : Dictionary<Autodesk.AutoCAD.DatabaseServices.ObjectId, string>, System.Collections.Specialized.INotifyCollectionChanged
-    {
+namespace IgorKL.ACAD3.Model {
+    public class ObjectIdNamedCollection : Dictionary<Autodesk.AutoCAD.DatabaseServices.ObjectId, string>, System.Collections.Specialized.INotifyCollectionChanged {
         public ObjectIdNamedCollection()
-            :base()
-        { }
+            : base() { }
 
         public event System.Collections.Specialized.NotifyCollectionChangedEventHandler CollectionChanged;
 
@@ -29,29 +22,24 @@ namespace IgorKL.ACAD3.Model
             }
             return res;
         }*/
-        
-        public new void Clear()
-        {
+
+        public new void Clear() {
             base.Clear();
             On_CollectionChanged(new System.Collections.Specialized.NotifyCollectionChangedEventArgs(System.Collections.Specialized.NotifyCollectionChangedAction.Reset));
         }
 
-        protected virtual void On_CollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (CollectionChanged != null)
-            {
+        protected virtual void On_CollectionChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+            if (CollectionChanged != null) {
                 CollectionChanged(this, e);
             }
         }
     }
 
     public class DynObjectIDNamedCollection :
-        System.Collections.ObjectModel.ObservableCollection<KeyValuePair<Autodesk.AutoCAD.DatabaseServices.ObjectId, string>>
-    {
+        System.Collections.ObjectModel.ObservableCollection<KeyValuePair<Autodesk.AutoCAD.DatabaseServices.ObjectId, string>> {
         public DynObjectIDNamedCollection()
-            :base()
-        {
-            
+            : base() {
+
         }
     }
 }

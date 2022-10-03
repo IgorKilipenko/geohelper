@@ -1,21 +1,15 @@
-﻿using System;
+﻿using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.Colors;
+using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Geometry;
+using IgorKL.ACAD3.Model.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Colors;
-
-using IgorKL.ACAD3.Model.Extensions;
-
-namespace IgorKL.ACAD3.Model.Drawing
-{
-    public class SlopeLinesGenerator:Drawing.PerpendicularVectorJigView
-    {
+namespace IgorKL.ACAD3.Model.Drawing {
+    public class SlopeLinesGenerator : Drawing.PerpendicularVectorJigView {
         private double _step;
         private double _smallLineLength;
 
@@ -37,14 +31,12 @@ namespace IgorKL.ACAD3.Model.Drawing
         private List<Entity> _entitiesInMemory;
 
         public SlopeLinesGenerator(bool opiMode)
-            :this(Matrix3d.Identity, opiMode)
-        {
+            : this(Matrix3d.Identity, opiMode) {
 
         }
 
         public SlopeLinesGenerator(Matrix3d ucs, bool opiMode)
-            :base(ucs)
-        {
+            : base(ucs) {
             if (_dataHost == null)
                 _dataHost = new MainMenu.HostProvider(this);
 
@@ -71,21 +63,18 @@ namespace IgorKL.ACAD3.Model.Drawing
 
         [RibbonCommandButton("Линии откоса", RibbonPanelCategories.Lines_Dimensions)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_DrawSlopeLines", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public static void DrawSlopeLinesCmd()
-        {
+        public static void DrawSlopeLinesCmd() {
             DrawSlopeLines(false);
         }
 
 
         [RibbonCommandButton("Откос П.И.", RibbonPanelCategories.Lines_Dimensions)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_DrawSlopeLinesOpi", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public static void DrawSlopeLinesOpiCmd()
-        {
+        public static void DrawSlopeLinesOpiCmd() {
             DrawSlopeLines(true);
         }
 
-        public static void DrawSlopeLines(bool opMode = false)
-        {
+        public static void DrawSlopeLines(bool opMode = false) {
             Matrix3d ucs = Tools.GetAcadEditor().CurrentUserCoordinateSystem;
             SlopeLinesGenerator mainBlock = new SlopeLinesGenerator(ucs, opMode);
             KeywordCollection keywords = new KeywordCollection();
@@ -93,60 +82,49 @@ namespace IgorKL.ACAD3.Model.Drawing
             keywords.Add("Step", "ШАГ", "ШАГ линий", true, true);
             keywords.Add("SmallLineLength", "ДЛИНА", "ДЛИНА короткой линии", true, true);
             mainBlock.AddKeywords(keywords);
-            mainBlock.PromptKeywordAction = (pres) =>
-            {
-                switch (pres.StringResult)
-                {
-                    case "SlopeMode":
-                        {
-                            var res = mainBlock.PromptSlopeLineMode();
-                            return res;
-                        }
-                    case "Step":
-                        {
-                            var res = mainBlock.PromptStep();
-                            return res;
-                        }
-                    case "SmallLineLength":
-                        {
-                            var res = mainBlock.PromptSmallLineLingrth();
-                            return res;
-                        }
-                    case "AllLineLength":
-                        {
-                            mainBlock._startPoint = mainBlock.BaseCurve.StartPoint;
-                            mainBlock._startPointComplete = true;
-                            mainBlock._endPoint = mainBlock.BaseCurve.EndPoint;
-                            mainBlock._endPointComplete = true;
-                            Tools.StartTransaction(() =>
-                            {
-                                mainBlock._entitiesInMemory.Clear();
-                                var slopeLines = mainBlock.Calculate(mainBlock._slopeMode);
-                                if (slopeLines != null && slopeLines.Count > 1)
-                                {
-                                    mainBlock._entitiesInMemory.AddRange(slopeLines);
-                                    mainBlock.SaveAtBlock();
-                                }
-                            });
-                            goto case "Exit";
-                        }
-                    case "Exit":
-                        {
-                            return PromptStatus.Cancel;
-                        }
+            mainBlock.PromptKeywordAction = (pres) => {
+                switch (pres.StringResult) {
+                    case "SlopeMode": {
+                        var res = mainBlock.PromptSlopeLineMode();
+                        return res;
+                    }
+                    case "Step": {
+                        var res = mainBlock.PromptStep();
+                        return res;
+                    }
+                    case "SmallLineLength": {
+                        var res = mainBlock.PromptSmallLineLingrth();
+                        return res;
+                    }
+                    case "AllLineLength": {
+                        mainBlock._startPoint = mainBlock.BaseCurve.StartPoint;
+                        mainBlock._startPointComplete = true;
+                        mainBlock._endPoint = mainBlock.BaseCurve.EndPoint;
+                        mainBlock._endPointComplete = true;
+                        Tools.StartTransaction(() => {
+                            mainBlock._entitiesInMemory.Clear();
+                            var slopeLines = mainBlock.Calculate(mainBlock._slopeMode);
+                            if (slopeLines != null && slopeLines.Count > 1) {
+                                mainBlock._entitiesInMemory.AddRange(slopeLines);
+                                mainBlock.SaveAtBlock();
+                            }
+                        });
+                        goto case "Exit";
+                    }
+                    case "Exit": {
+                        return PromptStatus.Cancel;
+                    }
                 }
                 return PromptStatus.Cancel;
             };
 
-            Tools.StartTransaction(() =>
-            {
+            Tools.StartTransaction(() => {
                 if (mainBlock.PromptBaseLine() != PromptStatus.OK)
                     return;
                 if (mainBlock.PromptDestinationLine() != PromptStatus.OK)
                     return;
 
-                while (mainBlock._baseLine.Id == mainBlock._destinationLine.Id)
-                {
+                while (mainBlock._baseLine.Id == mainBlock._destinationLine.Id) {
                     Tools.GetAcadEditor().WriteMessage("\nЛинии должны отличаться, укажите другую линию");
                     if (mainBlock.PromptDestinationLine() != PromptStatus.OK)
                         return;
@@ -154,25 +132,20 @@ namespace IgorKL.ACAD3.Model.Drawing
 
                 keywords.Add("AllLineLength", "ВсяЛиния", "ВсяЛиния", true, true);
 
-                try
-                {
+                try {
                     if (!mainBlock.PromptStartPoint(keywords, mainBlock.PromptKeywordAction))
                         return;
-                    if (mainBlock.PromptEndPoint())
-                    {
+                    if (mainBlock.PromptEndPoint()) {
                         mainBlock.SaveAtBlock();
                     }
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     Application.ShowAlertDialog("\nОшибка. \n" + ex.Message);
                 }
             });
         }
 
 
-        private PromptEntityResult _promptLine(string msg = "\nУкажите линию: ", KeywordCollection keywords = null)
-        {
+        private PromptEntityResult _promptLine(string msg = "\nУкажите линию: ", KeywordCollection keywords = null) {
             PromptEntityOptions peo = new PromptEntityOptions(msg);
             peo.SetRejectMessage("\nДолжна быть линия");
             peo.AddAllowedClass(typeof(Curve), false);
@@ -185,27 +158,22 @@ namespace IgorKL.ACAD3.Model.Drawing
             PromptEntityResult per = Tools.GetAcadEditor().GetEntity(peo);
             return per;
         }
-        public PromptStatus PromptBaseLine()
-        {
+        public PromptStatus PromptBaseLine() {
             KeywordCollection keywords = new KeywordCollection();
             keywords.Add("EditSlope", "РЕДактировать", "РЕДактировать", true, true);
 
             var per = _promptLine("\nУкажите верхнюю бровку: ", keywords);
-            if (per.Status == PromptStatus.Keyword)
-            {
-                switch (per.StringResult)
-                {
-                    case "EditSlope":
-                        {
-                            while (EditCreatedSlopeLines() == PromptStatus.OK)
-                            {
-                                Tools.GetAcadDatabase().TransactionManager.QueueForGraphicsFlush();
-                                //Tools.GetAcadDatabase().UpdateExt(true);
-                            }
-                            /*if (EditCreatedSlopeLines() != PromptStatus.OK)
-                                return PromptStatus.Cancel;*/
-                            break;
+            if (per.Status == PromptStatus.Keyword) {
+                switch (per.StringResult) {
+                    case "EditSlope": {
+                        while (EditCreatedSlopeLines() == PromptStatus.OK) {
+                            Tools.GetAcadDatabase().TransactionManager.QueueForGraphicsFlush();
+                            //Tools.GetAcadDatabase().UpdateExt(true);
                         }
+                        /*if (EditCreatedSlopeLines() != PromptStatus.OK)
+                            return PromptStatus.Cancel;*/
+                        break;
+                    }
 
                 }
             }
@@ -217,8 +185,7 @@ namespace IgorKL.ACAD3.Model.Drawing
             _regressBaseLine = IgorKL.ACAD3.Model.Helpers.Math.Statistical.LinearRegression(_baseLine.ConvertToPolyline());
             return PromptStatus.OK;
         }
-        public PromptStatus PromptDestinationLine()
-        {
+        public PromptStatus PromptDestinationLine() {
             var per = _promptLine("\nУкажите нижнюю бровку: ");
             if (per.Status != PromptStatus.OK)
                 return per.Status;
@@ -227,32 +194,26 @@ namespace IgorKL.ACAD3.Model.Drawing
             _regressDestLine = IgorKL.ACAD3.Model.Helpers.Math.Statistical.LinearRegression(_destinationLine.ConvertToPolyline());
             return PromptStatus.OK;
         }
-        public bool PromptStartPoint(KeywordCollection keywords = null, Func<PromptPointResult, PromptStatus> promptAction = null)
-        {
+        public bool PromptStartPoint(KeywordCollection keywords = null, Func<PromptPointResult, PromptStatus> promptAction = null) {
             Drawing.PerpendicularVectorJigView vectorView = new PerpendicularVectorJigView(_baseLine, _ucs);
             if (keywords != null)
                 vectorView.AddKeywords(keywords);
             if (promptAction != null)
                 vectorView.PromptKeywordAction = promptAction;
 
-            if (vectorView.StartJig() == PromptStatus.OK)
-            {
+            if (vectorView.StartJig() == PromptStatus.OK) {
                 _startPoint = vectorView.NormalPoint;
                 _startPointComplete = true;
                 return true;
-            }
-            else
-            {
+            } else {
                 _startPoint = Point3d.Origin;
                 _startPointComplete = false;
                 return false;
             }
         }
-        public bool PromptEndPoint()
-        {
+        public bool PromptEndPoint() {
             //SlopeLinesGenerator vectorView = new SlopeLinesGenerator(_ucs);
-            if (this.StartJig() == PromptStatus.OK)
-            {
+            if (this.StartJig() == PromptStatus.OK) {
                 _endPointComplete = true;
                 return true;
             }
@@ -261,8 +222,7 @@ namespace IgorKL.ACAD3.Model.Drawing
         }
 
         public PromptStatus PromptSlopeInsideBlock(out PromptNestedEntityResult res, KeywordCollection keywoeds = null,
-    Func<PromptNestedEntityResult, PromptStatus> promptAction = null, string msg = "\nВыберите линиюю")
-        {
+    Func<PromptNestedEntityResult, PromptStatus> promptAction = null, string msg = "\nВыберите линиюю") {
             res = null;
 
             PromptNestedEntityOptions pneo = new PromptNestedEntityOptions(msg);
@@ -273,8 +233,7 @@ namespace IgorKL.ACAD3.Model.Drawing
 
             PromptNestedEntityResult pner = Tools.GetAcadEditor().GetNestedEntity(pneo);
             if (pner.Status == PromptStatus.Keyword)
-                if (promptAction != null)
-                {
+                if (promptAction != null) {
                     var kwRes = promptAction(pner);
                     if (kwRes != PromptStatus.OK)
                         return kwRes;
@@ -291,8 +250,7 @@ namespace IgorKL.ACAD3.Model.Drawing
             return PromptStatus.OK;
         }
 
-        public List<Line> Calculate(SlopeModes slopeMode)
-        {
+        public List<Line> Calculate(SlopeModes slopeMode) {
             List<Line> slopeLines = new List<Line>();
 
             Polyline basePline = _baseLine.ConvertToPolyline();
@@ -305,20 +263,17 @@ namespace IgorKL.ACAD3.Model.Drawing
             double startDist = 0;
             startDist = basePline.GetDistAtPoint(_startPoint);
             double endDist = startDist;
-            try
-            {
+            try {
                 endDist = basePline.GetDistAtPoint(_endPoint);
-            }
-            catch { }
+            } catch { }
 
             Vector3d startVector = _startPoint - destPline.StartPoint;
             Vector3d endVector = _endPoint - destPline.EndPoint;
             Point3d centralPoint = _startPoint.Add((_endPoint - _startPoint).MultiplyBy(0.5d));
 
             if ((centralPoint - destPline.StartPoint).Length < startVector.Length &&
-                (centralPoint - destPline.EndPoint).Length < endVector.Length)
-            {
-                Vector3d buffVector = startVector;
+                (centralPoint - destPline.EndPoint).Length < endVector.Length) {
+                //Vector3d buffVector = startVector;
                 startVector = endVector;
                 endVector = startVector;
                 destPline = ((Polyline)destPline.Clone());
@@ -331,118 +286,104 @@ namespace IgorKL.ACAD3.Model.Drawing
             double buffLength = startVector.Length + endVector.Length + basePline.Length + destPline.Length;
             int slopeNumber = 0;
             //for (double dist = startDist; dist <= endDist && dist <= basePline.Length; dist += _step)
-            for (double dist = startDist; sign > 0 ? dist <= endDist : dist >= endDist; dist += _step*sign)
-            {
+            for (double dist = startDist; sign > 0 ? dist <= endDist : dist >= endDist; dist += _step * sign) {
                 slopeNumber++;
                 Point3d point = basePline.GetPointAtDist(dist);
 
-                switch (slopeMode)
-                {
-                    case SlopeModes.BothPerpendicular:
-                        {
-                            Point3d? destPoint = destPline.GetOrthoNormalPoint(point, null, true);
-                            if (destPoint.HasValue)
-                            {
-                                Line slope = new Line(point, destPoint.Value);
-                                //if ((dist-startDist +_step) % (_step*2d) < Tolerance.Global.EqualPoint)
-                                if (this._isSmallLine(slopeNumber, _opiMode))
-                                    slope = new Line(slope.StartPoint, slope.StartPoint.Add((slope.EndPoint - slope.StartPoint).MultiplyBy(_smallLineLength)));
-                                slopeLines.Add(slope);
-                            }
-                            break;
-                        }
-                    case SlopeModes.OwnPerpendicular:
-                        {
-                            Line line = new Line(point, point.Add(_baseLine.GetPerpendicularVector(point).MultiplyBy(buffLength)));
-                            Point3dCollection intersects = new Point3dCollection();
-
-                            Point3d? destPoint = _getIntersectPoint(line, destPline);
-                            if (!destPoint.HasValue)
-                                break;
+                switch (slopeMode) {
+                    case SlopeModes.BothPerpendicular: {
+                        Point3d? destPoint = destPline.GetOrthoNormalPoint(point, null, true);
+                        if (destPoint.HasValue) {
                             Line slope = new Line(point, destPoint.Value);
+                            //if ((dist-startDist +_step) % (_step*2d) < Tolerance.Global.EqualPoint)
                             if (this._isSmallLine(slopeNumber, _opiMode))
                                 slope = new Line(slope.StartPoint, slope.StartPoint.Add((slope.EndPoint - slope.StartPoint).MultiplyBy(_smallLineLength)));
                             slopeLines.Add(slope);
-
-                            break;
                         }
-                    case SlopeModes.EqualStep:
-                        {
-                            int count = Convert.ToInt32(Math.Floor(Math.Abs(endDist - startDist) / _step));
-                            if (count == 0)
-                                break;
+                        break;
+                    }
+                    case SlopeModes.OwnPerpendicular: {
+                        Line line = new Line(point, point.Add(_baseLine.GetPerpendicularVector(point).MultiplyBy(buffLength)));
+                        Point3dCollection intersects = new Point3dCollection();
 
-                            Point3d? startDestPoint = destPline.GetOrthoNormalPoint(_startPoint, null, true);
-                            Point3d? endDestPoint = destPline.GetOrthoNormalPoint(point, null, true);
-                            if (!startDestPoint.HasValue)
-                                startDestPoint = destPline.StartPoint;
-                            if (!endDestPoint.HasValue)
-                                endDestPoint = destPline.EndPoint;
-
-                            double lengthFactor = destPline.Length / basePline.Length;
-                            double destDist = dist * lengthFactor;
-                            
-                            if (Math.Abs(destDist) <= Tolerance.Global.EqualPoint)
-                                destDist = 0d;
-                            if (Math.Abs(destDist - destPline.Length) <= Tolerance.Global.EqualPoint)
-                                destDist = destPline.Length;
-
-                            Point3d destPoint = destPline.GetPointAtDist(destDist);
-
-                            Line slope = new Line(point, destPoint);
-                            if (_isSmallLine(slopeNumber, _opiMode))
-                                slope = new Line(slope.StartPoint, slope.StartPoint.Add((slope.EndPoint - slope.StartPoint).MultiplyBy(_smallLineLength)));
-                            slopeLines.Add(slope);
-
+                        Point3d? destPoint = _getIntersectPoint(line, destPline);
+                        if (!destPoint.HasValue)
                             break;
-                        }
-                    case SlopeModes.RegressBoth:
-                        {
-                            Point3d? basePoint = _regressBaseLine.GetOrthoNormalPoint(point, null, true);
-                            if (basePoint.HasValue)
-                            {
-                                Point3d? destPoint = _regressDestLine.GetOrthoNormalPoint(basePoint.Value, null, true);
-                                if (destPoint.HasValue)
-                                {
-                                    Line slope = new Line(basePoint.Value, destPoint.Value);
-                                    basePoint = _getIntersectPoint(slope, basePline);
-                                    if (basePoint.HasValue)
-                                    {
-                                        destPoint = _getIntersectPoint(slope, destPline);
-                                        if (destPoint.HasValue)
-                                        {
-                                            slope = new Line(basePoint.Value, destPoint.Value);
-                                            if (this._isSmallLine(slopeNumber, _opiMode))
-                                                slope = new Line(slope.StartPoint, slope.StartPoint.Add((slope.EndPoint - slope.StartPoint).MultiplyBy(_smallLineLength)));
-                                            slopeLines.Add(slope);
-                                        }
+                        Line slope = new Line(point, destPoint.Value);
+                        if (this._isSmallLine(slopeNumber, _opiMode))
+                            slope = new Line(slope.StartPoint, slope.StartPoint.Add((slope.EndPoint - slope.StartPoint).MultiplyBy(_smallLineLength)));
+                        slopeLines.Add(slope);
+
+                        break;
+                    }
+                    case SlopeModes.EqualStep: {
+                        int count = Convert.ToInt32(Math.Floor(Math.Abs(endDist - startDist) / _step));
+                        if (count == 0)
+                            break;
+
+                        Point3d? startDestPoint = destPline.GetOrthoNormalPoint(_startPoint, null, true);
+                        Point3d? endDestPoint = destPline.GetOrthoNormalPoint(point, null, true);
+                        if (!startDestPoint.HasValue)
+                            startDestPoint = destPline.StartPoint;
+                        if (!endDestPoint.HasValue)
+                            endDestPoint = destPline.EndPoint;
+
+                        double lengthFactor = destPline.Length / basePline.Length;
+                        double destDist = dist * lengthFactor;
+
+                        if (Math.Abs(destDist) <= Tolerance.Global.EqualPoint)
+                            destDist = 0d;
+                        if (Math.Abs(destDist - destPline.Length) <= Tolerance.Global.EqualPoint)
+                            destDist = destPline.Length;
+
+                        Point3d destPoint = destPline.GetPointAtDist(destDist);
+
+                        Line slope = new Line(point, destPoint);
+                        if (_isSmallLine(slopeNumber, _opiMode))
+                            slope = new Line(slope.StartPoint, slope.StartPoint.Add((slope.EndPoint - slope.StartPoint).MultiplyBy(_smallLineLength)));
+                        slopeLines.Add(slope);
+
+                        break;
+                    }
+                    case SlopeModes.RegressBoth: {
+                        Point3d? basePoint = _regressBaseLine.GetOrthoNormalPoint(point, null, true);
+                        if (basePoint.HasValue) {
+                            Point3d? destPoint = _regressDestLine.GetOrthoNormalPoint(basePoint.Value, null, true);
+                            if (destPoint.HasValue) {
+                                Line slope = new Line(basePoint.Value, destPoint.Value);
+                                basePoint = _getIntersectPoint(slope, basePline);
+                                if (basePoint.HasValue) {
+                                    destPoint = _getIntersectPoint(slope, destPline);
+                                    if (destPoint.HasValue) {
+                                        slope = new Line(basePoint.Value, destPoint.Value);
+                                        if (this._isSmallLine(slopeNumber, _opiMode))
+                                            slope = new Line(slope.StartPoint, slope.StartPoint.Add((slope.EndPoint - slope.StartPoint).MultiplyBy(_smallLineLength)));
+                                        slopeLines.Add(slope);
                                     }
                                 }
                             }
-                            break;
                         }
+                        break;
+                    }
                 }
             }
 
             return slopeLines;
         }
 
-        private bool _isSmallLine(int num, bool opiMode = false)
-        {
+        private bool _isSmallLine(int num, bool opiMode = false) {
             return (!opiMode ? num % 2d == 0d : (2 + num) % 3d != 0d);
         }
 
-        protected override SamplerStatus Sampler(JigPrompts prompts)
-        {
+        protected override SamplerStatus Sampler(JigPrompts prompts) {
             var status = base.Sampler(prompts);
 
 
-            if (status == SamplerStatus.OK)
-            {
+            if (status == SamplerStatus.OK) {
 
                 _endPoint = base.NormalPoint;
                 _endPointComplete = true;
-                
+
 
                 /*_endPoint = base.NormalPoint;
                 var slopeLines = Calculate(_slopeMode);
@@ -462,8 +403,7 @@ namespace IgorKL.ACAD3.Model.Drawing
             return status;
         }
 
-        public PromptStatus PromptSlopeLineMode(string msg = "\nУкавите метод построения линий откоса")
-        {
+        public PromptStatus PromptSlopeLineMode(string msg = "\nУкавите метод построения линий откоса") {
             PromptKeywordOptions pko = new PromptKeywordOptions(msg);
             pko.Keywords.Add(SlopeModes.OwnPerpendicular.ToString(), "ПРостойПЕРпендикуляр", "ПРостойПЕРпендикуляр", true, true);
             pko.Keywords.Add(SlopeModes.EqualStep.ToString(), "ЕКВивалентныйШаг", "ЕКВивалентныйШаг", true, true);
@@ -475,42 +415,30 @@ namespace IgorKL.ACAD3.Model.Drawing
             if (pr.Status != PromptStatus.OK)
                 return pr.Status;
 
-            if (pr.StringResult == "Exit")
-            {
+            if (pr.StringResult == "Exit") {
                 return PromptStatus.Cancel;
-            }
-            else if (pr.StringResult == SlopeModes.OwnPerpendicular.ToString())
-            {
+            } else if (pr.StringResult == SlopeModes.OwnPerpendicular.ToString()) {
                 _slopeMode = SlopeModes.OwnPerpendicular;
                 _dataHost.Write("slopeMode", _slopeMode);
                 return PromptStatus.OK;
-            }
-            else if (pr.StringResult == SlopeModes.EqualStep.ToString())
-            {
+            } else if (pr.StringResult == SlopeModes.EqualStep.ToString()) {
                 _slopeMode = SlopeModes.EqualStep;
                 _dataHost.Write("slopeMode", _slopeMode);
                 return PromptStatus.OK;
-            }
-            else if (pr.StringResult == SlopeModes.BothPerpendicular.ToString())
-            {
+            } else if (pr.StringResult == SlopeModes.BothPerpendicular.ToString()) {
                 _slopeMode = SlopeModes.BothPerpendicular;
                 _dataHost.Write("slopeMode", _slopeMode);
                 return PromptStatus.OK;
-            }
-            else if (pr.StringResult == SlopeModes.RegressBoth.ToString())
-            {
+            } else if (pr.StringResult == SlopeModes.RegressBoth.ToString()) {
                 _slopeMode = SlopeModes.RegressBoth;
                 _dataHost.Write("slopeMode", _slopeMode);
                 return PromptStatus.OK;
-            }
-            else
-            {
+            } else {
                 throw new ArgumentException();
             }
         }
 
-        public PromptStatus PromptStep(string msg = "\nУкажите шаг линий, м")
-        {
+        public PromptStatus PromptStep(string msg = "\nУкажите шаг линий, м") {
             PromptDoubleOptions pdo = new PromptDoubleOptions(msg);
             pdo.AllowNegative = false;
             pdo.AllowNone = false;
@@ -527,8 +455,7 @@ namespace IgorKL.ACAD3.Model.Drawing
             return PromptStatus.OK;
         }
 
-        public PromptStatus PromptSmallLineLingrth(string msg = "\nУкажите относительную длину коротких линий")
-        {
+        public PromptStatus PromptSmallLineLingrth(string msg = "\nУкажите относительную длину коротких линий") {
             PromptDoubleOptions pdo = new PromptDoubleOptions(msg);
             pdo.AllowNegative = false;
             pdo.AllowNone = false;
@@ -546,18 +473,14 @@ namespace IgorKL.ACAD3.Model.Drawing
             return PromptStatus.OK;
         }
 
-        protected override bool WorldDraw(Autodesk.AutoCAD.GraphicsInterface.WorldDraw draw)
-        {
-            lock (_entitiesInMemory)
-            {
+        protected override bool WorldDraw(Autodesk.AutoCAD.GraphicsInterface.WorldDraw draw) {
+            lock (_entitiesInMemory) {
                 bool res = base.WorldDraw(draw);
 
-                if (_endPointComplete)
-                {
+                if (_endPointComplete) {
                     var slopeLines = Calculate(_slopeMode);
 
-                    if (slopeLines.Count > 0)
-                    {
+                    if (slopeLines.Count > 0) {
                         foreach (var ent in _entitiesInMemory)
                             if (!ent.IsDisposed)
                                 ent.Dispose();
@@ -571,15 +494,12 @@ namespace IgorKL.ACAD3.Model.Drawing
                 return res;
             }
 
-            
+
         }
 
-        public ObjectId SaveAtBlock()
-        {
-            if (_entitiesInMemory != null && _entitiesInMemory.Count > 0)
-            {
-                _entitiesInMemory.ForEach(ent =>
-                {
+        public ObjectId SaveAtBlock() {
+            if (_entitiesInMemory != null && _entitiesInMemory.Count > 0) {
+                _entitiesInMemory.ForEach(ent => {
                     ent.Color = Color.FromColorIndex(ColorMethod.ByBlock, 0);
                     ent.Linetype = "ByBlock";
                     ent.LineWeight = LineWeight.ByBlock;
@@ -588,12 +508,10 @@ namespace IgorKL.ACAD3.Model.Drawing
                 ObjectId btrId = AcadBlocks.BlockTools.CreateBlockTableRecord("*U", _startPoint, _entitiesInMemory.GetClonedEntities(), AnnotativeStates.NotApplicable);
                 ObjectId brId = AcadBlocks.BlockTools.AppendBlockItem(_startPoint, btrId, null);
                 return brId;
-            }
-            else
+            } else
                 return ObjectId.Null;
         }
-        public ObjectId SaveAtBlock(IEnumerable<Line> slopeLines)
-        {
+        public ObjectId SaveAtBlock(IEnumerable<Line> slopeLines) {
             if (_entitiesInMemory == null)
                 _entitiesInMemory = new List<Entity>(slopeLines.Count());
             _entitiesInMemory.AddRange(slopeLines);
@@ -601,21 +519,17 @@ namespace IgorKL.ACAD3.Model.Drawing
         }
 
 
-        public PromptStatus EditCreatedSlopeLines()
-        {
+        public PromptStatus EditCreatedSlopeLines() {
             KeywordCollection keywords = new KeywordCollection();
             keywords.Add("Exit", "ВЫХод", "ВЫХод", true, true);
-            Func<PromptNestedEntityResult, PromptStatus> promptActon = (pr) =>
-                {
-                    switch (pr.StringResult)
-                    {
-                        case "Exit":
-                            {
-                                return PromptStatus.Cancel;
-                            }
+            Func<PromptNestedEntityResult, PromptStatus> promptActon = (pr) => {
+                switch (pr.StringResult) {
+                    case "Exit": {
+                        return PromptStatus.Cancel;
                     }
-                    return PromptStatus.Cancel;
-                };
+                }
+                return PromptStatus.Cancel;
+            };
 
             PromptNestedEntityResult pner;
             if (PromptSlopeInsideBlock(out pner, keywords, promptActon) != PromptStatus.OK)
@@ -625,11 +539,9 @@ namespace IgorKL.ACAD3.Model.Drawing
 
             Matrix3d brMat = Matrix3d.Identity;
 
-            Tools.StartTransaction(() =>
-            {
+            Tools.StartTransaction(() => {
                 var conts = pner.GetContainers();
-                foreach (var brId in conts)
-                {
+                foreach (var brId in conts) {
                     var br = brId.GetObjectForRead<BlockReference>(false);
                     if (br != null)
                         brMat = brMat.PreMultiplyBy(br.BlockTransform);
@@ -640,17 +552,14 @@ namespace IgorKL.ACAD3.Model.Drawing
 
                 MoveSlopeLineJig moveJig = new MoveSlopeLineJig(slopeLine);
                 res = Tools.GetAcadEditor().Drag(moveJig);
-                if (res.Status == PromptStatus.OK)
-                {
+                if (res.Status == PromptStatus.OK) {
                     slopeLine.TransformBy(brMat.Inverse());
 
                     // Open each of the containers and set a property so that
                     // they each get regenerated
-                    foreach (var id in conts)
-                    {
+                    foreach (var id in conts) {
                         var ent = id.GetObjectForWrite<Entity>();
-                        if (ent != null)
-                        {
+                        if (ent != null) {
                             // We might also have called this method:
                             // ent.RecordGraphicsModified(true);
                             // but setting a property works better with undo
@@ -662,37 +571,29 @@ namespace IgorKL.ACAD3.Model.Drawing
             return res.Status;
         }
 
-        private Point3d? _getIntersectPoint(Line direction, Polyline destLine)
-        {
+        private Point3d? _getIntersectPoint(Line direction, Polyline destLine) {
             Point3d bpoint = direction.StartPoint;
             Point3dCollection intersects = new Point3dCollection();
             direction.IntersectWith(destLine, Intersect.ExtendBoth, direction.GetPlane(), intersects, IntPtr.Zero, IntPtr.Zero);
 
-            if (intersects.Count > 0)
-            {
+            if (intersects.Count > 0) {
                 List<Vector3d> vs = new List<Vector3d>();
                 var buffer = intersects.ToEnumerable().ToArray();
                 List<Point3d> allowedPoints = new List<Point3d>();
 
-                Action processor = () =>
-                {
-                    foreach (var p in buffer)
-                    {
-                        try
-                        {
+                Action processor = () => {
+                    foreach (var p in buffer) {
+                        try {
                             double testDest = destLine.GetDistAtPoint(p);
                             Point3d elevatedPoint = destLine.GetPointAtDist(testDest);
                             allowedPoints.Add(elevatedPoint);
-                        }
-                        catch (Autodesk.AutoCAD.Runtime.Exception)
-                        { }
+                        } catch (Autodesk.AutoCAD.Runtime.Exception) { }
                     }
                     allowedPoints.Sort((x1, x2) => Comparer<double>.Default.Compare((x1 - bpoint).Length, (x2 - bpoint).Length));
                 };
 
                 processor();
-                if (allowedPoints.Count() < 2)
-                {
+                if (allowedPoints.Count() < 2) {
                     direction.ReverseCurve();
                     processor();
                 }
@@ -704,8 +605,7 @@ namespace IgorKL.ACAD3.Model.Drawing
             return null;
         }
 
-        private IEnumerable<Point3d> _getPointsAtStep(Curve curve, Point3d startPoint, Point3d endPoint, int count)
-        {
+        private IEnumerable<Point3d> _getPointsAtStep(Curve curve, Point3d startPoint, Point3d endPoint, int count) {
             List<Point3d> points = new List<Point3d>(count);
             if (!curve.IsPointOnCurveGCP(startPoint.OrthoProject(curve.GetPlane())))
                 return points;
@@ -720,36 +620,31 @@ namespace IgorKL.ACAD3.Model.Drawing
             if (step <= Tolerance.Global.EqualPoint)
                 return points;
             int sign = endDist >= startDist ? 1 : -1;
-            for (double dist = startDist; sign > 0? dist <= endDist : dist >= endDist; dist += step*sign)
-            {
+            for (double dist = startDist; sign > 0 ? dist <= endDist : dist >= endDist; dist += step * sign) {
                 points.Add(curve.GetPointAtDist(dist));
             }
 
             return points;
         }
 
-        public enum SlopeModes
-        {
+        public enum SlopeModes {
             BothPerpendicular,
             OwnPerpendicular,
             EqualStep,
             RegressBoth
         }
 
-        private class MoveSlopeLineJig:EntityJig
-        {
+        private class MoveSlopeLineJig : EntityJig {
             private Point3d _pos;
             private Point3d _loc;
 
             public MoveSlopeLineJig(Line line)
-                :base(line)
-            {
+                : base(line) {
                 _pos = line.EndPoint;
                 _loc = _pos;
             }
 
-            protected override bool Update()
-            {
+            protected override bool Update() {
                 var disp = _pos - _loc;
                 _loc = _pos;
                 var mat = Matrix3d.Displacement(disp);
@@ -757,8 +652,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                 return true;
             }
 
-            protected override SamplerStatus Sampler(JigPrompts prompts)
-            {
+            protected override SamplerStatus Sampler(JigPrompts prompts) {
                 var opts = new JigPromptPointOptions("\nSelect displacement");
                 opts.BasePoint = _pos;
                 opts.UserInputControls =

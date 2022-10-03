@@ -15,14 +15,11 @@ using wnd = System.Windows.Forms;
 
 using IgorKL.ACAD3.Model.Extensions;
 
-namespace IgorKL.ACAD3.Model.Commands
-{
-    public class MLeaderCmd
-    {
+namespace IgorKL.ACAD3.Model.Commands {
+    public class MLeaderCmd {
         [RibbonCommandButton("Копировать текст", "Текст/Аннотации")]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_CopyMLeaderTextContext", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public static void CopyMLeaderTextContext()
-        {
+        public static void CopyMLeaderTextContext() {
             MLeader sourceLeader;
             MLeader destLeader;
 
@@ -39,8 +36,7 @@ namespace IgorKL.ACAD3.Model.Commands
 
         [RibbonCommandButton("Выбор текста с шагом", "Текст/Аннотации")]
         [Autodesk.AutoCAD.Runtime.CommandMethod("ICmd_SelectTextAtGrid")]
-        public static void SelectTextAtGrid()
-        {
+        public static void SelectTextAtGrid() {
             Matrix3d ucs = Tools.GetAcadEditor().CurrentUserCoordinateSystem;
 
             List<DBText> res = new List<DBText>();
@@ -58,8 +54,7 @@ namespace IgorKL.ACAD3.Model.Commands
 
 
             double textHeight = 0;
-            Tools.StartTransaction(() =>
-            {
+            Tools.StartTransaction(() => {
                 textHeight = sourceObj.Id.GetObjectForRead<DBText>(false).Height;
             });
 
@@ -70,11 +65,9 @@ namespace IgorKL.ACAD3.Model.Commands
             Matrix3d displace = Matrix3d.Displacement(ucs.CoordinateSystem3d.Origin - sourceObj.Position);
 
             var transformedText = selectedTexts.Select(ent => new KeyValuePair<Point3d, ObjectId>(ent.Position.TransformBy(rot).TransformBy(displace), ent.Id));
-            Tools.StartTransaction(() =>
-            {
+            Tools.StartTransaction(() => {
                 List<ObjectId> selected = new List<ObjectId>();
-                foreach (var text in transformedText)
-                {
+                foreach (var text in transformedText) {
                     Vector3d v = text.Key - sourceObj.Position.TransformBy(displace);
 
                     double tolerance = textHeight * 0.1 + (v.Length - vector.Length) * Tolerance.Global.EqualPoint * 100;
@@ -83,8 +76,7 @@ namespace IgorKL.ACAD3.Model.Commands
                     double dy = Math.Abs(v.Y) % vector.Length;
 
                     if (dx < tolerance || Math.Abs(dx - vector.Length) < tolerance)
-                        if (dy < tolerance || Math.Abs(dy - vector.Length) < tolerance)
-                        {
+                        if (dy < tolerance || Math.Abs(dy - vector.Length) < tolerance) {
                             //text.Value.GetObjectForWrite<DBText>(false).ColorIndex = 181;
                             selected.Add(text.Value);
                         }

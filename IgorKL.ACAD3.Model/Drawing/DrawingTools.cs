@@ -1,32 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.GraphicsInterface;
+using Autodesk.AutoCAD.Runtime;
+using System.Collections.Generic;
 
-namespace IgorKL.ACAD3.Model.Drawing
-{
-    public class DrawingTools
-    {
-        public class DynamicPreviewer
-        {
+namespace IgorKL.ACAD3.Model.Drawing {
+    public class DrawingTools {
+        public class DynamicPreviewer {
             TransientGraphicsTools.SelectableTransient _st;
 
             [CommandMethod("TRS2")]
-            public void DisplayLine()
-            {
-                
+            public void DisplayLine() {
+
                 // Create a line and pass it to the SelectableTransient
                 // This makes cleaning up much more straightforward
 
-                List<Entity> lines = new List<Entity>( new[] {
+                List<Entity> lines = new List<Entity>(new[] {
                     new Line(new Point3d(0, 0, 0), new Point3d(10, 0, 0)),
                     new Line(new Point3d(5, 4, 0), new Point3d(7,1, 0)),
                     new Line(new Point3d(3, 8, 0), new Point3d(17,11, 0))
@@ -38,20 +28,17 @@ namespace IgorKL.ACAD3.Model.Drawing
             }
 
             [CommandMethod("TRU2")]
-            public void Stop()
-            {
+            public void Stop() {
                 _st.StopDisplaying();
             }
 
             [CommandMethod("TRS3")]
-            public void DisplayLine2()
-            {
+            public void DisplayLine2() {
                 _st.Display();
             }
         }
 
-        public class SelectableTransient : Transient
-        {
+        public class SelectableTransient : Transient {
             // Windows messages we care about
 
             const int WM_LBUTTONDOWN = 513;
@@ -62,13 +49,11 @@ namespace IgorKL.ACAD3.Model.Drawing
             Entity _ent = null;
             bool _picked = false, _clicked = false;
 
-            public SelectableTransient(Entity ent)
-            {
+            public SelectableTransient(Entity ent) {
                 _ent = ent;
             }
 
-            protected override int SubSetAttributes(DrawableTraits traits)
-            {
+            protected override int SubSetAttributes(DrawableTraits traits) {
                 // If the cursor is over the entity, make it colored
                 // (whether it's red or yellow will depend on whether
                 // there's a mouse-button click, too)
@@ -78,45 +63,37 @@ namespace IgorKL.ACAD3.Model.Drawing
                 return (int)DrawableAttributes.None;
             }
 
-            protected override void SubViewportDraw(ViewportDraw vd)
-            {
+            protected override void SubViewportDraw(ViewportDraw vd) {
                 _ent.ViewportDraw(vd);
             }
 
-            protected override bool SubWorldDraw(WorldDraw wd)
-            {
+            protected override bool SubWorldDraw(WorldDraw wd) {
                 _ent.WorldDraw(wd);
 
                 return true;
             }
 
-            protected override void OnDeviceInput(DeviceInputEventArgs e)
-            {
+            protected override void OnDeviceInput(DeviceInputEventArgs e) {
                 bool redraw = false;
 
-                if (e.Message == WM_LBUTTONDOWN)
-                {
+                if (e.Message == WM_LBUTTONDOWN) {
                     _clicked = true;
 
                     // If we're over the entity, absorb the click
                     // (stops the window selection from happening)
 
-                    if (_picked)
-                    {
+                    if (_picked) {
                         e.Handled = true;
                     }
                     redraw = true;
-                }
-                else if (e.Message == WM_LBUTTONUP)
-                {
+                } else if (e.Message == WM_LBUTTONUP) {
                     _clicked = false;
                     redraw = true;
                 }
 
                 // Only update the graphics if things have changed
 
-                if (redraw)
-                {
+                if (redraw) {
                     TransientManager.CurrentTransientManager.UpdateTransient(
                       this, new IntegerCollection()
                     );
@@ -130,8 +107,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                 base.OnDeviceInput(e);
             }
 
-            private void ForceMessage()
-            {
+            private void ForceMessage() {
                 // Set the cursor without ectually moving it - enough to
                 // generate a Windows message
 
@@ -141,30 +117,26 @@ namespace IgorKL.ACAD3.Model.Drawing
                   new System.Drawing.Point(pt.X, pt.Y);
             }
 
-            protected override void OnPointInput(PointInputEventArgs e)
-            {
+            protected override void OnPointInput(PointInputEventArgs e) {
                 bool wasPicked = _picked;
 
                 _picked = false;
 
                 Curve cv = _ent as Curve;
-                if (cv != null)
-                {
+                if (cv != null) {
                     Point3d pt =
                       cv.GetClosestPointTo(e.Context.ComputedPoint, false);
                     if (
                       pt.DistanceTo(e.Context.ComputedPoint) <= 0.1
-                        // Tolerance.Global.EqualPoint is too small
-                    )
-                    {
+                    // Tolerance.Global.EqualPoint is too small
+                    ) {
                         _picked = true;
                     }
                 }
 
                 // Only update the graphics if things have changed
 
-                if (_picked != wasPicked)
-                {
+                if (_picked != wasPicked) {
                     TransientManager.CurrentTransientManager.UpdateTransient(
                       this, new IntegerCollection()
                     );
@@ -178,8 +150,7 @@ namespace IgorKL.ACAD3.Model.Drawing
         SelectableTransient _st = null;
 
         [CommandMethod("TRS")]
-        public void TransientSelection()
-        {
+        public void TransientSelection() {
             // Create a line and pass it to the SelectableTransient
             // This makes cleaning up much more straightforward
 
@@ -200,16 +171,14 @@ namespace IgorKL.ACAD3.Model.Drawing
         }
 
         [CommandMethod("TRU")]
-        public void RemoveTransientSelection()
-        {
+        public void RemoveTransientSelection() {
             // Removal is performed by setting to null
 
             Transient.CapturedDrawable = null;
 
             // Erase the transient graphics and dispose of the transient
 
-            if (_st != null)
-            {
+            if (_st != null) {
                 TransientManager.CurrentTransientManager.EraseTransient(
                   _st,
                   new IntegerCollection()
@@ -220,8 +189,7 @@ namespace IgorKL.ACAD3.Model.Drawing
 
             // And dispose of our line
 
-            if (_ln != null)
-            {
+            if (_ln != null) {
                 _ln.Dispose();
                 _ln = null;
             }

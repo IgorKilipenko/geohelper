@@ -11,14 +11,12 @@ using Autodesk.AutoCAD.EditorInput;
 
 using IgorKL.ACAD3.Model.Extensions;
 
-namespace IgorKL.ACAD3.Model.Drawing.Helpers
-{
+namespace IgorKL.ACAD3.Model.Drawing.Helpers {
     /// <summary>
     /// 
     /// </summary>
     [Serializable]
-    public class Arrow : CustomObjects.Helpers.CustomObjectSerializer
-    {
+    public class Arrow : CustomObjects.Helpers.CustomObjectSerializer {
         private double _length;
         private double _arrowBlug;
         private double _arrowLength;
@@ -26,8 +24,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
 
         private Matrix3d _lineTarnsform;
 
-        public Arrow(Vector3d axisVector)
-        {
+        public Arrow(Vector3d axisVector) {
             _length = 4.0d;
             _arrowBlug = 0.4d;
             _arrowLength = 1.5d;
@@ -46,8 +43,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
             this.BaseArrow = null;
         }
         public Arrow(Arrow baseArrow)
-            : this(baseArrow.AxisVector)
-        {
+            : this(baseArrow.AxisVector) {
             this.BaseArrow = baseArrow;
         }
 
@@ -60,24 +56,19 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
         public bool IsBottomDisplacemented { get; private set; }
         public bool IsTopDisplacemented { get; private set; }
         public double? LastValue { get; private set; }
-        public IEnumerable<Entity> Entities
-        {
-            get
-            {
+        public IEnumerable<Entity> Entities {
+            get {
                 yield return (Entity)this.ArrowLine.Clone();
                 foreach (var ent in this.ArrowSymbols)
                     yield return ent;
             }
         }
 
-        public Matrix3d LineTarnsform
-        {
+        public Matrix3d LineTarnsform {
             get { return _lineTarnsform; }
-            set
-            {
+            set {
                 this.ArrowLine.TransformBy(value);
-                this.ArrowSymbols.ForEach(ent =>
-                {
+                this.ArrowSymbols.ForEach(ent => {
                     ent.TransformBy(value);
                     if (ent is DBText)
                         ((DBText)ent).AdjustAlignment(Tools.GetAcadDatabase());
@@ -87,10 +78,8 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
         }
 
         public Arrow BaseArrow { get; private set; }
-        public bool IsCodirectional
-        {
-            get
-            {
+        public bool IsCodirectional {
+            get {
                 if (BaseArrow == null)
                     return false;
                 return _lineTarnsform.CoordinateSystem3d.Xaxis.IsCodirectionalTo(
@@ -98,27 +87,23 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
             }
         }
 
-        public void AppendArrowSymbolsWithTransform(Entity entity)
-        {
+        public void AppendArrowSymbolsWithTransform(Entity entity) {
             this.ArrowSymbols.Add(entity.GetTransformedCopy(_lineTarnsform));
             if (entity is DBText)
                 ((DBText)this.ArrowSymbols.Last()).AdjustAlignment(Tools.GetAcadDatabase());
         }
 
-        public void AppendArrowSymbols(Entity entity)
-        {
+        public void AppendArrowSymbols(Entity entity) {
             this.ArrowSymbols.Add((Entity)entity.Clone());
             if (entity is DBText)
                 ((DBText)this.ArrowSymbols.Last()).AdjustAlignment(Tools.GetAcadDatabase());
         }
 
-        public void AppendArrowSymbols(IEnumerable<Entity> entities)
-        {
+        public void AppendArrowSymbols(IEnumerable<Entity> entities) {
             entities.ToList().ForEach(ent => AppendArrowSymbols(ent));
         }
 
-        public void Mirror()
-        {
+        public void Mirror() {
             Matrix3d mirror = _lineTarnsform;
 
             mirror = _mirror(this.ArrowLine, _lineTarnsform);
@@ -132,8 +117,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
 
         }
 
-        private Matrix3d _mirror(Entity entity, Matrix3d transform)
-        {
+        private Matrix3d _mirror(Entity entity, Matrix3d transform) {
             //Plane plane = new Plane(Point3d.Origin, transform.CoordinateSystem3d.Yaxis, transform.CoordinateSystem3d.Zaxis);
             Plane plane = new Plane(Point3d.Origin, Matrix3d.Identity.CoordinateSystem3d.Yaxis, Matrix3d.Identity.CoordinateSystem3d.Zaxis);
             plane.TransformBy(_lineTarnsform);
@@ -141,15 +125,13 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
             return mat;
         }
 
-        private Matrix3d _mirror(Entity entity)
-        {
+        private Matrix3d _mirror(Entity entity) {
             Plane plane = new Plane(Point3d.Origin, this.AxisVector, Matrix3d.Identity.CoordinateSystem3d.Zaxis);
             Matrix3d mat = Matrix3d.Mirroring(plane);
             return mat;
         }
 
-        public void Redirect(Point3d point)
-        {
+        public void Redirect(Point3d point) {
             Vector3d directionVector = _lineTarnsform.CoordinateSystem3d.Xaxis.Negate();
             if (IsRedirected)
                 directionVector = directionVector.Negate();
@@ -168,10 +150,8 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
             Redirect();
         }
 
-        public void Redirect()
-        {
-            if (IsCodirectional || this.BaseArrow == null)
-            {
+        public void Redirect() {
+            if (IsCodirectional || this.BaseArrow == null) {
                 Point3d destPoint = Point3d.Origin.Add(_lineTarnsform.CoordinateSystem3d.Xaxis.Negate()
                     .MultiplyBy((IsRedirected ? -1 : 1) * (_spaceLength * 2d + _length + _arrowLength)));
                 Matrix3d mat = Matrix3d.Displacement(destPoint.GetAsVector());
@@ -183,8 +163,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
             }
         }
 
-        private Polyline _createLine()
-        {
+        private Polyline _createLine() {
             Point3d origin = Point3d.Origin;
 
             Polyline pline = new Polyline(3);
@@ -197,8 +176,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
             return pline;
         }
 
-        private Matrix3d _getMainRotation()
-        {
+        private Matrix3d _getMainRotation() {
             double angle = Matrix3d.Identity.CoordinateSystem3d.Xaxis.GetAngleTo(this.AxisVector.GetPerpendicularVector().Negate(),
                 Matrix3d.Identity.CoordinateSystem3d.Zaxis.Negate());
             /*double angle = Matrix3d.Identity.CoordinateSystem3d.Yaxis.GetAngleTo(this.AxisVector,
@@ -210,8 +188,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
         }
 
         [Obsolete("изм. разделил логику на два метода")]
-        public double CalculateEx(Point3d pointLocal)
-        {
+        public double CalculateEx(Point3d pointLocal) {
             Point3d point2d = new Point3d(pointLocal.X, pointLocal.Y, 0d);
             Vector3d perp = point2d - point2d.Add(this.AxisVector.GetPerpendicularVector());
             Vector3d project = perp.ProjectTo(this.AxisVector.GetNormal(), this.AxisVector);
@@ -219,32 +196,24 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
             Line3d line3d = new Line3d(point2d, project);
             var points = line3d.IntersectWith(new Line3d(Point3d.Origin, this.AxisVector), Tolerance.Global);
 
-            if (points != null && points.Length > 0)
-            {
+            if (points != null && points.Length > 0) {
                 Line line = new Line(point2d, points[0]);
                 this.LastValue = line.Length * (this.AxisVector.GetPerpendicularVector().IsCodirectionalTo(line.GetFirstDerivative(0d)) ? 1 : -1);
                 if (LastValue < 0d)
                     this.Mirror();
 
-                if (this.IsCodirectional)
-                {
+                if (this.IsCodirectional) {
                     if (BaseArrow.IsRedirected && !this.IsRedirected)
                         this.Redirect();
                     if (!this.IsSymbolsMirrored && !BaseArrow.IsSymbolsMirrored)
                         BaseArrow.MirrorSymbols();
-                }
-                else
-                {
-                    if (this.BaseArrow != null)
-                    {
-                        if (this.BaseArrow.IsRedirected)
-                        {
+                } else {
+                    if (this.BaseArrow != null) {
+                        if (this.BaseArrow.IsRedirected) {
                             this.BaseArrow.Redirect();
                             if (this.BaseArrow.IsSymbolsMirrored)
                                 this.BaseArrow.MirrorSymbols();
-                        }
-                        else
-                        {
+                        } else {
                             if (this.BaseArrow.IsSymbolsMirrored)
                                 this.BaseArrow.MirrorSymbols();
                         }
@@ -257,25 +226,19 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
             return 0d;
         }
 
-        public double Calculate(Point3d destPointLocal)
-        {
+        public double Calculate(Point3d destPointLocal) {
             this.LastValue = _calculateValue(destPointLocal);
             if (this.LastValue.Value < 0d)
                 this.Mirror();
 
-            if (this.IsCodirectional)
-            {
+            if (this.IsCodirectional) {
                 if (BaseArrow.IsRedirected && !this.IsRedirected)
                     this.Redirect();
                 if (!this.IsSymbolsMirrored && !BaseArrow.IsSymbolsMirrored)
                     BaseArrow.MirrorSymbols();
-            }
-            else
-            {
-                if (this.BaseArrow != null)
-                {
-                    if (this.BaseArrow.IsRedirected)
-                    {
+            } else {
+                if (this.BaseArrow != null) {
+                    if (this.BaseArrow.IsRedirected) {
                         /////////////////////////////////////////////////////////////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!///////////////////////////
                         /*this.BaseArrow.Redirect();
                         if (this.BaseArrow.IsSymbolsMirrored)
@@ -285,9 +248,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
                             this.BaseArrow.MoveToBottom();
                         if (!this.IsTopDisplacemented)
                             this.MoveToTop();
-                    }
-                    else
-                    {
+                    } else {
                         if (this.BaseArrow.IsSymbolsMirrored)
                             this.BaseArrow.MirrorSymbols();
                     }
@@ -297,8 +258,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
             return LastValue.Value;
         }
 
-        private double _calculateValue(Point3d destPoint)
-        {
+        private double _calculateValue(Point3d destPoint) {
             Point3d point2d = new Point3d(destPoint.X, destPoint.Y, 0d);
             Vector3d perp = point2d - point2d.Add(this.AxisVector.GetPerpendicularVector());
             Vector3d project = perp.ProjectTo(this.AxisVector.GetNormal(), this.AxisVector);
@@ -306,8 +266,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
             Line3d line3d = new Line3d(point2d, project);
             var points = line3d.IntersectWith(new Line3d(Point3d.Origin, this.AxisVector), Tolerance.Global);
 
-            if (points != null && points.Length > 0)
-            {
+            if (points != null && points.Length > 0) {
                 Line line = new Line(point2d, points[0]);
                 double res = line.Length * (this.AxisVector.GetPerpendicularVector().IsCodirectionalTo(line.GetFirstDerivative(0d)) ? 1 : -1);
                 return res;
@@ -315,14 +274,12 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
             throw new ArgumentOutOfRangeException();
         }
 
-        public void MirrorSymbols()
-        {
+        public void MirrorSymbols() {
             Plane plane = new Plane(Point3d.Origin, _lineTarnsform.CoordinateSystem3d.Xaxis, _lineTarnsform.CoordinateSystem3d.Zaxis);
             Matrix3d mat = Matrix3d.Mirroring(plane);
 
             Extents3d? bounds = _getSymbolsBounds(this.ArrowSymbols);
-            if (bounds.HasValue)
-            {
+            if (bounds.HasValue) {
                 Point3d max = bounds.Value.MaxPoint.TransformBy(_lineTarnsform.Inverse());
                 max = new Point3d(0, max.Y, 0).TransformBy(_lineTarnsform);
                 Point3d min = bounds.Value.MinPoint.TransformBy(_lineTarnsform.Inverse());
@@ -336,8 +293,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
                 mat = mat.PreMultiplyBy(Matrix3d.Mirroring(plane));
             }
 
-            this.ArrowSymbols.ForEach(ent =>
-            {
+            this.ArrowSymbols.ForEach(ent => {
                 ent.TransformBy(mat);
                 if (ent is DBText)
                     ((DBText)ent).AdjustAlignment(Tools.GetAcadDatabase());
@@ -346,8 +302,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
             IsSymbolsMirrored = !IsSymbolsMirrored;
         }
 
-        public bool MoveToBottom()
-        {
+        public bool MoveToBottom() {
             if (this.IsBottomDisplacemented)
                 return false;
 
@@ -360,8 +315,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
             return true;
         }
 
-        public bool MoveToTop()
-        {
+        public bool MoveToTop() {
             if (this.IsTopDisplacemented)
                 return false;
 
@@ -374,8 +328,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
             return true;
         }
 
-        private Matrix3d? _movetAtYaxis(int sign)
-        {
+        private Matrix3d? _movetAtYaxis(int sign) {
             Extents3d? bounds = _getSymbolsBounds(this.ArrowSymbols);
             if (!bounds.HasValue)
                 return null;
@@ -396,21 +349,17 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
             return mat;
         }
 
-        private Extents3d? _getSymbolsBounds(IEnumerable<Entity> symbols)
-        {
+        private Extents3d? _getSymbolsBounds(IEnumerable<Entity> symbols) {
             if (symbols.Count() < 1)
                 return null;
             Extents3d res = new Extents3d();
-            symbols.ToList().ForEach(ent =>
-            {
+            symbols.ToList().ForEach(ent => {
                 /*var clone = ent.GetTransformedCopy(_lineTarnsform.Inverse());
                 if (clone.Bounds.HasValue)
                     res.AddExtents(ent.Bounds.Value);*/
-                if (ent is DBText)
-                {
+                if (ent is DBText) {
                     var rectg = ((DBText)ent).GetTextBoxCorners();
-                    if (rectg.HasValue)
-                    {
+                    if (rectg.HasValue) {
                         Point3d lowerLeft = rectg.Value.LowerLeft.TransformBy(_lineTarnsform.Inverse());
                         Point3d upperRight = rectg.Value.UpperRight.TransformBy(_lineTarnsform.Inverse());
 
@@ -419,12 +368,10 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
                             lowerLeft = new Point3d(upperRight.X - 1d, lowerLeft.Y, lowerLeft.Z);
                         ///////////////////////////////////////////////////////////!!!!!!!!!!//////////////////////////
 
-                        try
-                        {
+                        try {
                             Extents3d ext = new Extents3d(lowerLeft, upperRight);
                             res.AddExtents(ext);
-                        }
-                        catch { }
+                        } catch { }
                     }
                 }
             });
@@ -435,17 +382,14 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
         }
 
         public event EventHandler<ArrowEventArgs> ArrowChanging;
-        protected virtual void On_ArrowChanging(object sender, ArrowEventArgs e)
-        {
+        protected virtual void On_ArrowChanging(object sender, ArrowEventArgs e) {
             if (ArrowChanging != null)
                 ArrowChanging(sender, e);
         }
 
-        public class ArrowEventArgs : EventArgs
-        {
+        public class ArrowEventArgs : EventArgs {
             public ArrowEventArgs()
-                : base()
-            {
+                : base() {
 
             }
 
@@ -453,8 +397,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
             public object Tag { get; set; }
         }
 
-        public enum ArrowActions
-        {
+        public enum ArrowActions {
             Moved,
             Mirrowed,
             Redirected
@@ -464,15 +407,13 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
         [System.Security.Permissions.SecurityPermission(System.Security.Permissions.SecurityAction.LinkDemand,
            Flags = System.Security.Permissions.SecurityPermissionFlag.SerializationFormatter)]
         public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info,
-            System.Runtime.Serialization.StreamingContext context)
-        {
+            System.Runtime.Serialization.StreamingContext context) {
             info.AddValue("AxisVector", this.AxisVector.ToArray());
             //info.AddValue("BaseArrow", this.BaseArrow);
         }
 
         protected Arrow(
-         System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
-        {
+         System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) {
             if (info == null)
                 throw new System.ArgumentNullException("info");
 
@@ -480,10 +421,8 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers
             //this.BaseArrow = (Arrow)info.GetValue("BaseArrow", typeof(Arrow));
         }
 
-        public override string ApplicationName
-        {
-            get
-            {
+        public override string ApplicationName {
+            get {
                 return "Icmd_WallArrow_Data";
             }
         }

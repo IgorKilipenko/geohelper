@@ -1,20 +1,13 @@
-﻿using System;
+﻿using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
+using Autodesk.AutoCAD.Geometry;
+using IgorKL.ACAD3.Model.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.EditorInput;
-
-using IgorKL.ACAD3.Model.Extensions;
-
-namespace IgorKL.ACAD3.Model.Drawing
-{
-    public class VerticalDeviationArrow:CustomObjects.MultiEntity
-    {
+namespace IgorKL.ACAD3.Model.Drawing {
+    public class VerticalDeviationArrow : CustomObjects.MultiEntity {
 
         private Point3d _insertPointUcs;
         private Point3d _lowerPointUcs;
@@ -31,15 +24,13 @@ namespace IgorKL.ACAD3.Model.Drawing
         private Arrow _arrow;
 
         public VerticalDeviationArrow()
-            :base(Point3d.Origin, Point3d.Origin, new List<Entity>(), AnnotativeStates.True, Matrix3d.Identity)
-        {
+            : base(Point3d.Origin, Point3d.Origin, new List<Entity>(), AnnotativeStates.True, Matrix3d.Identity) {
 
         }
 
 #if DEBUG
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_DrawVerticalArrows", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public static void DrawArrows()
-        {
+        public static void DrawArrows() {
             VerticalDeviationArrow mainMlock = new VerticalDeviationArrow();
             mainMlock._ucs = CoordinateSystem.CoordinateTools.GetCurrentUcs();
             PromptPointOptions ppo = new PromptPointOptions("\nУкажите положение знака");
@@ -88,28 +79,22 @@ namespace IgorKL.ACAD3.Model.Drawing
         }
 #endif
 
-        public override void Calculate()
-        {
-            Tools.StartTransaction(() =>
-            {
+        public override void Calculate() {
+            Tools.StartTransaction(() => {
                 if (Entities.FirstOrDefault() != null)
                     ((BlockReference)Entities.First()).BlockTableRecord.GetObjectForWrite<BlockTableRecord>().DeepErase(true);
             });
             Entities.ForEach(ent => ent.Dispose());
             Entities.Clear();
 
-            if (!_lowerComplite)
-            {
+            if (!_lowerComplite) {
                 Matrix3d toLocalCs = Arrow.GetToLocalTransform(_lowerPointUcs, _ucs);
                 _arrow = new Arrow();
                 _arrow.CalculateLower(_jigPoint.TransformBy(toLocalCs));
 
                 _setEntitiesToBlock(_arrow.Explode(Matrix3d.Identity), true);
-            }
-            else
-            {
-                if (!_lowerJigComplite)
-                {
+            } else {
+                if (!_lowerJigComplite) {
                     Matrix3d toLocalCs = Arrow.GetToLocalTransform(_lowerPointUcs, _ucs);
                     _arrow.CalculateJigLower(_jigPoint.TransformBy(toLocalCs));
                     _setEntitiesToBlock(_arrow.Explode(Matrix3d.Identity), true);
@@ -117,26 +102,22 @@ namespace IgorKL.ACAD3.Model.Drawing
             }
         }
 
-        private void _setEntitiesToBlock(IEnumerable<Entity> entities, bool erase)
-        {
-            Tools.StartTransaction(() =>
-            {
+        private void _setEntitiesToBlock(IEnumerable<Entity> entities, bool erase) {
+            Tools.StartTransaction(() => {
                 var btrId = AcadBlocks.BlockTools.CreateBlockTableRecord("*U", Point3d.Origin, entities, AnnotativeStates.True);
                 //var brId = AcadBlocks.BlockTools.AppendBlockItem(_lowerPointUcs.TransformBy(_ucs.Inverse()), btrId, null, Matrix3d.Identity);
                 var brId = AcadBlocks.BlockTools.AppendBlockItem(_lowerPointUcs, btrId, null, Ucs);
                 BlockReference br = brId.GetObjectForRead<BlockReference>();
                 Entities.Add((Entity)br.Clone());
 
-                if (erase)
-                {
+                if (erase) {
                     br.UpgradeOpen();
                     br.Erase();
                 }
             });
         }
 
-        protected override SamplerStatus Sampler(JigPrompts prompts)
-        {
+        protected override SamplerStatus Sampler(JigPrompts prompts) {
             JigPromptPointOptions ppo = new JigPromptPointOptions("\nУкажите точку определяющую положение");
             ppo.UseBasePoint = true;
             ppo.BasePoint = _insertPointUcs.TransformBy(_ucs);
@@ -159,8 +140,7 @@ namespace IgorKL.ACAD3.Model.Drawing
             return SamplerStatus.OK;
         }
 
-        public override PromptStatus JigDraw()
-        {
+        public override PromptStatus JigDraw() {
             PromptStatus res = PromptStatus.Cancel;
             if ((res = base.JigDraw()) != PromptStatus.OK)
                 return PromptStatus.Cancel;
@@ -169,32 +149,29 @@ namespace IgorKL.ACAD3.Model.Drawing
 
             if ((res = base.JigDraw()) != PromptStatus.OK)
                 return PromptStatus.Cancel;
-            if (!_lowerJigComplite)
-            {
+            if (!_lowerJigComplite) {
                 _lowerJigComplite = true;
                 var ids = Tools.AppendEntity(Entities);
                 Entities.Clear();
 
                 var brId = ids.FirstOrDefault();
-                if (brId != ObjectId.Null)
-                {
-                    Tools.StartTransaction(() =>
-                        {
-                            brId.GetObjectForRead<BlockReference>();
-                            var xrecord = CustomObjects.Helpers.XRecordTools.GetSetExtensionDictionaryEntry(brId, "ARROW_JigPosition").GetObjectForRead<Xrecord>();
-                            xrecord.UpgradeOpen();
-                            
-                            //Point3d p = _jigPoint.TransformBy(Arrow.GetToLocalTransform(_lowerPointUcs, _ucs));
-                            Point3d p = _jigPoint.TransformBy(_ucs);
-                            
-                            ResultBuffer rb = new ResultBuffer(
-                                    new TypedValue((int)DxfCode.Real, p.X),
-                                    new TypedValue((int)DxfCode.Real, p.Y),
-                                    new TypedValue((int)DxfCode.Real, p.Z)
-                                );
-                            xrecord.Append(rb);
-                        });
-                    
+                if (brId != ObjectId.Null) {
+                    Tools.StartTransaction(() => {
+                        brId.GetObjectForRead<BlockReference>();
+                        var xrecord = CustomObjects.Helpers.XRecordTools.GetSetExtensionDictionaryEntry(brId, "ARROW_JigPosition").GetObjectForRead<Xrecord>();
+                        xrecord.UpgradeOpen();
+
+                        //Point3d p = _jigPoint.TransformBy(Arrow.GetToLocalTransform(_lowerPointUcs, _ucs));
+                        Point3d p = _jigPoint.TransformBy(_ucs);
+
+                        ResultBuffer rb = new ResultBuffer(
+                                new TypedValue((int)DxfCode.Real, p.X),
+                                new TypedValue((int)DxfCode.Real, p.Y),
+                                new TypedValue((int)DxfCode.Real, p.Z)
+                            );
+                        xrecord.Append(rb);
+                    });
+
                 }
             }
 
@@ -206,8 +183,7 @@ namespace IgorKL.ACAD3.Model.Drawing
             return res;
         }
 
-        private class Arrow
-        {
+        private class Arrow {
 
             private double _textHeight;
             private int _unitScale;
@@ -216,47 +192,40 @@ namespace IgorKL.ACAD3.Model.Drawing
             private SArrow _lowerSet;
             private SArrow _upperSet;
 
-            public static Matrix3d GetToLocalTransform(Point3d pointUcs, Matrix3d ucs)
-            {
+            public static Matrix3d GetToLocalTransform(Point3d pointUcs, Matrix3d ucs) {
                 Matrix3d toLocalCs = ucs.Inverse();
                 toLocalCs = toLocalCs.PostMultiplyBy(Matrix3d.Displacement(Point3d.Origin - pointUcs));
                 return toLocalCs;
             }
 
-            public Arrow()
-            {
+            public Arrow() {
                 _initDefValues();
             }
 
-            private void _initDefValues()
-            {
+            private void _initDefValues() {
                 _textHeight = 2.0d;
                 _unitScale = 1000;
                 _digitalCount = 0;
             }
 
 
-            public void CalculateLower(Point3d destPoint)
-            {
+            public void CalculateLower(Point3d destPoint) {
                 _lowerSet = new SArrow();
                 _calculateSet(destPoint, _lowerSet);
             }
 
-            public void CalculateUpper(Point3d destPoint)
-            {
+            public void CalculateUpper(Point3d destPoint) {
                 _upperSet = new SArrow();
                 _calculateSet(destPoint, _upperSet);
             }
 
-            public void CalculateJigLower(Point3d jigPoint)
-            {
+            public void CalculateJigLower(Point3d jigPoint) {
                 Vector3d vector = jigPoint - Point3d.Origin;
                 _lowerSet.RedirectHorizontalArrow(vector);
                 _lowerSet.RedirectVerticalArrow(vector);
             }
 
-            public List<Entity> Explode(Matrix3d transform)
-            {
+            public List<Entity> Explode(Matrix3d transform) {
                 List<Entity> res = new List<Entity>();
                 if (_lowerSet != null)
                     res.AddRange(_lowerSet.Entities);
@@ -267,8 +236,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                 return res;
             }
 
-            private void _calculateSet(Point3d destPoint, SArrow arrowSet)
-            {
+            private void _calculateSet(Point3d destPoint, SArrow arrowSet) {
                 Vector3d vector = destPoint - Point3d.Origin;
 
                 if (vector.X < 0d && !arrowSet.IsHorizontalMirrored)
@@ -281,8 +249,7 @@ namespace IgorKL.ACAD3.Model.Drawing
 
 
 
-            private class SArrow
-            {
+            private class SArrow {
                 private double _length;
                 private double _arrowBlug;
                 private double _arrowLength;
@@ -292,8 +259,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                 private Matrix3d _verticalTarnsform;
 
 
-                public SArrow()
-                {
+                public SArrow() {
                     _length = 3.5d;
                     _arrowBlug = 0.4d;
                     _arrowLength = 1.5d;
@@ -313,26 +279,22 @@ namespace IgorKL.ACAD3.Model.Drawing
                     Vector3d v = Matrix3d.Identity.Translation;
                 }
 
-                public Polyline HorizontalLine {get; private set;}
+                public Polyline HorizontalLine { get; private set; }
                 public Polyline VerticalLine { get; private set; }
                 public List<Entity> VerticalLineSymbols { get; private set; }
                 public List<Entity> HorizontalLineSymbols { get; private set; }
-                public Matrix3d HorizontalTarnsform
-                {
+                public Matrix3d HorizontalTarnsform {
                     get { return _horizontalTarnsform; }
-                    set
-                    {
+                    set {
                         HorizontalLine.TransformBy(value);
                         if (HorizontalLineSymbols != null)
                             HorizontalLineSymbols.ForEach(ent => ent.TransformBy(value));
                         _horizontalTarnsform = _horizontalTarnsform.PostMultiplyBy(value);
                     }
                 }
-                public Matrix3d VerticalTarnsform
-                {
+                public Matrix3d VerticalTarnsform {
                     get { return _verticalTarnsform; }
-                    set
-                    {
+                    set {
                         VerticalLine.TransformBy(value);
                         if (VerticalLineSymbols != null)
                             VerticalLineSymbols.ForEach(ent => ent.TransformBy(value));
@@ -343,30 +305,24 @@ namespace IgorKL.ACAD3.Model.Drawing
                 public bool IsHorizontalMirrored { get; private set; }
                 public bool IsHorizontalRedirected { get; private set; }
                 public bool IsVerticalRedirected { get; private set; }
-                public double Length
-                {
+                public double Length {
                     get { return _spaceLength + _length + _arrowLength; }
                 }
-                public IEnumerable<Entity> Entities
-                {
-                    get
-                    {
+                public IEnumerable<Entity> Entities {
+                    get {
                         yield return HorizontalLine;
                         yield return VerticalLine;
                     }
                 }
 
-                public void AppendHorizontalSymbol(Entity entity)
-                {
+                public void AppendHorizontalSymbol(Entity entity) {
                     HorizontalLineSymbols.Add(entity.GetTransformedCopy(_horizontalTarnsform));
                 }
-                public void AppendVerticalSymbol(Entity entity)
-                {
+                public void AppendVerticalSymbol(Entity entity) {
                     VerticalLineSymbols.Add(entity.GetTransformedCopy(_verticalTarnsform));
                 }
 
-                private Polyline _createLine()
-                {
+                private Polyline _createLine() {
                     Point3d origin = Point3d.Origin;
 
                     Polyline pline = new Polyline(3);
@@ -378,8 +334,7 @@ namespace IgorKL.ACAD3.Model.Drawing
                     return pline;
                 }
 
-                private DBText _createHorizontalText(SArrow arrow)
-                {
+                private DBText _createHorizontalText(SArrow arrow) {
                     DBText text = new DBText();
                     text.SetDatabaseDefaults();
 
@@ -392,16 +347,14 @@ namespace IgorKL.ACAD3.Model.Drawing
                     return text;
                 }
 
-                public void MirrorHorizontalArrow()
-                {
-                    Matrix3d mirror = Matrix3d.Mirroring(new Plane(Point3d.Origin, 
-                        IsHorizontalMirrored ? _horizontalTarnsform.CoordinateSystem3d.Yaxis.Negate(): _horizontalTarnsform.CoordinateSystem3d.Yaxis,
+                public void MirrorHorizontalArrow() {
+                    Matrix3d mirror = Matrix3d.Mirroring(new Plane(Point3d.Origin,
+                        IsHorizontalMirrored ? _horizontalTarnsform.CoordinateSystem3d.Yaxis.Negate() : _horizontalTarnsform.CoordinateSystem3d.Yaxis,
                         _horizontalTarnsform.CoordinateSystem3d.Zaxis));
                     HorizontalTarnsform = mirror;
                     IsHorizontalMirrored = !IsHorizontalMirrored;
                 }
-                public void MirrorVerticalArrow()
-                {
+                public void MirrorVerticalArrow() {
                     Matrix3d mirror = Matrix3d.Mirroring(new Plane(Point3d.Origin,
                         IsVerticalMirrored ? _verticalTarnsform.CoordinateSystem3d.Xaxis.Negate() : _verticalTarnsform.CoordinateSystem3d.Xaxis,
                         _verticalTarnsform.CoordinateSystem3d.Zaxis));
@@ -409,17 +362,15 @@ namespace IgorKL.ACAD3.Model.Drawing
                     IsVerticalMirrored = !IsVerticalMirrored;
                 }
 
-                private Matrix3d _mirror(Matrix3d mat)
-                {
+                private Matrix3d _mirror(Matrix3d mat) {
                     CoordinateSystem3d cs = mat.CoordinateSystem3d;
                     Matrix3d res = mat.PreMultiplyBy(Matrix3d.Mirroring(
-                        new Plane(cs.Origin, new Vector3d(Math.Abs(Math.Round(cs.Yaxis.X, 6)), Math.Abs(Math.Round(cs.Yaxis.Y, 6)), 
+                        new Plane(cs.Origin, new Vector3d(Math.Abs(Math.Round(cs.Yaxis.X, 6)), Math.Abs(Math.Round(cs.Yaxis.Y, 6)),
                             Math.Abs(Math.Round(cs.Yaxis.Z, 6))), cs.Zaxis)));
                     return res;
                 }
 
-                public void RedirectHorizontalArrow(Vector3d direction)
-                {
+                public void RedirectHorizontalArrow(Vector3d direction) {
                     double rd = 1;
                     if (IsHorizontalRedirected)
                         rd *= -1;
@@ -430,13 +381,12 @@ namespace IgorKL.ACAD3.Model.Drawing
 
                     rd = IsHorizontalRedirected ? -1 : 1;
 
-                    Point3d destPoint = Point3d.Origin.Add(_horizontalTarnsform.CoordinateSystem3d.Xaxis.MultiplyBy(-rd * (_spaceLength*2d + _length + _arrowLength) ));
+                    Point3d destPoint = Point3d.Origin.Add(_horizontalTarnsform.CoordinateSystem3d.Xaxis.MultiplyBy(-rd * (_spaceLength * 2d + _length + _arrowLength)));
                     Matrix3d mat = Matrix3d.Displacement(destPoint.GetAsVector());
                     HorizontalTarnsform = mat;
                     IsHorizontalRedirected = !IsHorizontalRedirected;
                 }
-                public void RedirectVerticalArrow(Vector3d direction)
-                {
+                public void RedirectVerticalArrow(Vector3d direction) {
                     double rd = 1;
                     if (IsVerticalRedirected)
                         rd *= -1;
@@ -447,12 +397,12 @@ namespace IgorKL.ACAD3.Model.Drawing
 
                     rd = IsVerticalRedirected ? -1 : 1;
 
-                    Point3d destPoint = Point3d.Origin.Add(_verticalTarnsform.CoordinateSystem3d.Yaxis.MultiplyBy(-rd * (_spaceLength*2d + _length + _arrowLength)));
+                    Point3d destPoint = Point3d.Origin.Add(_verticalTarnsform.CoordinateSystem3d.Yaxis.MultiplyBy(-rd * (_spaceLength * 2d + _length + _arrowLength)));
                     Matrix3d mat = Matrix3d.Displacement(destPoint.GetAsVector());
                     VerticalTarnsform = mat;
                     IsVerticalRedirected = !IsVerticalRedirected;
                 }
-                
+
             }
         }
 

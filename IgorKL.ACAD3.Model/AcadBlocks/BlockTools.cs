@@ -1,49 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.EditorInput;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
-
 using IgorKL.ACAD3.Model.Extensions;
+using System;
+using System.Collections.Generic;
 
-namespace IgorKL.ACAD3.Model.AcadBlocks
-{
-    public class BlockTools
-    {
-        public static List<BlockReference> PromptBlocks(string msg = "\nSelect block references: ")
-        {
+namespace IgorKL.ACAD3.Model.AcadBlocks {
+    public class BlockTools {
+        public static List<BlockReference> PromptBlocks(string msg = "\nSelect block references: ") {
             List<BlockReference> blocks;
             if (!ObjectCollector.TrySelectObjects(out blocks, msg))
                 return null;
-            else return blocks;
+            else
+                return blocks;
         }
 
         [Obsolete]
-        public static List<AttributeDefinition> GetAttributes(BlockReference br, Transaction trans)
-        {
+        public static List<AttributeDefinition> GetAttributes(BlockReference br, Transaction trans) {
             BlockTableRecord btr = (BlockTableRecord)trans.GetObject(br.BlockTableRecord, OpenMode.ForRead);
             return GetAttributes(btr, trans);
         }
 
         [Obsolete]
-        public static List<AttributeDefinition> GetAttributes(BlockTableRecord btr, Transaction trans)
-        {
+        public static List<AttributeDefinition> GetAttributes(BlockTableRecord btr, Transaction trans) {
             List<AttributeDefinition> res = new List<AttributeDefinition>();
-            if (btr.HasAttributeDefinitions)
-            {
+            if (btr.HasAttributeDefinitions) {
                 // Add attributes from the block table record
-                foreach (ObjectId objID in btr)
-                {
+                foreach (ObjectId objID in btr) {
                     DBObject dbObj = trans.GetObject(objID, OpenMode.ForRead) as DBObject;
 
-                    if (dbObj is AttributeDefinition)
-                    {
+                    if (dbObj is AttributeDefinition) {
                         AttributeDefinition acAtt = dbObj as AttributeDefinition;
                         res.Add(acAtt);
                     }
@@ -53,8 +38,7 @@ namespace IgorKL.ACAD3.Model.AcadBlocks
         }
 
         [Obsolete]
-        public static AttributeDefinition GetAttributeByTag(string tag, BlockTableRecord btr, Transaction trans)
-        {
+        public static AttributeDefinition GetAttributeByTag(string tag, BlockTableRecord btr, Transaction trans) {
             var attrs = GetAttributes(btr, trans);
             foreach (var a in attrs)
                 if (a.Tag == tag)
@@ -63,23 +47,19 @@ namespace IgorKL.ACAD3.Model.AcadBlocks
         }
 
         [Obsolete]
-        public static ObjectId CreateBlockTableRecordEx(Point3d origin, string name, List<Entity> entities, AnnotativeStates aState, bool rewriteBlock = false)
-        {
-            using (Transaction trans = Tools.StartTransaction())
-            {
+        public static ObjectId CreateBlockTableRecordEx(Point3d origin, string name, List<Entity> entities, AnnotativeStates aState, bool rewriteBlock = false) {
+            using (Transaction trans = Tools.StartTransaction()) {
                 var res = CreateBlockTableRecordEx(origin, name, entities, aState, trans, true, rewriteBlock);
                 return res;
             }
         }
 
         [Obsolete]
-        public static ObjectId CreateBlockTableRecordEx(Point3d origin, string name, List<Entity> entities, AnnotativeStates aState, Transaction trans, bool commit ,bool rewriteBlock = false)
-        {
+        public static ObjectId CreateBlockTableRecordEx(Point3d origin, string name, List<Entity> entities, AnnotativeStates aState, Transaction trans, bool commit, bool rewriteBlock = false) {
             var bt = (BlockTable)trans.GetObject(Tools.GetAcadDatabase().BlockTableId, OpenMode.ForRead);
             // Validate the provided symbol table name
 
-            if (name != "*U")
-            {
+            if (name != "*U") {
                 SymbolUtilityServices.ValidateSymbolName(
                   name,
                   false
@@ -87,8 +67,7 @@ namespace IgorKL.ACAD3.Model.AcadBlocks
 
                 // Only set the block name if it isn't in use
 
-                if (bt.Has(name))
-                {
+                if (bt.Has(name)) {
                     //throw new ArgumentException(string.Format("A block with this name \"{0}\" already exists.", name));
                     if (!rewriteBlock)
                         return bt[name];
@@ -114,8 +93,7 @@ namespace IgorKL.ACAD3.Model.AcadBlocks
             ObjectId btrId = bt.Add(btr);
             trans.AddNewlyCreatedDBObject(btr, true);
 
-            foreach (Entity ent in entities)
-            {
+            foreach (Entity ent in entities) {
                 btr.AppendEntity(ent);
                 trans.AddNewlyCreatedDBObject(ent, true);
             }
@@ -130,58 +108,50 @@ namespace IgorKL.ACAD3.Model.AcadBlocks
 
         }
 
-        public static ObjectId CreateBlockTableRecord(string name, Point3d origin, IEnumerable<Entity> entities, AnnotativeStates annotative, bool getIfExists = false)
-        {
+        public static ObjectId CreateBlockTableRecord(string name, Point3d origin, IEnumerable<Entity> entities, AnnotativeStates annotative, bool getIfExists = false) {
             ObjectId btrId = ObjectId.Null;
 
-            Tools.StartTransaction(() =>
-                {
-                    Transaction trans = Tools.GetAcadDatabase().TransactionManager.TopTransaction;
+            Tools.StartTransaction(() => {
+                Transaction trans = Tools.GetAcadDatabase().TransactionManager.TopTransaction;
 
-                    var bt = Tools.GetAcadDatabase().BlockTableId.GetObjectForRead<BlockTable>();
+                var bt = Tools.GetAcadDatabase().BlockTableId.GetObjectForRead<BlockTable>();
 
-                    if (name != "*U")
-                    {
-                        SymbolUtilityServices.ValidateSymbolName(
-                          name,
-                          false
-                        );
+                if (name != "*U") {
+                    SymbolUtilityServices.ValidateSymbolName(
+                      name,
+                      false
+                    );
 
-                        if (bt.Has(name))
-                        {
-                            if (!getIfExists)
-                                btrId = bt[name];
-                            else
-                                throw new ArgumentException(string.Format("A block with this name \"{0}\" already exists.", name));
-                        }
+                    if (bt.Has(name)) {
+                        if (!getIfExists)
+                            btrId = bt[name];
+                        else
+                            throw new ArgumentException(string.Format("A block with this name \"{0}\" already exists.", name));
                     }
+                }
 
-                    BlockTableRecord btr = new BlockTableRecord
-                    {
-                        Name = name,
-                        Origin = origin,
-                        Annotative = annotative
-                    };
+                BlockTableRecord btr = new BlockTableRecord {
+                    Name = name,
+                    Origin = origin,
+                    Annotative = annotative
+                };
 
-                    bt.UpgradeOpen();
-                    btrId = bt.Add(btr);
-                    trans.AddNewlyCreatedDBObject(btr, true);
+                bt.UpgradeOpen();
+                btrId = bt.Add(btr);
+                trans.AddNewlyCreatedDBObject(btr, true);
 
-                    foreach (Entity ent in entities)
-                    {
-                        btr.AppendEntity(ent);
-                        trans.AddNewlyCreatedDBObject(ent, true);
-                    }
+                foreach (Entity ent in entities) {
+                    btr.AppendEntity(ent);
+                    trans.AddNewlyCreatedDBObject(ent, true);
+                }
 
-                });
+            });
             return btrId;
         }
 
         [Obsolete]
-        public static ObjectId SaveBlockTableRecord(BlockTableRecord btr)
-        {
-            using (Transaction trans = Tools.StartTransaction())
-            {
+        public static ObjectId SaveBlockTableRecord(BlockTableRecord btr) {
+            using (Transaction trans = Tools.StartTransaction()) {
                 var bt = (BlockTable)trans.GetObject(Tools.GetAcadDatabase().BlockTableId, OpenMode.ForRead);
                 // Validate the provided symbol table name
 
@@ -203,20 +173,17 @@ namespace IgorKL.ACAD3.Model.AcadBlocks
             }
         }
 
-        public static ObjectId AddBlockRefToModelSpace(ObjectId blockTableRecordId, List<string> attrTextValues, Point3d location, Matrix3d matrix)
-        {
+        public static ObjectId AddBlockRefToModelSpace(ObjectId blockTableRecordId, List<string> attrTextValues, Point3d location, Matrix3d matrix) {
             // Add a block reference to the model space
-            using (Transaction trans = Tools.StartTransaction())
-            {
+            using (Transaction trans = Tools.StartTransaction()) {
                 var res = AddBlockRefToModelSpace(blockTableRecordId, attrTextValues, location, matrix, trans, true);
                 return res;
             }
         }
 
         [Obsolete]
-        public static ObjectId AddBlockRefToModelSpace(ObjectId blockTableRecordId, 
-            List<string> attrTextValues, Point3d location, Matrix3d matrix, Transaction trans, bool commit)
-        {
+        public static ObjectId AddBlockRefToModelSpace(ObjectId blockTableRecordId,
+            List<string> attrTextValues, Point3d location, Matrix3d matrix, Transaction trans, bool commit) {
             // Add a block reference to the model space
             BlockTableRecord ms = Tools.GetAcadBlockTableRecordModelSpace(trans, OpenMode.ForWrite);
 
@@ -228,8 +195,7 @@ namespace IgorKL.ACAD3.Model.AcadBlocks
             ObjectContextManager ocm = btr.Database.ObjectContextManager;
             ObjectContextCollection occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
 
-            if (btr.Annotative == AnnotativeStates.True)
-            {
+            if (btr.Annotative == AnnotativeStates.True) {
                 br.AddContext(occ.CurrentContext);
             }
 
@@ -238,17 +204,14 @@ namespace IgorKL.ACAD3.Model.AcadBlocks
             ObjectId brId = ms.AppendEntity(br);
             trans.AddNewlyCreatedDBObject(br, true);
 
-            
+
 
             // Add attributes from the block table record
             List<AttributeDefinition> attributes = GetAttributes(btr, trans);
             int i = 0;
-            foreach (AttributeDefinition acAtt in attributes)
-            {
-                if (!acAtt.Constant)
-                {
-                    using (AttributeReference acAttRef = new AttributeReference())
-                    {
+            foreach (AttributeDefinition acAtt in attributes) {
+                if (!acAtt.Constant) {
+                    using (AttributeReference acAttRef = new AttributeReference()) {
                         //acAttRef.RecordGraphicsModified(true);
 
                         acAttRef.SetAttributeFromBlock(acAtt, br.BlockTransform);
@@ -279,11 +242,9 @@ namespace IgorKL.ACAD3.Model.AcadBlocks
         }
 
         public static ObjectId AppendBlockItem(Point3d insertPoint, ObjectId blockTableRecordId,
-            List<string> attrTextValues, Matrix3d toWcsTransform)
-        {
+            List<string> attrTextValues, Matrix3d toWcsTransform) {
             ObjectId resBlockId = ObjectId.Null;
-            Tools.StartTransaction(() =>
-            {
+            Tools.StartTransaction(() => {
                 Transaction trans = Tools.GetTopTransaction();
 
                 // Add a block reference to the model space
@@ -298,8 +259,7 @@ namespace IgorKL.ACAD3.Model.AcadBlocks
                 ObjectContextManager ocm = btr.Database.ObjectContextManager;
                 ObjectContextCollection occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
 
-                if (btr.Annotative == AnnotativeStates.True)
-                {
+                if (btr.Annotative == AnnotativeStates.True) {
                     br.AddContext(occ.CurrentContext);
                 }
 
@@ -309,12 +269,9 @@ namespace IgorKL.ACAD3.Model.AcadBlocks
                 // Add attributes from the block table record
                 List<AttributeDefinition> attributes = GetAttributes(btr, trans);
                 int i = 0;
-                foreach (AttributeDefinition acAtt in attributes)
-                {
-                    if (!acAtt.Constant)
-                    {
-                        using (AttributeReference acAttRef = new AttributeReference())
-                        {
+                foreach (AttributeDefinition acAtt in attributes) {
+                    if (!acAtt.Constant) {
+                        using (AttributeReference acAttRef = new AttributeReference()) {
                             acAttRef.SetAttributeFromBlock(acAtt, br.BlockTransform);
 
                             if (attrTextValues != null)
@@ -333,11 +290,9 @@ namespace IgorKL.ACAD3.Model.AcadBlocks
         }
 
         public static ObjectId AppendBlockItem(Point3d insertPointWcs, ObjectId blockTableRecordId,
-            Dictionary<string, string> attrTextValues)
-        {
+            Dictionary<string, string> attrTextValues) {
             ObjectId resBlockId = ObjectId.Null;
-            Tools.StartTransaction(() =>
-            {
+            Tools.StartTransaction(() => {
                 Transaction trans = Tools.GetTopTransaction();
 
                 // Add a block reference to the model space
@@ -351,8 +306,7 @@ namespace IgorKL.ACAD3.Model.AcadBlocks
                 ObjectContextManager ocm = btr.Database.ObjectContextManager;
                 ObjectContextCollection occ = ocm.GetContextCollection("ACDB_ANNOTATIONSCALES");
 
-                if (btr.Annotative == AnnotativeStates.True)
-                {
+                if (btr.Annotative == AnnotativeStates.True) {
                     br.AddContext(occ.CurrentContext);
                 }
 
@@ -362,28 +316,23 @@ namespace IgorKL.ACAD3.Model.AcadBlocks
                 // Add attributes from the block table record
                 List<AttributeDefinition> attributes = GetAttributes(btr, trans);
 
-                foreach (AttributeDefinition acAtt in attributes)
-                {
+                foreach (AttributeDefinition acAtt in attributes) {
                     acAtt.UpgradeOpen();
                     acAtt.AdjustAlignment(br.Database); //
                     acAtt.RecordGraphicsModified(true); //
 
-                    if (!acAtt.Constant)
-                    {
-                        using (AttributeReference acAttRef = new AttributeReference())
-                        {
+                    if (!acAtt.Constant) {
+                        using (AttributeReference acAttRef = new AttributeReference()) {
                             acAttRef.SetAttributeFromBlock(acAtt, br.BlockTransform);
 
-                            if (attrTextValues != null)
-                            {
+                            if (attrTextValues != null) {
                                 if (attrTextValues.ContainsKey(acAtt.Tag))
                                     acAttRef.TextString = attrTextValues[acAtt.Tag];
                                 else
                                     acAttRef.TextString = acAtt.TextString;
-                            }
-                            else
+                            } else
                                 acAttRef.TextString = acAtt.TextString;
-                            
+
                             acAttRef.AdjustAlignment(br.Database);  //
                             acAttRef.RecordGraphicsModified(true);  //
 
@@ -397,37 +346,31 @@ namespace IgorKL.ACAD3.Model.AcadBlocks
             return resBlockId;
         }
 
-        public static void MirroringBlockByYAxis(BlockReference br)
-        {
+        public static void MirroringBlockByYAxis(BlockReference br) {
             CoordinateSystem.CoordinateTools.MirrorAtYAxis(br, br.Position);
             Matrix3d mat = Matrix3d.Mirroring(new Plane(br.Position, br.BlockTransform.CoordinateSystem3d.Zaxis));
             br.TransformBy(mat);
         }
 
-        public static void MirroringBlockByXAxis(BlockReference br)
-        {
+        public static void MirroringBlockByXAxis(BlockReference br) {
             CoordinateSystem.CoordinateTools.MirrorAtXAxis(br, br.Position);
             Matrix3d mat = Matrix3d.Mirroring(new Plane(br.Position, br.BlockTransform.CoordinateSystem3d.Zaxis));
             br.TransformBy(mat);
         }
 
-        public static List<Entity> GetEntities(BlockTableRecord btr, Transaction trans)
-        {
+        public static List<Entity> GetEntities(BlockTableRecord btr, Transaction trans) {
             List<Entity> res = new List<Entity>();
-            foreach (ObjectId objID in btr)
-            {
+            foreach (ObjectId objID in btr) {
                 DBObject dbObj = trans.GetObject(objID, OpenMode.ForRead) as DBObject;
 
-                if (!(dbObj is AttributeDefinition))
-                {
+                if (!(dbObj is AttributeDefinition)) {
                     res.Add(dbObj as Entity);
                 }
             }
             return res;
         }
 
-        public static ObjectId GetAnonymCopy(ObjectId brId, Transaction trans, bool commit)
-        {
+        public static ObjectId GetAnonymCopy(ObjectId brId, Transaction trans, bool commit) {
             BlockReference baseBr = (BlockReference)brId.GetObject(OpenMode.ForRead, true, true);
             BlockTableRecord baseBtr = (BlockTableRecord)baseBr.BlockTableRecord.GetObject(OpenMode.ForRead, false, true);
             var bt = (BlockTable)trans.GetObject(Tools.GetAcadDatabase().BlockTableId, OpenMode.ForRead);
@@ -446,11 +389,9 @@ namespace IgorKL.ACAD3.Model.AcadBlocks
             ObjectId btrId = bt.Add(btr);
             trans.AddNewlyCreatedDBObject(btr, true);
 
-            foreach (ObjectId id in baseBtr)
-            {
+            foreach (ObjectId id in baseBtr) {
                 Entity ent = id.GetObject(OpenMode.ForRead, false, true) as Entity;
-                if (ent != null)
-                {
+                if (ent != null) {
                     ent = ent.GetTransformedCopy(mat);
                     btr.AppendEntity(ent);
                     trans.AddNewlyCreatedDBObject(ent, true);
@@ -465,22 +406,18 @@ namespace IgorKL.ACAD3.Model.AcadBlocks
             return btr.Id;
         }
 
-        public static ObjectId GetAnonymCopy(ObjectId brId)
-        {
-            using (Transaction trans = Tools.StartTransaction())
-            {
+        public static ObjectId GetAnonymCopy(ObjectId brId) {
+            using (Transaction trans = Tools.StartTransaction()) {
                 var res = GetAnonymCopy(brId, trans, true);
                 return res;
             }
         }
 
 
-        public static ObjectId GetTransformedAnonymCopy(BlockTableRecord btr, Matrix3d matrix)
-        {
+        public static ObjectId GetTransformedAnonymCopy(BlockTableRecord btr, Matrix3d matrix) {
             ObjectId res = ObjectId.Null;
             Database db = Tools.GetAcadDatabase();
-            Tools.StartTransaction(() =>
-            {
+            Tools.StartTransaction(() => {
                 Matrix3d mat = Matrix3d.Identity.PreMultiplyBy(matrix);
                 btr = btr.Id.GetObjectForRead<BlockTableRecord>(true);
 
@@ -495,8 +432,7 @@ namespace IgorKL.ACAD3.Model.AcadBlocks
                 var btrId = bt.Add(btr2);
                 db.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(btr2, true);
 
-                foreach (ObjectId id in btr)
-                {
+                foreach (ObjectId id in btr) {
                     Entity ent = (Entity)id.GetObjectForRead<Entity>(true).Clone();
 
                     ent.TransformBy(mat);
@@ -508,9 +444,9 @@ namespace IgorKL.ACAD3.Model.AcadBlocks
             });
             return res;
         }
-    }    
+    }
 
-    
+
 
 
 }

@@ -11,14 +11,11 @@ using Autodesk.AutoCAD.EditorInput;
 
 using IgorKL.ACAD3.Model.Extensions;
 
-namespace IgorKL.ACAD3.Model.Commands
-{
-    public class TestCmd
-    {
+namespace IgorKL.ACAD3.Model.Commands {
+    public class TestCmd {
 #if DEBUG
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmdTest_TextMirror", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public void TextMirror()
-        {
+        public void TextMirror() {
             Matrix3d ucs = CoordinateSystem.CoordinateTools.GetCurrentUcs();
 
             DBText text = new DBText();
@@ -33,22 +30,20 @@ namespace IgorKL.ACAD3.Model.Commands
 
             Polyline pline = null;
 
-            Tools.StartTransaction(() =>
-                {
-                    text = text.Id.GetObjectForRead<DBText>();
-                    Rectangle3d? bounds = text.GetTextBoxCorners();
+            Tools.StartTransaction(() => {
+                text = text.Id.GetObjectForRead<DBText>();
+                Rectangle3d? bounds = text.GetTextBoxCorners();
 
-                    if (bounds.HasValue)
-                    {
-                        pline = new Polyline(5);
-                        pline.AddVertexAt(0, bounds.Value.LowerLeft);
-                        pline.AddVertexAt(1, bounds.Value.UpperLeft);
-                        pline.AddVertexAt(2, bounds.Value.UpperRight);
-                        pline.AddVertexAt(3, bounds.Value.LowerRight);
-                        pline.AddVertexAt(4, bounds.Value.LowerLeft);
-                    }
+                if (bounds.HasValue) {
+                    pline = new Polyline(5);
+                    pline.AddVertexAt(0, bounds.Value.LowerLeft);
+                    pline.AddVertexAt(1, bounds.Value.UpperLeft);
+                    pline.AddVertexAt(2, bounds.Value.UpperRight);
+                    pline.AddVertexAt(3, bounds.Value.LowerRight);
+                    pline.AddVertexAt(4, bounds.Value.LowerLeft);
+                }
 
-                });
+            });
             if (pline != null)
                 Tools.AppendEntityEx(pline);
 
@@ -61,8 +56,7 @@ namespace IgorKL.ACAD3.Model.Commands
 
 
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmdTest_SelectPointAtPolygon", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public void SelectPointAtPolygon()
-        {
+        public void SelectPointAtPolygon() {
             Polyline pline;
             if (!ObjectCollector.TrySelectAllowedClassObject(out pline))
                 return;
@@ -74,38 +68,31 @@ namespace IgorKL.ACAD3.Model.Commands
 
             List<ObjectId> pointIds = new List<ObjectId>();
 
-            Tools.StartTransaction(() =>
-            {
+            Tools.StartTransaction(() => {
                 pointIds = Tools.AppendEntity(
-                    randomPoints.Select(x =>
-                    {
+                    randomPoints.Select(x => {
                         return (new DBPoint(x));
                     }));
             });
 
-            Tools.StartTransaction(() =>
-                {
-                    foreach (var id in pointIds)
-                    {
-                        DBPoint p = id.GetObjectForRead<DBPoint>();
-                        if (pline.IsInsidePolygon(p.Position))
-                        {
-                            p.UpgradeOpen();
-                            p.Highlight();
-                        }
+            Tools.StartTransaction(() => {
+                foreach (var id in pointIds) {
+                    DBPoint p = id.GetObjectForRead<DBPoint>();
+                    if (pline.IsInsidePolygon(p.Position)) {
+                        p.UpgradeOpen();
+                        p.Highlight();
                     }
-                });
+                }
+            });
         }
 
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmdTest_DynamicBlockTest", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public void DynamicBlockTest()
-        {
+        public void DynamicBlockTest() {
             BlockReference br;
             if (!ObjectCollector.TrySelectAllowedClassObject(out br))
                 return;
 
-            Tools.StartTransaction(() =>
-            {
+            Tools.StartTransaction(() => {
                 br = br.Id.GetObjectForRead<BlockReference>();
                 var pSet = br.DynamicBlockReferencePropertyCollection;
 
@@ -114,27 +101,23 @@ namespace IgorKL.ACAD3.Model.Commands
                 if (pSet == null)
                     return;
 
-                foreach (DynamicBlockReferenceProperty p in pSet)
-                {
-                    if (p.PropertyTypeCode == (short)PropertyTypeCodes.Mirror)
-                    {
+                foreach (DynamicBlockReferenceProperty p in pSet) {
+                    if (p.PropertyTypeCode == (short)PropertyTypeCodes.Mirror) {
                         Type t = p.Value.GetType();
                         p.Value = (short)((short)p.Value == 0 ? 1 : 0);
-                    } 
+                    }
                 }
 
                 BlockTableRecord btrDyn = br.DynamicBlockTableRecord.GetObjectForRead<BlockTableRecord>();
 
-                foreach (ObjectId id in btrDyn.GetBlockReferenceIds(false, false))
-                {
+                foreach (ObjectId id in btrDyn.GetBlockReferenceIds(false, false)) {
                     var brDyn = id.GetObjectForRead<BlockReference>();
                     pSet = brDyn.DynamicBlockReferencePropertyCollection;
 
                     if (pSet == null)
                         return;
 
-                    foreach (DynamicBlockReferenceProperty p in pSet)
-                    {
+                    foreach (DynamicBlockReferenceProperty p in pSet) {
                         object obj = p;
                     }
                 }
@@ -142,15 +125,14 @@ namespace IgorKL.ACAD3.Model.Commands
                 var rbuffer = btrDyn.XData;
                 byte[] buffer = new byte[System.Runtime.InteropServices.Marshal.SizeOf(rbuffer.UnmanagedObject)];
                 IntPtr destPtr = System.Runtime.InteropServices.Marshal.AllocHGlobal(rbuffer.UnmanagedObject);
-                System.Runtime.InteropServices.Marshal.Copy(rbuffer.UnmanagedObject, buffer, 0, 
+                System.Runtime.InteropServices.Marshal.Copy(rbuffer.UnmanagedObject, buffer, 0,
                     System.Runtime.InteropServices.Marshal.SizeOf(rbuffer.UnmanagedObject));
             });
         }
 
         //[RibbonCommandButton("AddCusPropertyField", RibbonPanelCategories.TestProperties)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("AddCusPropertyField")]
-        public void AddCusPropertyField()
-        {
+        public void AddCusPropertyField() {
             Document doc = Application.DocumentManager.MdiActiveDocument;
             Database db = doc.Database;
             Editor ed = doc.Editor;
@@ -163,8 +145,7 @@ namespace IgorKL.ACAD3.Model.Commands
             if (ppr.Status != PromptStatus.OK)
                 return;
 
-            using (Transaction Tx = db.TransactionManager.StartTransaction())
-            {
+            using (Transaction Tx = db.TransactionManager.StartTransaction()) {
                 //%<\AcVar CustomDP.Address \f "%tc4">%
                 MText text = new MText();
                 text.Location = ppr.Value;
@@ -191,8 +172,7 @@ namespace IgorKL.ACAD3.Model.Commands
         }
 
         [Autodesk.AutoCAD.Runtime.CommandMethod("ICmdTest_SelectAtDistanseAtVis")]
-        public void SelectAtDistanseAtVis()
-        {
+        public void SelectAtDistanseAtVis() {
             List<DBText> res = new List<DBText>();
 
             DBText sourceObj;
@@ -209,7 +189,7 @@ namespace IgorKL.ACAD3.Model.Commands
             if (!destBounds.HasValue)
                 return;
 
-            Vector3d vector =  destBounds.Value.LowerLeft - bounds.Value.LowerLeft;
+            Vector3d vector = destBounds.Value.LowerLeft - bounds.Value.LowerLeft;
 
             Drawing.SimpleGride gride1 = new Drawing.SimpleGride(bounds.Value.LowerLeft, vector.GetPerpendicularVector().Negate(), vector, vector.Length, vector.Length);
 
@@ -228,18 +208,15 @@ namespace IgorKL.ACAD3.Model.Commands
 
             int count = 200;
             Point3d maxPointScreen = sourceObj.Position.Add(vector.MultiplyBy(count) +
-                vector.GetPerpendicularVector().Negate().MultiplyBy(count*vector.Length));
+                vector.GetPerpendicularVector().Negate().MultiplyBy(count * vector.Length));
             Point3d minPointScreen = sourceObj.Position.Add(vector.Negate().MultiplyBy(count) +
                 vector.GetPerpendicularVector().MultiplyBy(count * vector.Length));
             Drawing.Helpers.Zoomer.Zoom(minPointScreen, maxPointScreen, new Point3d(), 1);
 
-            Tools.StartTransaction(() =>
-            {
-                for (int r = -count; r < count; r++)
-                {
+            Tools.StartTransaction(() => {
+                for (int r = -count; r < count; r++) {
 
-                    for (int c = -count; c < count; c++)
-                    {
+                    for (int c = -count; c < count; c++) {
                         var point1 = gride1.CalculateGridPoint(r, c);
                         Matrix3d mat = Matrix3d.Displacement(point1 - bounds.Value.LowerLeft);
 
@@ -248,11 +225,9 @@ namespace IgorKL.ACAD3.Model.Commands
 
                         //((Polyline)rectg.GetTransformedCopy(mat)).SaveToDatebase();
 
-                        if (spres.Status == PromptStatus.OK)
-                        {
+                        if (spres.Status == PromptStatus.OK) {
                             DBText text = spres.Value.GetSelectedItems<DBText>().FirstOrDefault();
-                            if (text != null)
-                            {
+                            if (text != null) {
                                 text.UpgradeOpen();
                                 text.ColorIndex = 181;
                                 text.DowngradeOpen();
@@ -263,7 +238,7 @@ namespace IgorKL.ACAD3.Model.Commands
                         /*Entity[] marker = new[] { (Entity)new DBPoint(point1), (Entity)new Line(point1, point1.Add(bounds.Value.UpperRight - bounds.Value.LowerLeft)) };
                         marker.SaveToDatebase<Entity>();*/
                     }
-                    
+
                 }
             });
         }
@@ -274,15 +249,13 @@ namespace IgorKL.ACAD3.Model.Commands
 
         [RibbonCommandButton("Выбор текста по границе", RibbonPanelCategories.Test_Text)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("ICmdTest_SelectTextAtBounds")]
-        public void SelectTextAtBounds()
-        {
+        public void SelectTextAtBounds() {
             DBText sourceObj;
             if (!ObjectCollector.TrySelectAllowedClassObject<DBText>(out sourceObj))
                 return;
             TypedValue[] tvs = new[] {
                 new TypedValue((int)DxfCode.Start, "TEXT")};
-            Tools.StartTransaction(() =>
-            {
+            Tools.StartTransaction(() => {
                 Rectangle3d? bounds = sourceObj.GetTextBoxCorners();
                 if (!bounds.HasValue)
                     return;
@@ -298,11 +271,9 @@ namespace IgorKL.ACAD3.Model.Commands
 
                 pline.SaveToDatebase();
 
-                if (spres.Status == PromptStatus.OK)
-                {
+                if (spres.Status == PromptStatus.OK) {
                     DBText text = spres.Value.GetSelectedItems<DBText>().FirstOrDefault();
-                    if (text != null)
-                    {
+                    if (text != null) {
                         text.UpgradeOpen();
                         text.ColorIndex = 181;
                         text.DowngradeOpen();
@@ -312,25 +283,21 @@ namespace IgorKL.ACAD3.Model.Commands
         }
 
 
-        public enum PropertyTypeCodes:short
-        {
+        public enum PropertyTypeCodes : short {
             Mirror = 3
         }
 #endif
 
-        public class DBTextMirroringJig : DrawJig
-        {
+        public class DBTextMirroringJig : DrawJig {
             private Point3d _position;
             public DBText _text;
 
             public DBTextMirroringJig(DBText text)
-                :base()
-            {
+                : base() {
                 _text = text;
             }
 
-            protected override Autodesk.AutoCAD.EditorInput.SamplerStatus Sampler(Autodesk.AutoCAD.EditorInput.JigPrompts prompts)
-            {
+            protected override Autodesk.AutoCAD.EditorInput.SamplerStatus Sampler(Autodesk.AutoCAD.EditorInput.JigPrompts prompts) {
                 JigPromptPointOptions ppo = new JigPromptPointOptions("\nSelect point");
                 ppo.UseBasePoint = true;
                 ppo.BasePoint = _text.Position;
@@ -338,7 +305,7 @@ namespace IgorKL.ACAD3.Model.Commands
                 ppo.UserInputControls = UserInputControls.Accept3dCoordinates | UserInputControls.NoZeroResponseAccepted;
 
                 PromptPointResult ppr = prompts.AcquirePoint(ppo);
-                
+
                 if (ppr.Status != PromptStatus.OK)
                     return SamplerStatus.Cancel;
 
@@ -350,14 +317,12 @@ namespace IgorKL.ACAD3.Model.Commands
                 return SamplerStatus.OK;
             }
 
-            public PromptStatus Run()
-            {
+            public PromptStatus Run() {
                 PromptResult promptResult = Tools.GetAcadEditor().Drag(this);
                 return promptResult.Status;
             }
 
-            private DBText _getMirrorClone()
-            {            
+            private DBText _getMirrorClone() {
                 var bounds = _text.GetTextBoxCorners();
                 if (!bounds.HasValue)
                     return null;
@@ -373,8 +338,7 @@ namespace IgorKL.ACAD3.Model.Commands
                 return res;
             }
 
-            protected override bool WorldDraw(Autodesk.AutoCAD.GraphicsInterface.WorldDraw draw)
-            {
+            protected override bool WorldDraw(Autodesk.AutoCAD.GraphicsInterface.WorldDraw draw) {
                 DBText inMemoryText = _getMirrorClone();
 
                 draw.Geometry.Draw(inMemoryText);

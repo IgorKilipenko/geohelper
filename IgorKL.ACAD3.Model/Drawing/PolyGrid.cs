@@ -1,34 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.Geometry;
-//using Autodesk.AutoCAD.GraphicsInterface;
-using Autodesk.AutoCAD.ApplicationServices;
+﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
-
+using Autodesk.AutoCAD.Geometry;
 using IgorKL.ACAD3.Model.Extensions;
+using System;
+using System.Collections.Generic;
 
-namespace IgorKL.ACAD3.Model.Drawing
-{
-    public class PolyGrid:CustomObjects.SimpleEntityOverride
-    {
+namespace IgorKL.ACAD3.Model.Drawing {
+    public class PolyGrid : CustomObjects.SimpleEntityOverride {
         private double _verticalStep;
         private double _horizontalStep;
         private Rectangle3d _mainRec;
         private Point3d _jigPosition;
 
         public PolyGrid()
-            : this(Point3d.Origin, 0,0, Matrix3d.Identity)
-        {
+            : this(Point3d.Origin, 0, 0, Matrix3d.Identity) {
         }
 
         public PolyGrid(Point3d origin, double hStep, double vStep, Matrix3d ucs)
-            :base(origin, new List<Entity>(), ucs)
-        {
+            : base(origin, new List<Entity>(), ucs) {
             _horizontalStep = hStep;
             _verticalStep = vStep;
             _jigPosition = Point3d.Origin;
@@ -36,8 +25,7 @@ namespace IgorKL.ACAD3.Model.Drawing
 
 #if DEBUG
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmdTest_DrawRec", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public void TestDrawRec()
-        {
+        public void TestDrawRec() {
             Matrix3d ucs = CoordinateSystem.CoordinateTools.GetCurrentUcs();
 
             PromptPointOptions ppo = new PromptPointOptions("\nУкажите начальную точку");
@@ -64,12 +52,11 @@ namespace IgorKL.ACAD3.Model.Drawing
         }
 #endif
 
-        private void _createGrid(Point3d destPoint)
-        {
+        private void _createGrid(Point3d destPoint) {
             Entities.Clear();
 
 
-            Vector3d vector = destPoint-Origin;
+            Vector3d vector = destPoint - Origin;
 
             /*Point3d leftTop = Origin.Add(_ucs.CoordinateSystem3d.Yaxis.MultiplyBy(vector.Y));
             Point3d leftLow = Origin;
@@ -93,18 +80,16 @@ namespace IgorKL.ACAD3.Model.Drawing
             int columnsCount = (int)Math.Ceiling(hCount);
 
             Rectangle3d current = new Rectangle3d(
-                upperLeft: _mainRec.LowerLeft.Add((_mainRec.UpperLeft-_mainRec.LowerLeft).Normalize().MultiplyBy(_verticalStep)),
+                upperLeft: _mainRec.LowerLeft.Add((_mainRec.UpperLeft - _mainRec.LowerLeft).Normalize().MultiplyBy(_verticalStep)),
                 upperRight: _mainRec.LowerLeft.Add((_mainRec.LowerRight - _mainRec.LowerLeft).Normalize().MultiplyBy(_horizontalStep))
-                    .Add((_mainRec.UpperLeft-_mainRec.LowerLeft).Normalize().MultiplyBy(_verticalStep)),
+                    .Add((_mainRec.UpperLeft - _mainRec.LowerLeft).Normalize().MultiplyBy(_verticalStep)),
                 lowerLeft: _mainRec.LowerLeft,
-                lowerRight: _mainRec.LowerLeft.Add((_mainRec.LowerRight-_mainRec.LowerLeft).Normalize().MultiplyBy(_horizontalStep))
+                lowerRight: _mainRec.LowerLeft.Add((_mainRec.LowerRight - _mainRec.LowerLeft).Normalize().MultiplyBy(_horizontalStep))
                 );
 
             SimpleGride table = new SimpleGride(current);
-            for (int r = 0; r < rowsCount; r++)
-            {
-                for (int c= 0; c < columnsCount; c++)
-                {
+            for (int r = 0; r < rowsCount; r++) {
+                for (int c = 0; c < columnsCount; c++) {
                     var rec = table.CalculateRectagle(r, c);
                     rec.TransformBy(_ucs);
                     this.Entities.Add(rec);
@@ -114,20 +99,18 @@ namespace IgorKL.ACAD3.Model.Drawing
         }
 
 
-        public void Display(Point3d destPoint)
-        {
+        public void Display(Point3d destPoint) {
             _createGrid(destPoint);
 
             base.Display();
         }
 
-        protected override Autodesk.AutoCAD.EditorInput.SamplerStatus Sampler(Autodesk.AutoCAD.EditorInput.JigPrompts prompts)
-        {
+        protected override Autodesk.AutoCAD.EditorInput.SamplerStatus Sampler(Autodesk.AutoCAD.EditorInput.JigPrompts prompts) {
             JigPromptPointOptions ppo = new JigPromptPointOptions("\nУкажите точку");
             ppo.UseBasePoint = true;
             ppo.BasePoint = this.Origin;
 
-            ppo.UserInputControls =  UserInputControls.NoZeroResponseAccepted;
+            ppo.UserInputControls = UserInputControls.NoZeroResponseAccepted;
 
             PromptPointResult ppr = prompts.AcquirePoint(ppo);
 
@@ -139,8 +122,7 @@ namespace IgorKL.ACAD3.Model.Drawing
 
             _jigPosition = ppr.Value.TransformBy(_ucs.Inverse());
 
-            lock (Entities)
-            {
+            lock (Entities) {
                 _createGrid(_jigPosition);
             }
 
