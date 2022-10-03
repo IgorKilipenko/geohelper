@@ -143,13 +143,15 @@ namespace IgorKL.ACAD3.Customization.Ribbons
 
         private void _createMainRibbon()
         {
-            _ribbonTab = new RibbonTab();
-            _ribbonTab.Id = "ICmd_Drawing_Tab";
-            _ribbonTab.Name = "ТочностиНЕТ";
-            _ribbonTab.Tag = this;
-            _ribbonTab.Title = "ТочностиНЕТ";
-            _ribbonTab.IsContextualTab = false;
-            _ribbonTab.IsVisible = true;
+            _ribbonTab = new RibbonTab
+            {
+                Id = "ICmd_Drawing_Tab",
+                Name = "GeoHelper.NET",
+                Tag = this,
+                Title = "GeoHelper.NET",
+                IsContextualTab = false,
+                IsVisible = true
+            };
 
             ComponentManager.Ribbon.Tabs.Add(_ribbonTab);
         }
@@ -206,11 +208,13 @@ namespace IgorKL.ACAD3.Customization.Ribbons
                 buttonUnRegApp.CommandHandler = new RibbonButtonCommandHandler();
 
 
-                RibbonPanel mangPanel = new RibbonPanel();
-                //mangPanel.CustomPanelTitleBarBackground = System.Windows.Media.Brushes.LightYellow;
-                mangPanel.CanToggleOrientation = true;
-                mangPanel.Source = sourceMangPanel;
-                mangPanel.ResizeStyle = RibbonResizeStyles.NeverResizeItemWidth | RibbonResizeStyles.NeverHideText | RibbonResizeStyles.NeverCollapseItem;
+                RibbonPanel mangPanel = new RibbonPanel
+                {
+                    //mangPanel.CustomPanelTitleBarBackground = System.Windows.Media.Brushes.LightYellow;
+                    CanToggleOrientation = true,
+                    Source = sourceMangPanel,
+                    ResizeStyle = RibbonResizeStyles.NeverResizeItemWidth | RibbonResizeStyles.NeverHideText | RibbonResizeStyles.NeverCollapseItem
+                };
 
                 mangPanel.Source.Items.Add(buttonRegApp);
                 mangPanel.Source.Items.Add(buttonUnRegApp);
@@ -439,8 +443,7 @@ namespace IgorKL.ACAD3.Customization.Ribbons
 
             public void Execute(object parameter)
             {
-                RibbonButton button = parameter as RibbonButton;
-                if (button != null)
+                if (parameter is RibbonButton button)
                 {
                     /*string cmd =button.CommandParameter.ToString();
                     if (cmd.ToUpper().StartsWith("@@ICmd_Netload".ToUpper()))    
@@ -586,7 +589,6 @@ namespace IgorKL.ACAD3.Customization.Ribbons
             catch { }
 
         }
-
 
         private void _createDefaultNamedRibbonPanels()
         {
@@ -742,8 +744,6 @@ namespace IgorKL.ACAD3.Customization.Ribbons
             ComponentManager.Ribbon.Tabs.Add(_ribbonTab);
         }
 
-
-
         private void _createAutoRibbonPanels()
         {
             string asmName = "IgorKL.ACAD3.Model.dll";
@@ -826,9 +826,7 @@ namespace IgorKL.ACAD3.Customization.Ribbons
             if (row is RibbonRowPanel)
                 ((RibbonRowPanel)row).Items.Add(new RibbonRowBreak());
 
-
         }
-
 
         private static System.Windows.Media.Imaging.BitmapImage loadImage(System.Drawing.Bitmap img)
         {
@@ -879,7 +877,6 @@ namespace IgorKL.ACAD3.Customization.Ribbons
 
         public class RibbonButtonCommandHandler : System.Windows.Input.ICommand
         {
-
             public bool CanExecute(object parameter)
             {
                 //return parameter is RibbonButton;
@@ -890,8 +887,7 @@ namespace IgorKL.ACAD3.Customization.Ribbons
 
             public void Execute(object parameter)
             {
-                RibbonButton button = parameter as RibbonButton;
-                if (button != null)
+                if (parameter is RibbonButton button)
                 {
                     /*string cmd =button.CommandParameter.ToString();
                     if (cmd.ToUpper().StartsWith("@@ICmd_Netload".ToUpper()))    

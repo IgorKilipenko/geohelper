@@ -1,25 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IgorKL.ACAD3.Model", "IgorKL.ACAD3.Model\IgorKL.ACAD3.Model.csproj", "{0D50CC5B-3089-44B3-9C2B-A9D76DC873BC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IgorKL.ACAD3.Customization", "IgorKL.Customization\IgorKL.ACAD3.Customization.csproj", "{6B2833C8-5924-4836-9745-F1920FC37CB8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0D50CC5B-3089-44B3-9C2B-A9D76DC873BC} = {0D50CC5B-3089-44B3-9C2B-A9D76DC873BC}
+	EndProjectSection
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 3
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = http://server:8080/tfs/igorklserver
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = IgorKL.ACAD3.Model\\IgorKL.ACAD3.Model.csproj
-		SccProjectName1 = IgorKL.ACAD3.Model
-		SccLocalPath1 = IgorKL.ACAD3.Model
-		SccProjectUniqueName2 = IgorKL.Customization\\IgorKL.ACAD3.Customization.csproj
-		SccProjectName2 = IgorKL.Customization
-		SccLocalPath2 = IgorKL.Customization
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -36,6 +27,7 @@ Global
 		{0D50CC5B-3089-44B3-9C2B-A9D76DC873BC}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
 		{0D50CC5B-3089-44B3-9C2B-A9D76DC873BC}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{0D50CC5B-3089-44B3-9C2B-A9D76DC873BC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0D50CC5B-3089-44B3-9C2B-A9D76DC873BC}.Debug|x64.Build.0 = Debug|Any CPU
 		{0D50CC5B-3089-44B3-9C2B-A9D76DC873BC}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{0D50CC5B-3089-44B3-9C2B-A9D76DC873BC}.Debug|x86.Build.0 = Debug|Any CPU
 		{0D50CC5B-3089-44B3-9C2B-A9D76DC873BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -50,6 +42,7 @@ Global
 		{6B2833C8-5924-4836-9745-F1920FC37CB8}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
 		{6B2833C8-5924-4836-9745-F1920FC37CB8}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{6B2833C8-5924-4836-9745-F1920FC37CB8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6B2833C8-5924-4836-9745-F1920FC37CB8}.Debug|x64.Build.0 = Debug|Any CPU
 		{6B2833C8-5924-4836-9745-F1920FC37CB8}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{6B2833C8-5924-4836-9745-F1920FC37CB8}.Debug|x86.Build.0 = Debug|Any CPU
 		{6B2833C8-5924-4836-9745-F1920FC37CB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -62,5 +55,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6836B1B7-BC75-4AD2-85C4-AFD873252168}
 	EndGlobalSection
 EndGlobal

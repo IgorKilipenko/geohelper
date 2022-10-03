@@ -11,7 +11,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>IgorKL.ACAD3.Customization</RootNamespace>
-    <AssemblyName>IgorKL.ACAD3.Customization</AssemblyName>
+    <AssemblyName>geohelper</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -124,13 +124,6 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IgorKL.ACAD3.Model\IgorKL.ACAD3.Model.csproj">
-      <Project>{0d50cc5b-3089-44b3-9c2b-a9d76dc873bc}</Project>
-      <Name>IgorKL.ACAD3.Model</Name>
-      <Private>True</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="CustomWindows\AcadWindow2.cs" />
     <Compile Include="CustomWindows\KeywordsWindow.xaml.cs">
       <DependentUpon>KeywordsWindow.xaml</DependentUpon>
@@ -192,7 +185,12 @@
   <ItemGroup>
     <None Include="Resources\DrawWallArrows.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\IgorKL.ACAD3.Model\IgorKL.ACAD3.Model.csproj">
+      <Project>{0d50cc5b-3089-44b3-9c2b-a9d76dc873bc}</Project>
+      <Name>IgorKL.ACAD3.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <Page Include="CustomWindows\KeywordsWindow.xaml">
       <SubType>Designer</SubType>

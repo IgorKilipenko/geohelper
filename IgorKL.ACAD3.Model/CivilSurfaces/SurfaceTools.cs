@@ -29,7 +29,6 @@ namespace IgorKL.ACAD3.Model.CivilSurfaces
 
         public static ObjectId CroppingSurface(TinSurface surface, Polyline border)
         {
-            double area2d = 0.0;
             using (Database destDb = new Database(true, true))
             {
                 Database db = Tools.GetAcadDatabase();
