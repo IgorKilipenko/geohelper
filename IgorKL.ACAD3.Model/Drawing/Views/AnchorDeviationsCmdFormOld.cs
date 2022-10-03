@@ -19,38 +19,31 @@ using acadApp = Autodesk.AutoCAD.ApplicationServices;
 
 using IgorKL.ACAD3.Model.Extensions;
 
-namespace IgorKL.ACAD3.Model.Drawing.Views
-{
-    public partial class AnchorDeviationsCmdFormOld : Form
-    {
+namespace IgorKL.ACAD3.Model.Drawing.Views {
+    public partial class AnchorDeviationsCmdFormOld : Form {
         private Matrix3d _ucs;
         private double _angle;
 
-        public AnchorDeviationsCmdFormOld()
-        {
+        public AnchorDeviationsCmdFormOld() {
             InitializeComponent();
             this._ucs = Tools.GetActiveAcadDocument().Editor.CurrentUserCoordinateSystem;
             _angle = 0d;
         }
 
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_DrawAnchorDeviations_Old", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public void DrawCmd()
-        {
-            Autodesk.AutoCAD.ApplicationServices.Application.ShowModalDialog(Autodesk.AutoCAD.ApplicationServices.Application.MainWindow.Handle,this, false);
+        public void DrawCmd() {
+            Autodesk.AutoCAD.ApplicationServices.Application.ShowModalDialog(Autodesk.AutoCAD.ApplicationServices.Application.MainWindow.Handle, this, false);
         }
 
 
-        private void addOneItem_button_Click(object sender, EventArgs e)
-        {
+        private void addOneItem_button_Click(object sender, EventArgs e) {
             this.Hide();
-            while (DrawAnchorDeviations())
-            {
+            while (DrawAnchorDeviations()) {
                 Tools.GetActiveAcadDocument().Editor.UpdateScreen();
             }
         }
 
-        public bool DrawAnchorDeviations()
-        {
+        public bool DrawAnchorDeviations() {
             Polyline pline = new Polyline(4);
             pline.AddVertexAt(0, new Point2d(0, 0), 0, 0, 0);
             pline.AddVertexAt(1, new Point2d(3, 0), 0, 0, 0);
@@ -90,14 +83,12 @@ namespace IgorKL.ACAD3.Model.Drawing.Views
 
             var btrId = BlockTools.CreateBlockTableRecordEx(Point3d.Origin, "_DrawAnchorDeviations", ents, AnnotativeStates.True);
 
-            if (btrId != ObjectId.Null)
-            {
+            if (btrId != ObjectId.Null) {
                 fPoint = fPoint.RotateBy(-_angle, _ucs.CoordinateSystem3d.Zaxis, pPoint);
 
                 var brHorizontalId = BlockTools.AddBlockRefToModelSpace(btrId, new[] { Math.Abs(Math.Round((fPoint.X - pPoint.X) * 1000d, 0)).ToString() }.ToList(), pPoint, _ucs);
                 var brVerticalId = BlockTools.AddBlockRefToModelSpace(btrId, new[] { Math.Abs(Math.Round((fPoint.Y - pPoint.Y) * 1000d, 0)).ToString() }.ToList(), pPoint, _ucs);
-                using (Transaction trans = Tools.StartTransaction())
-                {
+                using (Transaction trans = Tools.StartTransaction()) {
                     BlockReference br1 = (BlockReference)trans.GetObject(brHorizontalId, OpenMode.ForWrite);
                     BlockReference br2 = (BlockReference)trans.GetObject(brVerticalId, OpenMode.ForWrite);
 
@@ -105,18 +96,15 @@ namespace IgorKL.ACAD3.Model.Drawing.Views
                     object defVal = acadApp.Application.GetSystemVariable(MIRRTEXT);
                     acadApp.Application.SetSystemVariable(MIRRTEXT, 0);
 
-                    try
-                    {
-                        if (fPoint.X - pPoint.X < 0d)
-                        {
+                    try {
+                        if (fPoint.X - pPoint.X < 0d) {
                             BlockTools.MirroringBlockByYAxis(br1);
                         }
 
                         br2.TransformBy(Matrix3d.Rotation(Math.PI / 2, _ucs.CoordinateSystem3d.Zaxis, br2.Position));
                         if (fPoint.X - pPoint.X < 0d)
                             BlockTools.MirroringBlockByYAxis(br2);
-                        if (fPoint.Y - pPoint.Y < 0)
-                        {
+                        if (fPoint.Y - pPoint.Y < 0) {
                             BlockTools.MirroringBlockByXAxis(br2);
                             BlockTools.MirroringBlockByYAxis(br2);
                         }
@@ -125,8 +113,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Views
                         br2.TransformBy(Matrix3d.Rotation(_angle, _ucs.CoordinateSystem3d.Zaxis, br2.Position));
 
                         using (TransientGraphicsTools.SelectableTransient _transient =
-                            new TransientGraphicsTools.SelectableTransient(new List<Entity>(new[] { br1, br2 })))
-                        {
+                            new TransientGraphicsTools.SelectableTransient(new List<Entity>(new[] { br1, br2 }))) {
                             _transient.Display();
 
                             ppo = new PromptPointOptions("\nУкажите точку определяющую сторону отобажения");
@@ -136,8 +123,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Views
 
                             ppr = Tools.GetAcadEditor().GetPoint(ppo);
 
-                            if (ppr.Status == PromptStatus.OK)
-                            {
+                            if (ppr.Status == PromptStatus.OK) {
                                 Point3d point = ppr.Value;
 
                                 Polyline transPline = null;
@@ -148,8 +134,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Views
 
                                 transPline.TransformBy(br1.BlockTransform);
                                 double ang = CoordinateGeometry.Helper.GetAngle(transPline.StartPoint, transPline.EndPoint, point);
-                                if (Math.Abs(ang) > Math.PI/2d)
-                                {
+                                if (Math.Abs(ang) > Math.PI / 2d) {
                                     Matrix3d mat = Matrix3d.Displacement(transPline.StartPoint - transPline.EndPoint);
                                     br1.TransformBy(mat);
                                 }
@@ -158,8 +143,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Views
 
                                 transPline.TransformBy(br2.BlockTransform);
                                 ang = CoordinateGeometry.Helper.GetAngle(transPline.StartPoint, transPline.EndPoint, point);
-                                if (Math.Abs(ang) > Math.PI / 2d)
-                                {
+                                if (Math.Abs(ang) > Math.PI / 2d) {
                                     Matrix3d mat = Matrix3d.Displacement(transPline.StartPoint - transPline.EndPoint);
                                     br2.TransformBy(mat);
                                 }
@@ -170,13 +154,9 @@ namespace IgorKL.ACAD3.Model.Drawing.Views
 
                         trans.Commit();
                         return true;
-                    }
-                    catch (Exception ex)
-                    {
+                    } catch (Exception ex) {
                         throw ex;
-                    }
-                    finally
-                    {
+                    } finally {
                         acadApp.Application.SetSystemVariable(MIRRTEXT, defVal);
                     }
                 }
@@ -184,8 +164,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Views
             return false;
         }
 
-        private void getYAxis_button_Click(object sender, EventArgs e)
-        {
+        private void getYAxis_button_Click(object sender, EventArgs e) {
             this.Hide();
 
             PromptPointOptions ppo = new PromptPointOptions("\nУкажите первую точку определяющую ось Y");

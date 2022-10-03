@@ -8,10 +8,8 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using IgorKL.ACAD3.Model.Extensions;
 
-namespace IgorKL.ACAD3.Model.Helpers.Math
-{
-    public static class Statistical
-    {
+namespace IgorKL.ACAD3.Model.Helpers.Math {
+    public static class Statistical {
         /// <summary>
         /// Fits a line to a collection of (x,y) points.
         /// </summary>
@@ -25,8 +23,7 @@ namespace IgorKL.ACAD3.Model.Helpers.Math
         public static void LinearRegression(double[] xVals, double[] yVals,
                                             int inclusiveStart, int exclusiveEnd,
                                             out double rsquared, out double yintercept,
-                                            out double slope)
-        {
+                                            out double slope) {
             System.Diagnostics.Debug.Assert(xVals.Length == yVals.Length);
             double sumOfX = 0;
             double sumOfY = 0;
@@ -38,8 +35,7 @@ namespace IgorKL.ACAD3.Model.Helpers.Math
             double sCo = 0;
             double count = exclusiveEnd - inclusiveStart;
 
-            for (int ctr = inclusiveStart; ctr < exclusiveEnd; ctr++)
-            {
+            for (int ctr = inclusiveStart; ctr < exclusiveEnd; ctr++) {
                 double x = xVals[ctr];
                 double y = yVals[ctr];
                 sumCodeviates += x * y;
@@ -63,25 +59,21 @@ namespace IgorKL.ACAD3.Model.Helpers.Math
             slope = sCo / ssX;
         }
 
-        public static Line LinearRegression(Polyline pline)
-        {
+        public static Line LinearRegression(Polyline pline) {
             return LinearRegression(pline, 0, pline.NumberOfVertices);
         }
 
-        public static Line LinearRegression(Polyline pline, int inclusiveStart, int exclusiveEnd)
-        {
+        public static Line LinearRegression(Polyline pline, int inclusiveStart, int exclusiveEnd) {
             double rsquared;
             return LinearRegression(pline, 0, pline.NumberOfVertices, out rsquared);
         }
 
-        public static Line LinearRegression(Polyline pline, int inclusiveStart, int exclusiveEnd, out  double rsquared)
-        {
+        public static Line LinearRegression(Polyline pline, int inclusiveStart, int exclusiveEnd, out double rsquared) {
             int count = pline.NumberOfVertices;
             double[] xVals = new double[count];
             double[] yVals = new double[count];
 
-            for (int i = 0; i < count; i++)
-            {
+            for (int i = 0; i < count; i++) {
                 var point = pline.GetPoint2dAt(i);
                 xVals[i] = point.X;
                 yVals[i] = point.Y;

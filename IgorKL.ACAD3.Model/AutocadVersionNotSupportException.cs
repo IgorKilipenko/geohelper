@@ -6,6 +6,7 @@ namespace IgorKL.ACAD3.Model {
             : this("Текущая версия автокада не поддерживается") {
 
         }
+        
         public AutocadVersionNotSupportException(string msg)
             : base(msg) {
 

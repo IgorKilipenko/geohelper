@@ -5,10 +5,8 @@ using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 
-namespace IgorKL.ACAD3.Model.Helpers.Service
-{
-    public class DemandLoader
-    {
+namespace IgorKL.ACAD3.Model.Helpers.Service {
+    public class DemandLoader {
         /*
         [CommandMethod("Register_ICmd_Drawing")]
         public void RegisterMyApp()

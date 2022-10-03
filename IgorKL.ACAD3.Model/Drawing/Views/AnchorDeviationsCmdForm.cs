@@ -19,12 +19,9 @@ using acadApp = Autodesk.AutoCAD.ApplicationServices;
 
 using IgorKL.ACAD3.Model.Extensions;
 
-namespace IgorKL.ACAD3.Model.Drawing.Views
-{
-    public partial class AnchorDeviationsCmdForm : Form
-    {
-        public AnchorDeviationsCmdForm()
-        {
+namespace IgorKL.ACAD3.Model.Drawing.Views {
+    public partial class AnchorDeviationsCmdForm : Form {
+        public AnchorDeviationsCmdForm() {
             InitializeComponent();
         }
 

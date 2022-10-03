@@ -14,32 +14,29 @@ using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.Civil.DatabaseServices;
 
-namespace IgorKL.ACAD3.Model.CogoPoints
-{
-    public class CogoPointFactory
-    {
-        public static ObjectIdCollection CreateCogoPoints(Point3dCollection locations, string pointDescription = "_auto_created")
-        {
-            /*CogoPointCollection*/ dynamic points = Autodesk.Civil.ApplicationServices.CivilApplication.ActiveDocument.CogoPoints;
+namespace IgorKL.ACAD3.Model.CogoPoints {
+    public class CogoPointFactory {
+        public static ObjectIdCollection CreateCogoPoints(Point3dCollection locations, string pointDescription = "_auto_created") {
+            /*CogoPointCollection*/
+            dynamic points = Autodesk.Civil.ApplicationServices.CivilApplication.ActiveDocument.CogoPoints;
 #if ACAD2015
             if (Application.Version.Major > 19)
                 return points.Add(locations, pointDescription, true);
-//#else
+            //#else
             else
                 return points.Add(locations, pointDescription);
 #endif
         }
-        public static List<ObjectId> CreateCogoPoints(IEnumerable<Point3d> locations, string pointDescription = "_auto_created")
-        {
-            /*CogoPointCollection*/ dynamic points = Autodesk.Civil.ApplicationServices.CivilApplication.ActiveDocument.CogoPoints;
+        public static List<ObjectId> CreateCogoPoints(IEnumerable<Point3d> locations, string pointDescription = "_auto_created") {
+            /*CogoPointCollection*/
+            dynamic points = Autodesk.Civil.ApplicationServices.CivilApplication.ActiveDocument.CogoPoints;
             List<ObjectId> result = new List<ObjectId>(locations.Count());
 
-            foreach (var p in locations)
-            {
+            foreach (var p in locations) {
 #if ACAD2015
                 if (Application.Version.Major > 19)
                     result.Add(points.Add(p, pointDescription, true));
-//#elif ACAD2014
+                //#elif ACAD2014
                 else
                     result.Add(points.Add(p, pointDescription));
 #endif
@@ -47,21 +44,20 @@ namespace IgorKL.ACAD3.Model.CogoPoints
 
             return result;
         }
-        public static ObjectId CreateCogoPoints(Point3d location, string pointName, string pointDescription = "_auto_created")
-        {
-            /*CogoPointCollection*/ dynamic points = Autodesk.Civil.ApplicationServices.CivilApplication.ActiveDocument.CogoPoints;
+        public static ObjectId CreateCogoPoints(Point3d location, string pointName, string pointDescription = "_auto_created") {
+            /*CogoPointCollection*/
+            dynamic points = Autodesk.Civil.ApplicationServices.CivilApplication.ActiveDocument.CogoPoints;
 #if ACAD2015
-            ObjectId id = ObjectId.Null; 
+            ObjectId id = ObjectId.Null;
             if (Application.Version.Major > 19)
                 id = points.Add(location, pointDescription, true);
-//#elif ACAD2014
+            //#elif ACAD2014
             else
                 id = points.Add(location, pointDescription);
 #endif
 
             //Внес изменеие для созданияточек со стилем поумолчанию ///////////////////////////////////
-            using (Transaction trans = Tools.StartTransaction())
-            {
+            using (Transaction trans = Tools.StartTransaction()) {
                 var point = (CogoPoint)trans.GetObject(id, OpenMode.ForWrite);
                 point.StyleId = ObjectId.Null;
                 point.LabelStyleId = ObjectId.Null;

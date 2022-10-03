@@ -12,10 +12,8 @@ using Autodesk.AutoCAD.EditorInput;
 
 using IgorKL.ACAD3.Model.Extensions;
 
-namespace IgorKL.ACAD3.Model.CustomObjects
-{
-    public abstract class EntityDrawer : Autodesk.AutoCAD.EditorInput.DrawJig, IDisposable
-    {
+namespace IgorKL.ACAD3.Model.CustomObjects {
+    public abstract class EntityDrawer : Autodesk.AutoCAD.EditorInput.DrawJig, IDisposable {
         private List<Entity> _entities;
         private Database _db;
         private AnnotativeStates _annotative;
@@ -31,8 +29,7 @@ namespace IgorKL.ACAD3.Model.CustomObjects
 
 
         public EntityDrawer(List<Entity> entities, AnnotativeStates annotative, Matrix3d transformFromUcsToWcs)
-            : base()
-        {
+            : base() {
             _ucs = transformFromUcsToWcs;
             _annotative = annotative;
 
@@ -40,39 +37,33 @@ namespace IgorKL.ACAD3.Model.CustomObjects
             _entities = entities;
         }
 
-        public void TrasientDisplay()
-        {
+        public void TrasientDisplay() {
             if (_transient == null)
                 _transient = new IgorKL.ACAD3.Model.Helpers.Display.DynamicTransient();
 
-            foreach (var ent in Entities)
-            {
+            foreach (var ent in Entities) {
                 _transient.AddMarker((Entity)ent.Clone());
             }
 
             _transient.Display();
         }
 
-        public void TrasientDisplay(IEnumerable<Entity> entities)
-        {
+        public void TrasientDisplay(IEnumerable<Entity> entities) {
             if (_transient == null)
                 _transient = new IgorKL.ACAD3.Model.Helpers.Display.DynamicTransient();
 
-            foreach (var ent in entities)
-            {
+            foreach (var ent in entities) {
                 _transient.AddMarker((Entity)ent.Clone());
             }
 
             _transient.Display();
         }
 
-        public virtual void TrasientDisplayAtBlock(Point3d insertPoint)
-        {
+        public virtual void TrasientDisplayAtBlock(Point3d insertPoint) {
             TrasientDisplayAtBlock(insertPoint, _entities);
         }
 
-        public virtual void TrasientDisplayAtBlock(Point3d insertPoint, IEnumerable<Entity> entities)
-        {
+        public virtual void TrasientDisplayAtBlock(Point3d insertPoint, IEnumerable<Entity> entities) {
             if (_transient == null)
                 _transient = new IgorKL.ACAD3.Model.Helpers.Display.DynamicTransient();
 
@@ -82,8 +73,7 @@ namespace IgorKL.ACAD3.Model.CustomObjects
 
             BlockReference block = null;
 
-            Tools.StartTransaction(() =>
-            {
+            Tools.StartTransaction(() => {
                 block = blockId.GetObjectForWrite<BlockReference>();
                 var buffer = (BlockReference)block.Clone();
                 block.Erase(true);
@@ -97,39 +87,31 @@ namespace IgorKL.ACAD3.Model.CustomObjects
 
         public abstract void Calculate();
 
-        public virtual void StopTrasientDisplay()
-        {
-            if (_transient != null)
-            {
+        public virtual void StopTrasientDisplay() {
+            if (_transient != null) {
                 _transient.ClearTransientGraphics();
             }
         }
 
-        public void InnerUpgradeOpen()
-        {
+        public void InnerUpgradeOpen() {
             Entities.ForEach(ent => ent.UpgradeOpen());
         }
 
-        public void InnerSetDatabaseDefaults(Database db)
-        {
+        public void InnerSetDatabaseDefaults(Database db) {
             Entities.ForEach(ent => ent.SetDatabaseDefaults(db));
         }
 
 
-        public virtual void Dispose()
-        {
+        public virtual void Dispose() {
             if (this._transient != null)
                 _transient.Dispose();
         }
 
-        protected override bool WorldDraw(WorldDraw draw)
-        {
+        protected override bool WorldDraw(WorldDraw draw) {
             Calculate();
             List<Entity> inMemoryEntities = new List<Entity>(Entities.Count);
-            lock (Entities)
-            {
-                foreach (Entity ent in Entities.ToArray())
-                {
+            lock (Entities) {
+                foreach (Entity ent in Entities.ToArray()) {
                     //Entity inMemoryEntity = (Entity)ent.GetTransformedCopy(ToWcsTransform);
                     Entity inMemoryEntity = (Entity)ent.Clone();
                     inMemoryEntities.Add(inMemoryEntity);
@@ -138,10 +120,8 @@ namespace IgorKL.ACAD3.Model.CustomObjects
             }
 
             List<Entity> buffer = new List<Entity>(inMemoryEntities);
-            System.Threading.Thread thread = new System.Threading.Thread(obj =>
-            {
-                foreach (Entity ent in (List<Entity>)obj)
-                {
+            System.Threading.Thread thread = new System.Threading.Thread(obj => {
+                foreach (Entity ent in (List<Entity>)obj) {
                     ent.Dispose();
                 }
                 ((List<Entity>)obj).Clear();
@@ -152,17 +132,14 @@ namespace IgorKL.ACAD3.Model.CustomObjects
 
         protected abstract override Autodesk.AutoCAD.EditorInput.SamplerStatus Sampler(Autodesk.AutoCAD.EditorInput.JigPrompts prompts);
 
-        public virtual PromptStatus JigDraw()
-        {
+        public virtual PromptStatus JigDraw() {
             PromptResult promptResult = Tools.GetAcadEditor().Drag(this);
             return promptResult.Status;
         }
 
-        public List<Entity> Explode()
-        {
+        public List<Entity> Explode() {
             List<Entity> res = new List<Entity>(Entities.Count);
-            foreach (Entity ent in Entities)
-            {
+            foreach (Entity ent in Entities) {
                 res.Add(ent.GetTransformedCopy(_ucs));
             }
             return res;

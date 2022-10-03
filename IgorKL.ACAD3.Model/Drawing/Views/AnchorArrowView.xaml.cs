@@ -18,20 +18,17 @@ using Autodesk.AutoCAD.Windows;
 using IgorKL.ACAD3.Model.Extensions;
 
 
-namespace IgorKL.ACAD3.Model.Drawing.Views
-{
+namespace IgorKL.ACAD3.Model.Drawing.Views {
     /// <summary>
     /// Логика взаимодействия для AnchorArrowView.xaml
     /// </summary>
-    public partial class AnchorArrowView : UserControl
-    {
+    public partial class AnchorArrowView : UserControl {
         private Helpers.HostProvider _hostProvider;
 
-        public AnchorArrowView()
-        {
+        public AnchorArrowView() {
             InitializeComponent();
             _hostProvider = new Helpers.HostProvider();
-            
+
             //Deserialize();
         }
 
@@ -45,8 +42,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Views
                  Autodesk.AutoCAD.Runtime.CommandFlags.Modal | Autodesk.AutoCAD.Runtime.CommandFlags.Session
                 )]
 
-        public static void CreatePaletteSet()
-        {
+        public static void CreatePaletteSet() {
             PaletteSet pset = new PaletteSet(typeof(AnchorArrowView).Name, new Guid());
             pset.Size = new System.Drawing.Size(300, 400);
 
@@ -67,21 +63,17 @@ namespace IgorKL.ACAD3.Model.Drawing.Views
         }
 #endif
 
-        private void button_Save_Click(object sender, RoutedEventArgs e)
-        {
+        private void button_Save_Click(object sender, RoutedEventArgs e) {
             //Serialize();
         }
 
-        private void textBox_Tolerance_TextChanged(object sender, TextChangedEventArgs e)
-        {
+        private void textBox_Tolerance_TextChanged(object sender, TextChangedEventArgs e) {
         }
 
         public MainMenu.HostProvider DataHost { get; set; }
 
-        public sealed class MethodToValueConverter : IValueConverter
-        {
-            public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-            {
+        public sealed class MethodToValueConverter : IValueConverter {
+            public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
                 var methodName = parameter as string;
                 if (value == null || methodName == null)
                     return value;
@@ -91,8 +83,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Views
                 return methodInfo.Invoke(value, new object[0]);
             }
 
-            public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-            {
+            public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) {
                 throw new NotSupportedException("MethodToValueConverter can only be used for one way conversion.");
             }
         }

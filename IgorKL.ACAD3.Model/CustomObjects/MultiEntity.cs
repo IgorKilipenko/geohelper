@@ -12,10 +12,8 @@ using Autodesk.AutoCAD.EditorInput;
 
 using IgorKL.ACAD3.Model.Extensions;
 
-namespace IgorKL.ACAD3.Model.CustomObjects
-{
-    public abstract class MultiEntity : Autodesk.AutoCAD.EditorInput.DrawJig, IDisposable
-    {
+namespace IgorKL.ACAD3.Model.CustomObjects {
+    public abstract class MultiEntity : Autodesk.AutoCAD.EditorInput.DrawJig, IDisposable {
         private List<Entity> _entities;
         private Database _db;
         private Point3d _originWcs;
@@ -35,9 +33,8 @@ namespace IgorKL.ACAD3.Model.CustomObjects
         public Matrix3d InnerBlockTransform { get { return _innerBlockTransform; } }
         public Matrix3d Ucs { get { return _ucs; } }
 
-        public MultiEntity(Point3d insertPoint, Point3d originWcs, List<Entity> entities, AnnotativeStates annotative ,Matrix3d transformFromUcsToWcs)
-            : base()
-        {
+        public MultiEntity(Point3d insertPoint, Point3d originWcs, List<Entity> entities, AnnotativeStates annotative, Matrix3d transformFromUcsToWcs)
+            : base() {
             _innerBlockTransform = Matrix3d.Identity;
             _ucs = transformFromUcsToWcs;
             _insertPointUcs = insertPoint;
@@ -48,45 +45,39 @@ namespace IgorKL.ACAD3.Model.CustomObjects
             _entities = entities;
         }
 
-        public void TrasientDisplay()
-        {
+        public void TrasientDisplay() {
             if (_transient == null)
                 _transient = new IgorKL.ACAD3.Model.Helpers.Display.DynamicTransient();
 
-            foreach (var ent in Entities)
-            {
+            foreach (var ent in Entities) {
                 _transient.AddMarker((Entity)ent.Clone());
             }
 
             _transient.Display();
         }
 
-        public void TrasientDisplay(IEnumerable<Entity> entities)
-        {
+        public void TrasientDisplay(IEnumerable<Entity> entities) {
             if (_transient == null)
                 _transient = new IgorKL.ACAD3.Model.Helpers.Display.DynamicTransient();
 
-            foreach (var ent in entities)
-            {
+            foreach (var ent in entities) {
                 _transient.AddMarker((Entity)ent.Clone());
             }
 
             _transient.Display();
         }
 
-        public virtual void TrasientDisplayAtBlock()
-        {
+        public virtual void TrasientDisplayAtBlock() {
             if (_transient == null)
                 _transient = new IgorKL.ACAD3.Model.Helpers.Display.DynamicTransient();
-            
+
             Calculate();
             ObjectId btrId = _createTableRecord(_entities.Select(ent => (Entity)ent.Clone()));
             ObjectId blockId = _createBlockItem(btrId, _insertPointUcs);
 
             BlockReference block = null;
 
-            Tools.StartTransaction(() =>
-            {
+            Tools.StartTransaction(() => {
                 block = blockId.GetObjectForWrite<BlockReference>();
                 var buffer = (BlockReference)block.Clone();
                 block.Erase(true);
@@ -98,8 +89,7 @@ namespace IgorKL.ACAD3.Model.CustomObjects
             _transient.Display();
         }
 
-        public virtual void TrasientDisplayAtBlock(IEnumerable<Entity> entities)
-        {
+        public virtual void TrasientDisplayAtBlock(IEnumerable<Entity> entities) {
             if (_transient == null)
                 _transient = new IgorKL.ACAD3.Model.Helpers.Display.DynamicTransient();
 
@@ -109,8 +99,7 @@ namespace IgorKL.ACAD3.Model.CustomObjects
 
             BlockReference block = null;
 
-            Tools.StartTransaction(() =>
-            {
+            Tools.StartTransaction(() => {
                 block = blockId.GetObjectForWrite<BlockReference>();
                 var buffer = (BlockReference)block.Clone();
                 block.Erase(true);
@@ -124,21 +113,16 @@ namespace IgorKL.ACAD3.Model.CustomObjects
 
         public abstract void Calculate();
 
-        public virtual void StopTrasientDisplay()
-        {
-            if (_transient == null)
-            {
+        public virtual void StopTrasientDisplay() {
+            if (_transient == null) {
                 _transient.ClearTransientGraphics();
             }
         }
 
-        public void InnerTransformBy(Matrix3d matrix)
-        {
-            Tools.StartTransaction(() =>
-            {
+        public void InnerTransformBy(Matrix3d matrix) {
+            Tools.StartTransaction(() => {
                 Matrix3d mat = _innerBlockTransform.PreMultiplyBy(matrix);
-                for (int i = 0; i < _entities.Count; i++)
-                {
+                for (int i = 0; i < _entities.Count; i++) {
                     Entity ent = _entities[i];
                     if (ent.ObjectId != ObjectId.Null)
                         ent = ent.Id.GetObjectForWrite<Entity>(false);
@@ -149,47 +133,38 @@ namespace IgorKL.ACAD3.Model.CustomObjects
 
 
         [Obsolete]
-        public void AddInnerEntitiesToDatabase(Database db)
-        {
+        public void AddInnerEntitiesToDatabase(Database db) {
             Entities.ForEach(ent => ent.TransformBy(ToWcsTransform));
             Tools.AppendEntity(Entities);
         }
 
-        public void InnerUpgradeOpen()
-        {
+        public void InnerUpgradeOpen() {
             Entities.ForEach(ent => ent.UpgradeOpen());
         }
 
-        public void InnerSetDatabaseDefaults(Database db)
-        {
+        public void InnerSetDatabaseDefaults(Database db) {
             Entities.ForEach(ent => ent.SetDatabaseDefaults(db));
         }
 
 
-        public virtual void Dispose()
-        {
+        public virtual void Dispose() {
             if (this._transient != null)
                 _transient.Dispose();
         }
 
-        private ObjectId _createTableRecord(IEnumerable<Entity> entities)
-        {
-            return AcadBlocks.BlockTools.CreateBlockTableRecord("*U", _originWcs ,entities, _annotative);
+        private ObjectId _createTableRecord(IEnumerable<Entity> entities) {
+            return AcadBlocks.BlockTools.CreateBlockTableRecord("*U", _originWcs, entities, _annotative);
         }
 
-        protected virtual ObjectId _createBlockItem(ObjectId tableRecordId, Point3d insertPoint)
-        {
+        protected virtual ObjectId _createBlockItem(ObjectId tableRecordId, Point3d insertPoint) {
             return AcadBlocks.BlockTools.AddBlockRefToModelSpace(tableRecordId, null, insertPoint, _ucs);
         }
 
-        protected override bool WorldDraw(WorldDraw draw)
-        {
+        protected override bool WorldDraw(WorldDraw draw) {
             Calculate();
             List<Entity> inMemoryEntities = new List<Entity>(Entities.Count);
-            lock (Entities)
-            {
-                foreach (Entity ent in Entities.ToArray())
-                {
+            lock (Entities) {
+                foreach (Entity ent in Entities.ToArray()) {
                     //Entity inMemoryEntity = (Entity)ent.GetTransformedCopy(ToWcsTransform);
                     Entity inMemoryEntity = (Entity)ent.Clone();
                     inMemoryEntities.Add(inMemoryEntity);
@@ -198,10 +173,8 @@ namespace IgorKL.ACAD3.Model.CustomObjects
             }
 
             List<Entity> buffer = new List<Entity>(inMemoryEntities);
-            System.Threading.Thread thread = new System.Threading.Thread(obj =>
-            {
-                foreach (Entity ent in (List<Entity>)obj)
-                {
+            System.Threading.Thread thread = new System.Threading.Thread(obj => {
+                foreach (Entity ent in (List<Entity>)obj) {
                     ent.Dispose();
                 }
                 ((List<Entity>)obj).Clear();
@@ -212,17 +185,14 @@ namespace IgorKL.ACAD3.Model.CustomObjects
 
         protected abstract override Autodesk.AutoCAD.EditorInput.SamplerStatus Sampler(Autodesk.AutoCAD.EditorInput.JigPrompts prompts);
 
-        public virtual PromptStatus JigDraw()
-        {
+        public virtual PromptStatus JigDraw() {
             PromptResult promptResult = Tools.GetAcadEditor().Drag(this);
             return promptResult.Status;
         }
 
-        public List<Entity> Explode()
-        {
+        public List<Entity> Explode() {
             List<Entity> res = new List<Entity>(Entities.Count);
-            foreach (Entity ent in Entities)
-            {
+            foreach (Entity ent in Entities) {
                 res.Add(ent.GetTransformedCopy(_ucs));
             }
             return res;
@@ -231,12 +201,10 @@ namespace IgorKL.ACAD3.Model.CustomObjects
         protected Matrix3d ToUcsTransform { get { return _ucs.Inverse(); } }
         protected Matrix3d ToWcsTransform { get { return _ucs; } }
 
-        private void _fromUcsToWcs()
-        {
+        private void _fromUcsToWcs() {
             InnerTransformBy(_ucs);
         }
-        private void _fromWcsToUcs()
-        {
+        private void _fromWcsToUcs() {
             InnerTransformBy(_ucs.Inverse());
         }
     }

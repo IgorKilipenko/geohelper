@@ -9,9 +9,7 @@ using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.EditorInput;
 
-namespace IgorKL.ACAD3.Model.Extensions
-{
-    public static class EntityExtensions
-    {
+namespace IgorKL.ACAD3.Model.Extensions {
+    public static class EntityExtensions {
     }
 }

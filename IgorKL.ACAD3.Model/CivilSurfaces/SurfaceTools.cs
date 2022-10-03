@@ -15,27 +15,20 @@ using CivilSurface = Autodesk.Civil.DatabaseServices.Surface;
 using AcadEntity = Autodesk.AutoCAD.DatabaseServices.Entity;
 using IgorKL.ACAD3.Model.Extensions;
 
-namespace IgorKL.ACAD3.Model.CivilSurfaces
-{
-    public class SurfaceTools
-    {
-        public static void Test()
-        {
+namespace IgorKL.ACAD3.Model.CivilSurfaces {
+    public class SurfaceTools {
+        public static void Test() {
             TinVolumeSurface volSurface;
             if (!ObjectCollector.TrySelectAllowedClassObject(out volSurface))
                 return;
             var b = volSurface.BoundariesDefinition[0];
         }
 
-        public static ObjectId CroppingSurface(TinSurface surface, Polyline border)
-        {
-            using (Database destDb = new Database(true, true))
-            {
+        public static ObjectId CroppingSurface(TinSurface surface, Polyline border) {
+            using (Database destDb = new Database(true, true)) {
                 Database db = Tools.GetAcadDatabase();
-                using (Transaction transSrc = Tools.StartTransaction(db))
-                {
-                    using (Transaction transDest = Tools.StartTransaction(destDb))
-                    {
+                using (Transaction transSrc = Tools.StartTransaction(db)) {
+                    using (Transaction transDest = Tools.StartTransaction(destDb)) {
                         var points = border.GetPoints();
                         HostApplicationServices.WorkingDatabase = destDb;
 
@@ -44,12 +37,9 @@ namespace IgorKL.ACAD3.Model.CivilSurfaces
                         TinSurface newSurface = transDest.GetObject(newSurfaceId, OpenMode.ForRead) as TinSurface;
 
                         HostApplicationServices.WorkingDatabase = db;
-                        try
-                        {
+                        try {
                             return TinSurface.CreateByCropping(db, newSurface.Name, newSurface.Id, points);
-                        }
-                        catch (System.Exception ex)
-                        {
+                        } catch (System.Exception ex) {
                             Tools.GetAcadEditor().WriteMessage("\n" + ex.Message);
                             return ObjectId.Null;
                         }
@@ -58,19 +48,15 @@ namespace IgorKL.ACAD3.Model.CivilSurfaces
             }
         }
 
-        public static ObjectId CroppingSurface2(TinSurface surface, Polyline border)
-        {
+        public static ObjectId CroppingSurface2(TinSurface surface, Polyline border) {
             Polyline3d newBorder = null;
             ObjectId newBorderId = ObjectId.Null;
             TinSurface newSurface = null;
-            using (Database destDb = new Database(true, true))
-            {
+            using (Database destDb = new Database(true, true)) {
 
                 Database db = Tools.GetAcadDatabase();
-                using (Transaction transSrc = Tools.StartTransaction(db))
-                {
-                    using (Transaction transDest = Tools.StartTransaction(destDb))
-                    {
+                using (Transaction transSrc = Tools.StartTransaction(db)) {
+                    using (Transaction transDest = Tools.StartTransaction(destDb)) {
                         var points = border.GetPoints();
                         HostApplicationServices.WorkingDatabase = destDb;
 
@@ -89,15 +75,11 @@ namespace IgorKL.ACAD3.Model.CivilSurfaces
                         newBorder = newBorder.Clone() as Polyline3d;
                         newSurface = newSurface.Clone() as TinSurface;
                     }
-                    if (newBorder != null)
-                    {
-                        try
-                        {
+                    if (newBorder != null) {
+                        try {
                             Tools.AppendEntityEx(transSrc, db, newBorder, true);
 
-                        }
-                        catch (System.Exception ex)
-                        {
+                        } catch (System.Exception ex) {
                             Tools.GetAcadEditor().WriteMessage("\n" + ex.Message);
                         }
                     }
@@ -140,19 +122,15 @@ namespace IgorKL.ACAD3.Model.CivilSurfaces
         }
 
 
-        public static ObjectId CroppingSurface3(TinSurface surface, Polyline border)
-        {
+        public static ObjectId CroppingSurface3(TinSurface surface, Polyline border) {
             Polyline3d newBorder = null;
             ObjectId newBorderId = ObjectId.Null;
             TinSurface newSurface = null;
-            using (Database destDb = new Database(true, true))
-            {
+            using (Database destDb = new Database(true, true)) {
 
                 Database sourceDb = Tools.GetAcadDatabase();
-                using (Transaction transSrc = Tools.StartTransaction(sourceDb))
-                {
-                    using (Transaction transDest = Tools.StartTransaction(destDb))
-                    {
+                using (Transaction transSrc = Tools.StartTransaction(sourceDb)) {
+                    using (Transaction transDest = Tools.StartTransaction(destDb)) {
                         var points = border.GetPoints();
                         HostApplicationServices.WorkingDatabase = destDb;
 
@@ -172,14 +150,11 @@ namespace IgorKL.ACAD3.Model.CivilSurfaces
 
                 }
             }
-            try
-            {
+            try {
                 newBorder = newBorder.Clone() as Polyline3d;
                 Tools.AppendEntityEx(Tools.GetActiveAcadDocument(), newBorder);
 
-            }
-            catch (System.Exception ex)
-            {
+            } catch (System.Exception ex) {
                 Tools.GetAcadEditor().WriteMessage("\n" + ex.Message);
             }
 
@@ -187,14 +162,12 @@ namespace IgorKL.ACAD3.Model.CivilSurfaces
             return ObjectId.Null;
         }
 
-        public static ObjectId CroppingSurface4(TinSurface surface, Polyline border)
-        {
+        public static ObjectId CroppingSurface4(TinSurface surface, Polyline border) {
             Document activeDoc = Tools.GetActiveAcadDocument();
             Database sourceDb = activeDoc.Database;
             var points = border.GetPoints();
             string surfaceName = "Cropped_" + surface.Name + "<[Next Counter(CP)]>";
-            using (Database destDb = new Database(true, false))
-            {
+            using (Database destDb = new Database(true, false)) {
                 HostApplicationServices.WorkingDatabase = destDb;
                 ObjectId newSurfaceId = TinSurface.CreateByCropping(destDb, surfaceName, surface.Id, points);
 
@@ -210,20 +183,17 @@ namespace IgorKL.ACAD3.Model.CivilSurfaces
 
 
 
-        public static ObjectId CroppingSurface5(TinSurface surface, Polyline border)
-        {
+        public static ObjectId CroppingSurface5(TinSurface surface, Polyline border) {
             Document activeDoc = Tools.GetActiveAcadDocument();
             Database sourceDb = activeDoc.Database;
             var points = border.GetPoints();
             string surfaceName = "Cropped_" + surface.Name + "<[Next Counter(CP)]>";
-            using (Database destDb = new Database(true, false))
-            {
+            using (Database destDb = new Database(true, false)) {
                 HostApplicationServices.WorkingDatabase = destDb;
                 ObjectId newSurfaceId = TinSurface.CreateByCropping(destDb, surfaceName, surface.Id, points);
                 HostApplicationServices.WorkingDatabase = sourceDb;
 
-                using (Transaction transDest = Tools.StartTransaction(destDb))
-                {
+                using (Transaction transDest = Tools.StartTransaction(destDb)) {
                     TinSurface newSurface = transDest.GetObject(newSurfaceId, OpenMode.ForRead) as TinSurface;
                     /*newSurface = newSurface.Clone() as TinSurface;
 
@@ -241,8 +211,7 @@ namespace IgorKL.ACAD3.Model.CivilSurfaces
                     IntPtr ptr = newSurface.UnmanagedObject;
                     var obj = TinSurface.Create(ptr, false);
 
-                    using (Transaction srcTrans = Tools.StartTransaction(sourceDb))
-                    {
+                    using (Transaction srcTrans = Tools.StartTransaction(sourceDb)) {
                         newSurfaceId = TinSurface.Create(sourceDb, "test_surface");
 
                         newSurface.SetDatabaseDefaults(sourceDb);
@@ -255,8 +224,7 @@ namespace IgorKL.ACAD3.Model.CivilSurfaces
                         newSurface.Rebuild();
                         srcTrans.Commit();
                     }
-                    using (Transaction srcTrans = Tools.StartTransaction(sourceDb))
-                    {
+                    using (Transaction srcTrans = Tools.StartTransaction(sourceDb)) {
                         newSurface = srcTrans.GetObject(newSurfaceId, OpenMode.ForWrite) as TinSurface;
 
                         newSurface.UpgradeOpen();
@@ -275,8 +243,7 @@ namespace IgorKL.ACAD3.Model.CivilSurfaces
 
                     }
 
-                    using (Transaction srcTrans = Tools.StartTransaction(sourceDb))
-                    {
+                    using (Transaction srcTrans = Tools.StartTransaction(sourceDb)) {
                         newSurface = srcTrans.GetObject(newSurfaceId, OpenMode.ForWrite) as TinSurface;
                         newSurface.UpgradeOpen();
 
@@ -298,33 +265,25 @@ namespace IgorKL.ACAD3.Model.CivilSurfaces
         }
 
 
-        public static SurfaceVolumeInfo? GetVolumeInfo(TinVolumeSurface volumeSurface, Polyline border)
-        {
-            if (!border.Closed)
-            {
+        public static SurfaceVolumeInfo? GetVolumeInfo(TinVolumeSurface volumeSurface, Polyline border) {
+            if (!border.Closed) {
                 Tools.GetAcadEditor().WriteMessage("\nPolyline not closed");
                 return null;
             }
 
             Point3dCollection points = border.GetPoints();
-            try
-            {
+            try {
                 return volumeSurface.GetBoundedVolumes(points);
-            }
-            catch (System.Exception ex)
-            {
+            } catch (System.Exception ex) {
                 Tools.GetAcadEditor().WriteMessage("\n" + ex.Message);
                 return null;
             }
         }
 
-        public static void ExtractBorder(/*CivilSurface*/ ITerrainSurface surface)
-        {
-            using (Transaction trans = Tools.StartTransaction())
-            {
+        public static void ExtractBorder(/*CivilSurface*/ ITerrainSurface surface) {
+            using (Transaction trans = Tools.StartTransaction()) {
                 var ids = surface.GetBounds();
-                foreach (ObjectId id in ids)
-                {
+                foreach (ObjectId id in ids) {
                     AcadEntity ent = id.GetObject(OpenMode.ForRead) as AcadEntity;
                     ent = ent.Clone() as AcadEntity;
                     Tools.AppendEntityEx(trans, ent);
@@ -333,8 +292,7 @@ namespace IgorKL.ACAD3.Model.CivilSurfaces
         }
 
 
-        public static ObjectId PromptForSurface(string msg = "\nВыберите поверхность: ")
-        {
+        public static ObjectId PromptForSurface(string msg = "\nВыберите поверхность: ") {
             PromptEntityOptions options = new PromptEntityOptions(
               msg);
             options.SetRejectMessage(
@@ -342,8 +300,7 @@ namespace IgorKL.ACAD3.Model.CivilSurfaces
             options.AddAllowedClass(typeof(CivilSurface), false);
 
             PromptEntityResult result = Tools.GetAcadEditor().GetEntity(options);
-            if (result.Status == PromptStatus.OK)
-            {
+            if (result.Status == PromptStatus.OK) {
                 // Everything is cool; we return the selected
                 // surface ObjectId.
                 return result.ObjectId;
@@ -351,8 +308,7 @@ namespace IgorKL.ACAD3.Model.CivilSurfaces
             return ObjectId.Null;   // Indicating error.
         }
 
-        public static ObjectId PromptForTinSurface(string msg = "\nВыберите TIN поверхность: ")
-        {
+        public static ObjectId PromptForTinSurface(string msg = "\nВыберите TIN поверхность: ") {
             PromptEntityOptions options = new PromptEntityOptions(
               msg);
             options.SetRejectMessage(
@@ -360,8 +316,7 @@ namespace IgorKL.ACAD3.Model.CivilSurfaces
             options.AddAllowedClass(typeof(TinSurface), false);
 
             PromptEntityResult result = Tools.GetAcadEditor().GetEntity(options);
-            if (result.Status == PromptStatus.OK)
-            {
+            if (result.Status == PromptStatus.OK) {
                 // Everything is cool; we return the selected
                 // surface ObjectId.
                 return result.ObjectId;
@@ -369,20 +324,15 @@ namespace IgorKL.ACAD3.Model.CivilSurfaces
             return ObjectId.Null;   // Indicating error.
         }
 
-        public static List<string> GetAllSurfaceNames()
-        {
+        public static List<string> GetAllSurfaceNames() {
             List<string> result = new List<string>();
-            using (Transaction trans = Tools.StartTransaction())
-            {
+            using (Transaction trans = Tools.StartTransaction()) {
                 var civilDoc = Tools.GetActiveCivilDocument();
                 ObjectIdCollection ids = civilDoc.GetSurfaceIds();
-                foreach (ObjectId id in ids)
-                {
-                    if (id != ObjectId.Null)
-                    {
+                foreach (ObjectId id in ids) {
+                    if (id != ObjectId.Null) {
                         var surface = trans.GetObject(id, OpenMode.ForRead) as Autodesk.Civil.DatabaseServices.Surface;
-                        if (surface != null)
-                        {
+                        if (surface != null) {
                             result.Add(surface.Name);
                         }
                     }
@@ -391,20 +341,15 @@ namespace IgorKL.ACAD3.Model.CivilSurfaces
             return result;
         }
 
-        public static Dictionary<string, ObjectId> GetAllVolumeSurfaces()
-        {
+        public static Dictionary<string, ObjectId> GetAllVolumeSurfaces() {
             Dictionary<string, ObjectId> result = new Dictionary<string, ObjectId>();
-            using (Transaction trans = Tools.StartTransaction())
-            {
+            using (Transaction trans = Tools.StartTransaction()) {
                 var civilDoc = Tools.GetActiveCivilDocument();
                 ObjectIdCollection ids = civilDoc.GetSurfaceIds();
-                foreach (ObjectId id in ids)
-                {
-                    if (id != ObjectId.Null)
-                    {
+                foreach (ObjectId id in ids) {
+                    if (id != ObjectId.Null) {
                         var surface = trans.GetObject(id, OpenMode.ForRead) as Autodesk.Civil.DatabaseServices.Surface;
-                        if (surface != null && surface is TinVolumeSurface)
-                        {
+                        if (surface != null && surface is TinVolumeSurface) {
                             result.Add(surface.Name, surface.Id);
                         }
                     }

@@ -10,9 +10,7 @@ using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Colors;
 
-namespace IgorKL.ACAD3.Model.Extensions
-{
-    public static class GemotryExtentsions
-    {
+namespace IgorKL.ACAD3.Model.Extensions {
+    public static class GemotryExtentsions {
     }
 }

@@ -10,15 +10,12 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Colors;
 
-namespace IgorKL.ACAD3.Model.Layers
-{
-    public class LayerTools
-    {
+namespace IgorKL.ACAD3.Model.Layers {
+    public class LayerTools {
         /// <summary>
         /// http://through-the-interface.typepad.com/through_the_interface/2010/01/creating-an-autocad-layer-using-net.html
         /// </summary>
-        public static void CreateHiddenLayer(string layerName, bool isHidden = false ,bool isFrozen = false)
-        {
+        public static void CreateHiddenLayer(string layerName, bool isHidden = false, bool isFrozen = false) {
             short _colorIndex = 0;
 
             Document doc =
@@ -28,31 +25,26 @@ namespace IgorKL.ACAD3.Model.Layers
 
             Transaction tr =
               db.TransactionManager.StartTransaction();
-            using (tr)
-            {
+            using (tr) {
                 LayerTable lt =
                   (LayerTable)tr.GetObject(
                     db.LayerTableId,
                     OpenMode.ForRead
                   );
 
-                try
-                {
+                try {
                     SymbolUtilityServices.ValidateSymbolName(
                       layerName,
                       false
                     );
 
-                    if (lt.Has(layerName))
-                    {
+                    if (lt.Has(layerName)) {
                         ed.WriteMessage(
                           "\nA layer with this name already exists."
                         );
                         return;
                     }
-                }
-                catch
-                {
+                } catch {
                     ed.WriteMessage(
                       "\nInvalid layer name."
                     );

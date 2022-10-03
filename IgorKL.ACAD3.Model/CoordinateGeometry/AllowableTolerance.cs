@@ -12,14 +12,12 @@ using Autodesk.AutoCAD.EditorInput;
 
 using IgorKL.ACAD3.Model.Extensions;
 
-namespace IgorKL.ACAD3.Model.CoordinateGeometry
-{
-    public interface IAllowableTolerance
-    {
+namespace IgorKL.ACAD3.Model.CoordinateGeometry {
+    public interface IAllowableTolerance {
         PromptResult PromptTolerance(string msg);
         PromptResult PromptMinValue(string msg);
         PromptResult PromptMaxValue(string msg);
-        double MaxAllowableValue {get;}
+        double MaxAllowableValue { get; }
         double MinAllowableValue { get; }
     }
 }

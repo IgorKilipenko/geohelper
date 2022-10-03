@@ -4,18 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IgorKL.ACAD3.Model.MainMenu
-{
+namespace IgorKL.ACAD3.Model.MainMenu {
 
-    public interface IDataHost
-    {
+    public interface IDataHost {
         void SetData(string name, object value);
         bool TryGetData(string name, out object data);
 
     }
 
-    public class HostProvider
-    {
+    public class HostProvider {
 
 
         private const string resName = "ICmd_Settings.resources";
@@ -27,22 +24,17 @@ namespace IgorKL.ACAD3.Model.MainMenu
 
         public event EventHandler<KeyValueEventArgs> ValueSaved;
 
-        public HostProvider(object host)
-        {
+        public HostProvider(object host) {
             _savedIems = new System.Collections.Concurrent.ConcurrentDictionary<string, object>();
             _host = host;
             _hostName = host.GetType().FullName + "__";
 
             _path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create)
                 + "\\" + "ТочностиНЕТ";
-            if (!System.IO.Directory.Exists(_path))
-            {
-                try
-                {
+            if (!System.IO.Directory.Exists(_path)) {
+                try {
                     System.IO.Directory.CreateDirectory(_path);
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     Tools.GetAcadEditor().WriteMessage("\n" + ex.Message);
                 }
             }
@@ -52,15 +44,13 @@ namespace IgorKL.ACAD3.Model.MainMenu
 
 
 
-        public T Read<T>(string key)
-        {
+        public T Read<T>(string key) {
             T value;
             TryRead<T>(key, out value);
             return value;
         }
 
-        public T Read<T>(string key, T defaultValue)
-        {
+        public T Read<T>(string key, T defaultValue) {
             T value;
             if (TryRead<T>(key, out value))
                 return value;
@@ -68,8 +58,7 @@ namespace IgorKL.ACAD3.Model.MainMenu
                 return defaultValue;
         }
 
-        public bool TryRead<T>(string name, out T value)
-        {
+        public bool TryRead<T>(string name, out T value) {
             value = default(T);
             /*using (var stream = Properties.Resources.ResourceManager.GetStream(_hostName + name))
             {
@@ -91,8 +80,7 @@ namespace IgorKL.ACAD3.Model.MainMenu
             return res;
         }
 
-        public bool Write<T>(string name, T value)
-        {
+        public bool Write<T>(string name, T value) {
             /*using (var stream = Properties.Resources.ResourceManager.GetStream(_hostName + name))
             {
                 if (stream != null)
@@ -111,38 +99,32 @@ namespace IgorKL.ACAD3.Model.MainMenu
             return true;
         }
 
-        private void _addXmlResource(string key, string xml)
-        {
+        private void _addXmlResource(string key, string xml) {
             //string path = System.IO.Path.GetFullPath(@".\" + resName);
-            
-            using (System.Resources.IResourceWriter writer = new System.Resources.ResourceWriter(/*Properties.Resources.ResourceManager.BaseName*/ _path))
-            {
+
+            using (System.Resources.IResourceWriter writer = new System.Resources.ResourceWriter(/*Properties.Resources.ResourceManager.BaseName*/ _path)) {
                 byte[] buffer = Encoding.Unicode.GetBytes(xml);
                 writer.AddResource(key.ToLower(), buffer);
                 writer.Generate();
             }
         }
 
-        private bool _readXmlResorce(string key, out string xml)
-        {
+        private bool _readXmlResorce(string key, out string xml) {
             xml = null;
             string path = System.IO.Path.GetFullPath(_path);
             if (System.IO.File.Exists(_path))
-                using (System.Resources.ResourceReader rdr = new System.Resources.ResourceReader(_path))
-                {
+                using (System.Resources.ResourceReader rdr = new System.Resources.ResourceReader(_path)) {
                     byte[] buffer = null;
                     /*string typeName;
                     rdr.GetResourceData(key.ToLower(), out typeName, out buffer);*/
 
                     var dic = rdr.GetEnumerator();
-                    while (dic.MoveNext())
-                    {
+                    while (dic.MoveNext()) {
                         if (dic.Key.ToString() == key.ToLower())
                             buffer = (byte[])dic.Value;
                     }
 
-                    if (buffer != null && buffer.Length > 0)
-                    {
+                    if (buffer != null && buffer.Length > 0) {
                         xml = Encoding.Unicode.GetString(buffer);
                         return true;
                     }
@@ -151,18 +133,15 @@ namespace IgorKL.ACAD3.Model.MainMenu
             return false;
         }
 
-        public static String Serialize<T>(T t)
-        {
+        public static String Serialize<T>(T t) {
             using (System.IO.StringWriter sw = new System.IO.StringWriter())
-            using (System.Xml.XmlWriter xw = System.Xml.XmlWriter.Create(sw))
-            {
+            using (System.Xml.XmlWriter xw = System.Xml.XmlWriter.Create(sw)) {
                 new System.Xml.Serialization.XmlSerializer(typeof(T)).Serialize(xw, t);
                 return sw.GetStringBuilder().ToString();
             }
         }
 
-        public static T Deserialize<T>(String s_xml)
-        {
+        public static T Deserialize<T>(String s_xml) {
             using (System.Xml.XmlReader xw = System.Xml.XmlReader.Create(new System.IO.StringReader(s_xml)))
                 return (T)new System.Xml.Serialization.XmlSerializer(typeof(T)).Deserialize(xw);
         }
@@ -179,16 +158,13 @@ namespace IgorKL.ACAD3.Model.MainMenu
             }
         }*/
 
-        protected virtual void On_ValueSaved(KeyValueEventArgs e)
-        {
+        protected virtual void On_ValueSaved(KeyValueEventArgs e) {
             if (ValueSaved != null)
                 ValueSaved(this, e);
         }
 
-        public class KeyValueEventArgs:EventArgs
-        {
-            public KeyValueEventArgs(string name, object value, Type valueType)
-            {
+        public class KeyValueEventArgs : EventArgs {
+            public KeyValueEventArgs(string name, object value, Type valueType) {
                 Name = name;
                 Value = value;
                 ValueType = valueType;

@@ -10,12 +10,9 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 
-namespace IgorKL.ACAD3.Model.Helpers.Math
-{
-    public static class Calculator
-    {
-        public static double Atan(double y, double x)
-        {
+namespace IgorKL.ACAD3.Model.Helpers.Math {
+    public static class Calculator {
+        public static double Atan(double y, double x) {
             if (x > 0)
                 return System.Math.Atan(y / x);
             else if (x < 0)
@@ -44,8 +41,7 @@ namespace IgorKL.ACAD3.Model.Helpers.Math
         public static double ComputeAngle(
           Point3d startPoint, Point3d endPoint,
           Vector3d xdir, Matrix3d ucs
-        )
-        {
+        ) {
             var v =
               new Vector3d(
                 (endPoint.X - startPoint.X) / 2,

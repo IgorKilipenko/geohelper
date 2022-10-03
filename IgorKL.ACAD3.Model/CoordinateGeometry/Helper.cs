@@ -10,12 +10,9 @@ using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Colors;
 
-namespace IgorKL.ACAD3.Model.CoordinateGeometry
-{
-    public static class Helper
-    {
-        public static double GetAngle(Point3d basePoint, Point3d directionPoint, Point3d destinationPoint, Vector3d ZAxis)
-        {
+namespace IgorKL.ACAD3.Model.CoordinateGeometry {
+    public static class Helper {
+        public static double GetAngle(Point3d basePoint, Point3d directionPoint, Point3d destinationPoint, Vector3d ZAxis) {
             Vector3d baseVector = basePoint.GetVectorTo(directionPoint);
             Vector3d destinationVector = basePoint.GetVectorTo(destinationPoint);
 
@@ -23,8 +20,7 @@ namespace IgorKL.ACAD3.Model.CoordinateGeometry
 
             return angle;
         }
-        public static double GetAngle(Point3d basePoint, Point3d directionPoint, Point3d destinationPoint)
-        {
+        public static double GetAngle(Point3d basePoint, Point3d directionPoint, Point3d destinationPoint) {
             Vector3d baseVector = basePoint.GetVectorTo(directionPoint);
             Vector3d destinationVector = basePoint.GetVectorTo(destinationPoint);
 
@@ -33,8 +29,7 @@ namespace IgorKL.ACAD3.Model.CoordinateGeometry
             return angle;
         }
 
-        public static double GetAngle(Vector3d baseVector, Vector3d destinationVector, Vector3d ZAxis)
-        {
+        public static double GetAngle(Vector3d baseVector, Vector3d destinationVector, Vector3d ZAxis) {
             double angle = baseVector.GetAngleTo(destinationVector, ZAxis);
 
             return angle;

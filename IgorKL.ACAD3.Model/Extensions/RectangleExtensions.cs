@@ -9,29 +9,22 @@ using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.EditorInput;
 
-namespace IgorKL.ACAD3.Model.Extensions
-{
-    public static class RectangleExtensions
-    {
-        public static Vector3d GetLeftVerticalVector(this Rectangle3d rectg)
-        {
+namespace IgorKL.ACAD3.Model.Extensions {
+    public static class RectangleExtensions {
+        public static Vector3d GetLeftVerticalVector(this Rectangle3d rectg) {
             return rectg.UpperLeft - rectg.LowerLeft;
         }
-        public static Vector3d GetRightVerticalVector(this Rectangle3d rectg)
-        {
+        public static Vector3d GetRightVerticalVector(this Rectangle3d rectg) {
             return rectg.UpperRight - rectg.LowerRight;
         }
-        public static Vector3d GetLowertHorizontalVector(this Rectangle3d rectg)
-        {
+        public static Vector3d GetLowertHorizontalVector(this Rectangle3d rectg) {
             return rectg.LowerRight - rectg.LowerLeft;
         }
-        public static Vector3d GetUpperHorizontalVector(this Rectangle3d rectg)
-        {
+        public static Vector3d GetUpperHorizontalVector(this Rectangle3d rectg) {
             return rectg.UpperRight - rectg.UpperLeft;
         }
 
-        public static Polyline ConvertToPolyline(this Rectangle3d rec, Matrix3d transform)
-        {
+        public static Polyline ConvertToPolyline(this Rectangle3d rec, Matrix3d transform) {
             Polyline pline = new Polyline(5);
             pline.AddVertexAt(0, rec.LowerLeft.TransformBy(transform));
             pline.AddVertexAt(1, rec.UpperLeft.TransformBy(transform));
@@ -42,13 +35,11 @@ namespace IgorKL.ACAD3.Model.Extensions
             return pline;
         }
 
-        public static Polyline ConvertToPolyline(this Rectangle3d rec)
-        {
+        public static Polyline ConvertToPolyline(this Rectangle3d rec) {
             return ConvertToPolyline(rec, Matrix3d.Identity);
         }
 
-        public static Rectangle3d? ConvertToRectangle(this Polyline pline)
-        {
+        public static Rectangle3d? ConvertToRectangle(this Polyline pline) {
             if (pline.NumberOfVertices < 4)
                 return null;
 
@@ -67,8 +58,7 @@ namespace IgorKL.ACAD3.Model.Extensions
             return rectg;
         }
 
-        public static Point3dCollection GetPoints(this Rectangle3d rectg, bool close = false)
-        {
+        public static Point3dCollection GetPoints(this Rectangle3d rectg, bool close = false) {
             Point3dCollection points = new Point3dCollection(
                 new[] {
                     rectg.LowerLeft,

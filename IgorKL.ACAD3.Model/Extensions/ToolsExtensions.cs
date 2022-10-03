@@ -10,13 +10,10 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Geometry;
 
-namespace IgorKL.ACAD3.Model.Extensions
-{
-    public static class ToolsExtensions
-    {
+namespace IgorKL.ACAD3.Model.Extensions {
+    public static class ToolsExtensions {
         public static ObjectId SaveToDatebase<T>(this T obj, Transaction trans, bool comit = true)
-            where T : Entity
-        {
+            where T : Entity {
             var btr = Tools.GetAcadBlockTableRecordCurrentSpace(trans);
             var id = btr.AppendEntity(obj);
             trans.AddNewlyCreatedDBObject(obj, true);
@@ -26,19 +23,15 @@ namespace IgorKL.ACAD3.Model.Extensions
         }
 
         public static ObjectId SaveToDatebase<T>(this T obj)
-            where T : Entity
-        {
-            using (Transaction trans = Tools.StartTransaction())
-            {
+            where T : Entity {
+            using (Transaction trans = Tools.StartTransaction()) {
                 return obj.SaveToDatebase(trans, true);
             }
         }
 
         public static void SaveToDatebase<T>(this IEnumerable<T> collection, Transaction trans, bool comit = true)
-            where T : Entity
-        {
-            foreach (var ent in collection)
-            {
+            where T : Entity {
+            foreach (var ent in collection) {
                 ent.SaveToDatebase(trans, false);
             }
             if (comit)
@@ -46,29 +39,24 @@ namespace IgorKL.ACAD3.Model.Extensions
         }
 
         public static void SaveToDatebase<T>(this IEnumerable<T> collection)
-            where T : Entity
-        {
-            using (Transaction trans = Tools.StartTransaction())
-            {
+            where T : Entity {
+            using (Transaction trans = Tools.StartTransaction()) {
                 collection.SaveToDatebase(trans, true);
             }
         }
 
         public static T GetObject<T>(this ObjectId id, OpenMode mode)
-            where T:DBObject
-        {
+            where T : DBObject {
             return (T)id.GetObject(mode);
         }
 
         public static T GetObjectForRead<T>(this ObjectId id, bool openErased = false)
-            where T:DBObject
-        {
+            where T : DBObject {
             return (T)id.GetObject(OpenMode.ForRead, openErased, true);
         }
 
         public static T GetObjectForWrite<T>(this ObjectId id, bool openErased = false)
-            where T : DBObject
-        {
+            where T : DBObject {
             return (T)id.GetObject(OpenMode.ForWrite, openErased, true);
         }
     }

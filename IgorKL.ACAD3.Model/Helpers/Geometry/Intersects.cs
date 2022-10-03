@@ -12,19 +12,15 @@ using Autodesk.AutoCAD.EditorInput;
 
 using IgorKL.ACAD3.Model.Extensions;
 
-namespace IgorKL.ACAD3.Model.Helpers.Geometry
-{
-    public static class Intersects
-    {
-        public static bool IsInsidePolygon(Polyline polygon, Point3d pt)
-        {
+namespace IgorKL.ACAD3.Model.Helpers.Geometry {
+    public static class Intersects {
+        public static bool IsInsidePolygon(Polyline polygon, Point3d pt) {
             int n = polygon.NumberOfVertices;
             double angle = 0;
             Point pt1, pt2;
             double tolerence = System.Math.PI * 0.00001;
 
-            for (int i = 0; i < n; i++)
-            {
+            for (int i = 0; i < n; i++) {
                 pt1.X = polygon.GetPoint2dAt(i).X - pt.X;
                 pt1.Y = polygon.GetPoint2dAt(i).Y - pt.Y;
                 pt2.X = polygon.GetPoint2dAt((i + 1) % n).X - pt.X;
@@ -38,13 +34,11 @@ namespace IgorKL.ACAD3.Model.Helpers.Geometry
                 return true;
         }
 
-        public struct Point
-        {
+        public struct Point {
             public double X, Y;
         };
 
-        public static double Angle2D(double x1, double y1, double x2, double y2)
-        {
+        public static double Angle2D(double x1, double y1, double x2, double y2) {
             double dtheta, theta1, theta2;
 
             theta1 = System.Math.Atan2(y1, x1);

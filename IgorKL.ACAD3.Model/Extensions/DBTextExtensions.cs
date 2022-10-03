@@ -8,16 +8,13 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.ApplicationServices;
 
-namespace IgorKL.ACAD3.Model.Extensions
-{
-    public static class DBTextExtensions
-    {
-        public static Rectangle3d? GetTextBoxCorners(this DBText text)
-        {
+namespace IgorKL.ACAD3.Model.Extensions {
+    public static class DBTextExtensions {
+        public static Rectangle3d? GetTextBoxCorners(this DBText text) {
             if (!text.Bounds.HasValue)
                 return null;
             DBText cloneText = (DBText)text.Clone();
-            
+
             Matrix3d mat = Matrix3d.Identity;
             mat = mat.PreMultiplyBy(Matrix3d.Rotation(-text.Rotation, text.Normal, text.Position));
 
@@ -54,8 +51,7 @@ namespace IgorKL.ACAD3.Model.Extensions
             return rec;
         }
 
-        public static Extents3d? GetNotRotatedBounds(this DBText text)
-        {
+        public static Extents3d? GetNotRotatedBounds(this DBText text) {
             if (!text.Bounds.HasValue)
                 return null;
             DBText cloneText = (DBText)text.Clone();
@@ -72,8 +68,7 @@ namespace IgorKL.ACAD3.Model.Extensions
             return bounds;
         }
 
-        public static Extents3d? GetRotatedBounds(this DBText text)
-        {
+        public static Extents3d? GetRotatedBounds(this DBText text) {
             if (!text.Bounds.HasValue)
                 return null;
             DBText cloneText = (DBText)text.Clone();

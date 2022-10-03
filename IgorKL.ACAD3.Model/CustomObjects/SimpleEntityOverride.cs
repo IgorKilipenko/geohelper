@@ -12,10 +12,8 @@ using Autodesk.AutoCAD.EditorInput;
 
 using IgorKL.ACAD3.Model.Extensions;
 
-namespace IgorKL.ACAD3.Model.CustomObjects
-{
-    public class SimpleEntityOverride : Autodesk.AutoCAD.EditorInput.DrawJig, IDisposable
-    {
+namespace IgorKL.ACAD3.Model.CustomObjects {
+    public class SimpleEntityOverride : Autodesk.AutoCAD.EditorInput.DrawJig, IDisposable {
         private List<Entity> _entities;
         private Database _db;
         private Point3d _origin;
@@ -28,8 +26,7 @@ namespace IgorKL.ACAD3.Model.CustomObjects
         public Point3d Origin { get { return _origin; } }
 
         public SimpleEntityOverride(Point3d origin, List<Entity> entities, Matrix3d ucs)
-            : base()
-        {
+            : base() {
             _ucs = ucs;
 
             _origin = origin;
@@ -38,13 +35,11 @@ namespace IgorKL.ACAD3.Model.CustomObjects
             _entities = entities;
         }
 
-        public virtual void Display()
-        {
+        public virtual void Display() {
             if (_transient == null)
                 _transient = new IgorKL.ACAD3.Model.Helpers.Display.DynamicTransient();
 
-            foreach (var ent in Entities)
-            {
+            foreach (var ent in Entities) {
                 _transient.AddMarker((Entity)ent.Clone());
             }
 
@@ -52,21 +47,16 @@ namespace IgorKL.ACAD3.Model.CustomObjects
         }
 
 
-        public virtual void StopDisplay()
-        {
-            if (_transient == null)
-            {
+        public virtual void StopDisplay() {
+            if (_transient == null) {
                 _transient.ClearTransientGraphics();
             }
         }
 
-        public void InnerTransformBy(Matrix3d matrix)
-        {
-            Tools.StartTransaction(() =>
-            {
+        public void InnerTransformBy(Matrix3d matrix) {
+            Tools.StartTransaction(() => {
                 Matrix3d mat = Matrix3d.Identity.PreMultiplyBy(matrix);
-                for (int i = 0; i < _entities.Count; i++)
-                {
+                for (int i = 0; i < _entities.Count; i++) {
                     Entity ent = _entities[i];
                     if (ent.ObjectId != ObjectId.Null)
                         ent = ent.Id.GetObjectForWrite<Entity>(false);
@@ -75,14 +65,11 @@ namespace IgorKL.ACAD3.Model.CustomObjects
             });
         }
 
-        public virtual SimpleEntityOverride GetClone()
-        {
+        public virtual SimpleEntityOverride GetClone() {
             List<Entity> buffer = new List<Entity>(_entities.Count);
             SimpleEntityOverride clone = null;
-            Tools.StartOpenCloseTransaction(() =>
-            {
-                for (int i = 0; i < _entities.Count; i++)
-                {
+            Tools.StartOpenCloseTransaction(() => {
+                for (int i = 0; i < _entities.Count; i++) {
                     Entity ent = _entities[i];
                     if (ent.Id != ObjectId.Null)
                         ent = ent.Id.GetObjectForRead<Entity>();
@@ -94,26 +81,21 @@ namespace IgorKL.ACAD3.Model.CustomObjects
             return clone;
         }
 
-        public virtual void Dispose()
-        {
+        public virtual void Dispose() {
             if (this._transient != null)
                 _transient.Dispose();
         }
 
-        protected override bool WorldDraw(WorldDraw draw)
-        {
-            lock (Entities)
-            {
+        protected override bool WorldDraw(WorldDraw draw) {
+            lock (Entities) {
                 List<Entity> inMemoryEntities = new List<Entity>(Entities.Count);
-                foreach (Entity ent in Entities.ToArray())
-                {
+                foreach (Entity ent in Entities.ToArray()) {
                     Entity inMemoryEntity = (Entity)ent.Clone();
                     inMemoryEntities.Add(inMemoryEntity);
                     draw.Geometry.Draw(inMemoryEntity);
                 }
 
-                foreach (Entity ent in inMemoryEntities)
-                {
+                foreach (Entity ent in inMemoryEntities) {
                     ent.Dispose();
                 }
                 inMemoryEntities.Clear();
@@ -122,13 +104,11 @@ namespace IgorKL.ACAD3.Model.CustomObjects
             return true;
         }
 
-        protected override Autodesk.AutoCAD.EditorInput.SamplerStatus Sampler(Autodesk.AutoCAD.EditorInput.JigPrompts prompts)
-        {
+        protected override Autodesk.AutoCAD.EditorInput.SamplerStatus Sampler(Autodesk.AutoCAD.EditorInput.JigPrompts prompts) {
             return SamplerStatus.Cancel;
         }
 
-        public virtual PromptStatus JigDraw()
-        {
+        public virtual PromptStatus JigDraw() {
             PromptResult promptResult = Tools.GetAcadEditor().Drag(this);
             return promptResult.Status;
         }

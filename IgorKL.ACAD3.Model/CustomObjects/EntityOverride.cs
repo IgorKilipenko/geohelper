@@ -10,10 +10,8 @@ using Autodesk.AutoCAD.GraphicsInterface;
 using Autodesk.AutoCAD.ApplicationServices;
 
 
-namespace IgorKL.ACAD3.Model.CustomObjects
-{
-    public abstract class EntityOverride
-    {
+namespace IgorKL.ACAD3.Model.CustomObjects {
+    public abstract class EntityOverride {
         /*public bool annotative;
         private BlockTableRecord blockRecord;
         private Matrix3d matrix;

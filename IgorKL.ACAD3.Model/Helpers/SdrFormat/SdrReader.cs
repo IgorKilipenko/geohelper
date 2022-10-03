@@ -5,21 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace IgorKL.ACAD3.Model.Helpers.SdrFormat
-{
-    public class SdrReader
-    {
+namespace IgorKL.ACAD3.Model.Helpers.SdrFormat {
+    public class SdrReader {
 
-        public List<_SdrCoord> _SdrCoordParser(string path)
-        {
+        public List<_SdrCoord> _SdrCoordParser(string path) {
             List<_SdrCoord> res = new List<_SdrCoord>();
             string[] lines = null;
-            using (StreamReader sr = new StreamReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)))
-            {
+            using (StreamReader sr = new StreamReader(new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))) {
                 lines = sr.ReadToEnd().Split(new[] { System.Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             }
-            foreach (var l in lines)
-            {
+            foreach (var l in lines) {
                 _SdrCoord point = _parseSdrLine(l);
                 if (point != null)
                     res.Add(point);
@@ -27,8 +22,7 @@ namespace IgorKL.ACAD3.Model.Helpers.SdrFormat
             return res;
         }
 
-        public class _SdrCoord
-        {
+        public class _SdrCoord {
             public string code;
             public string name;
             public double x;
@@ -37,8 +31,7 @@ namespace IgorKL.ACAD3.Model.Helpers.SdrFormat
             public string code2;
         }
 
-        public static _SdrCoord _parseSdrLine(string line)
-        {
+        public static _SdrCoord _parseSdrLine(string line) {
             if (line.Length < 68)
                 return null;
             var format = System.Globalization.CultureInfo.GetCultureInfo("en-US");
@@ -57,12 +50,10 @@ namespace IgorKL.ACAD3.Model.Helpers.SdrFormat
             line = line.Remove(0, 16);
             if (!double.TryParse(line.Substring(0, 16).TrimEnd(), System.Globalization.NumberStyles.Number, format, out point.h))
                 return null;
-            try
-            {
+            try {
                 line = line.Remove(0, 16);
                 point.code2 = line.Substring(0, 16).Trim();
-            }
-            catch { }
+            } catch { }
             return point;
         }
 
