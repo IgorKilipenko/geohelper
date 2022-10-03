@@ -12,7 +12,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>IgorKL.ACAD3.Customization</RootNamespace>
     <AssemblyName>IgorKL.ACAD3.Customization</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <FileUpgradeFlags>
@@ -79,32 +79,32 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="accoremgd">
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2017\accoremgd.dll</HintPath>
-    </Reference>
-    <Reference Include="AcCui">
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2017\AcCui.dll</HintPath>
-    </Reference>
-    <Reference Include="acdbmgd, Version=20.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2017\acdbmgd.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="acmgd">
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2017\acmgd.dll</HintPath>
-    </Reference>
-    <Reference Include="AcWindows">
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2017\AcWindows.dll</HintPath>
-    </Reference>
-    <Reference Include="AdWindows, Version=5.2.10.200, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\AutoCAD 2017\AdWindows.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <!--ACA References Begin-->
     <!--ACA Refences End-->
     <!--AME Referebces Begin-->
     <!--AME Reference End-->
+    <Reference Include="accoremgd, Version=21.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Autodesk\AutoCAD 2021\accoremgd.dll</HintPath>
+    </Reference>
+    <Reference Include="AcCui, Version=21.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Autodesk\AutoCAD 2021\AcCui.dll</HintPath>
+    </Reference>
+    <Reference Include="acdbmgd">
+      <HintPath>C:\Program Files\Autodesk\AutoCAD 2021\acdbmgd.dll</HintPath>
+    </Reference>
+    <Reference Include="acmgd, Version=21.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Autodesk\AutoCAD 2021\acmgd.dll</HintPath>
+    </Reference>
+    <Reference Include="AcWindows, Version=21.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\Autodesk\AutoCAD 2021\AcWindows.dll</HintPath>
+    </Reference>
+    <Reference Include="AdWindows">
+      <HintPath>C:\Program Files\Autodesk\AutoCAD 2021\AdWindows.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>4.5</RequiredTargetFramework>

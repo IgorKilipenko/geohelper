@@ -3,4 +3,7 @@
   <PropertyGroup>
     <ProjectView>ShowAllFiles</ProjectView>
   </PropertyGroup>
+  <PropertyGroup>
+    <ReferencePath>C:\Program Files\Autodesk\AutoCAD 2021\C3D\;C:\Program Files\Autodesk\AutoCAD 2021\</ReferencePath>
+  </PropertyGroup>
 </Project>
