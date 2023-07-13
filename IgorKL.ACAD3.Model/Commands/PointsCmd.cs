@@ -542,5 +542,33 @@ namespace IgorKL.ACAD3.Model.Commands {
             foreach (CogoPoint point in points)
                 point.PointName = point.FullDescription;
         }
+
+        [RibbonCommandButton("Точки из блков", RibbonPanelCategories.Points_Coordinates)]
+        [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_ConvertBlocToPoint", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
+        public static void ConvertBlocToPoint() {
+            IList<BlockReference> blocks;
+            if (!TrySelectObjects<BlockReference>(out blocks, OpenMode.ForRead, "\nВыберите блоки"))
+                return;
+
+            using (Transaction trans = Tools.StartTransaction()) {
+                BlockTable acBlkTbl;
+                acBlkTbl = trans.GetObject(Application.DocumentManager.MdiActiveDocument.Database.BlockTableId,
+                                                OpenMode.ForRead) as BlockTable;
+                BlockTableRecord acBlkTblRec;
+                acBlkTblRec = trans.GetObject(acBlkTbl[BlockTableRecord.ModelSpace],
+                                                OpenMode.ForWrite) as BlockTableRecord;
+
+                foreach (BlockReference block in blocks) {
+                    BlockReference db_block = trans.GetObject(block.Id, OpenMode.ForRead) as BlockReference;
+                    DBPoint point = new DBPoint(new Point3d(db_block.Position.ToArray()));
+                    point.SetDatabaseDefaults();
+                    acBlkTblRec.AppendEntity(point);
+                    trans.AddNewlyCreatedDBObject(point, true);
+                }
+
+                trans.Commit();
+
+            }
+        }
     }
 }
