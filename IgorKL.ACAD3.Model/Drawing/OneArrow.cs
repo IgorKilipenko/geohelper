@@ -103,8 +103,9 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
             List<Entity> _inMemorySet;
 
-            public Arrow(Point3d position, Vector3d vector, Matrix3d ucs) {
+            public Arrow(Point3d position, Vector3d vector, Matrix3d ucs, double arrowBlug = 0.0d) {
                 _initDefValues();
+                _arrowBlug = arrowBlug == 0.0d ? _arrowBlug : arrowBlug;
                 _numFormat = "#0" + (_digitalCount > 0 ? "0".TakeWhile((x, i) => i++ < _digitalCount) : "");
                 _position = position;
                 _vector = vector;
