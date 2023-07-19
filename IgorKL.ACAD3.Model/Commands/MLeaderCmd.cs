@@ -84,6 +84,57 @@ namespace IgorKL.ACAD3.Model.Commands {
                 Tools.GetAcadEditor().SetImpliedSelection(selected.ToArray());
             });
         }
+
+        [RibbonCommandButton("Рамка текста", RibbonPanelCategories.Text_Annotations)]
+        [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_AddBboxToText", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
+        public static void AddBboxToText() {
+
+            List<DBText> textItems;
+            if (!ObjectCollector.TrySelectObjects<DBText>(out textItems, "\nВыберите текстовые объекты")) {
+                return;
+            }
+
+            using (Transaction trans = Tools.StartTransaction()) {
+                BlockTable acBlkTbl;
+                acBlkTbl = trans.GetObject(Application.DocumentManager.MdiActiveDocument.Database.BlockTableId,
+                                                OpenMode.ForRead) as BlockTable;
+                BlockTableRecord acBlkTblRec;
+                acBlkTblRec = trans.GetObject(acBlkTbl[BlockTableRecord.ModelSpace],
+                                                OpenMode.ForWrite) as BlockTableRecord;
+
+                foreach (DBText text in textItems) {
+                    DBText db_text = trans.GetObject(text.Id, OpenMode.ForRead) as DBText;
+                    var bounds = db_text.GetTextBoxCorners();
+                    if (!bounds.HasValue) {
+                        continue;
+                    }
+
+                    double offset = db_text.Height * 0.1;
+                    var layer = db_text.Layer;
+                    var color = db_text.Color;
+
+                    Polyline pline = new Polyline(4);
+                    pline.AddVertexes(new List<Point3d> { 
+                        bounds.Value.LowerLeft.Add(new Vector3d(-offset, -offset, 0)), 
+                        bounds.Value.UpperLeft.Add(new Vector3d(-offset, offset, 0)), 
+                        bounds.Value.UpperRight.Add(new Vector3d(offset, offset, 0)), 
+                        bounds.Value.LowerRight.Add(new Vector3d(offset, -offset, 0)) 
+                        }
+                    );
+
+                    pline.Closed = true;
+                    pline.Layer = layer;
+                    pline.Color = color;
+
+                    pline.SetDatabaseDefaults();
+                    acBlkTblRec.AppendEntity(pline);
+                    trans.AddNewlyCreatedDBObject(pline, true);
+                }
+
+                trans.Commit();
+
+            }
+        }
     }
 
 }
