@@ -29,6 +29,19 @@ namespace IgorKL.ACAD3.Model {
             return StartTransaction(db);
         }
 
+        public static void UseTransaction(Action<Transaction, BlockTable, BlockTableRecord> action) {
+            var db = HostApplicationServices.WorkingDatabase;
+            using (Transaction trans = StartTransaction(db)) {
+                BlockTable acBlkTbl;
+                acBlkTbl = trans.GetObject(Application.DocumentManager.MdiActiveDocument.Database.BlockTableId,
+                                                OpenMode.ForRead) as BlockTable;
+                BlockTableRecord acBlkTblRec;
+                acBlkTblRec = trans.GetObject(acBlkTbl[BlockTableRecord.ModelSpace],
+                                                OpenMode.ForWrite) as BlockTableRecord;
+                action(trans, acBlkTbl, acBlkTblRec);
+            }
+        }
+
         public static Transaction StartOpenCloseTransaction() {
             var db = HostApplicationServices.WorkingDatabase;
             return StartOpenCloseTransaction(db);

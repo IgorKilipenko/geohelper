@@ -94,13 +94,7 @@ namespace IgorKL.ACAD3.Model.Commands {
                 return;
             }
 
-            using (Transaction trans = Tools.StartTransaction()) {
-                BlockTable acBlkTbl;
-                acBlkTbl = trans.GetObject(Application.DocumentManager.MdiActiveDocument.Database.BlockTableId,
-                                                OpenMode.ForRead) as BlockTable;
-                BlockTableRecord acBlkTblRec;
-                acBlkTblRec = trans.GetObject(acBlkTbl[BlockTableRecord.ModelSpace],
-                                                OpenMode.ForWrite) as BlockTableRecord;
+            Tools.UseTransaction((Transaction trans, BlockTable acBlkTbl, BlockTableRecord acBlkTblRec) => {
 
                 foreach (DBText text in textItems) {
                     DBText db_text = trans.GetObject(text.Id, OpenMode.ForRead) as DBText;
@@ -114,11 +108,11 @@ namespace IgorKL.ACAD3.Model.Commands {
                     var color = db_text.Color;
 
                     Polyline pline = new Polyline(4);
-                    pline.AddVertexes(new List<Point3d> { 
-                        bounds.Value.LowerLeft.Add(new Vector3d(-offset, -offset, 0)), 
-                        bounds.Value.UpperLeft.Add(new Vector3d(-offset, offset, 0)), 
-                        bounds.Value.UpperRight.Add(new Vector3d(offset, offset, 0)), 
-                        bounds.Value.LowerRight.Add(new Vector3d(offset, -offset, 0)) 
+                    pline.AddVertexes(new List<Point3d> {
+                        bounds.Value.LowerLeft.Add(new Vector3d(-offset, -offset, 0)),
+                        bounds.Value.UpperLeft.Add(new Vector3d(-offset, offset, 0)),
+                        bounds.Value.UpperRight.Add(new Vector3d(offset, offset, 0)),
+                        bounds.Value.LowerRight.Add(new Vector3d(offset, -offset, 0))
                         }
                     );
 
@@ -133,8 +127,7 @@ namespace IgorKL.ACAD3.Model.Commands {
 
                 trans.Commit();
 
-            }
+            });
         }
     }
-
 }
