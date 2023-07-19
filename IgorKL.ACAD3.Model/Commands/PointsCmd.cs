@@ -570,5 +570,43 @@ namespace IgorKL.ACAD3.Model.Commands {
 
             }
         }
+
+        [RibbonCommandButton("Замена блоков", RibbonPanelCategories.Points_Coordinates)]
+        [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_BlocChange", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
+        public static void BlocChange() {
+            IList<BlockReference> blocksIn;
+            if (!TrySelectObjects<BlockReference>(out blocksIn, OpenMode.ForRead, "\nВыберите исходные блоки")) {
+                return;
+            }
+
+            BlockReference blockOut;
+            if (!ObjectCollector.TrySelectAllowedClassObject<BlockReference>(out blockOut, "\nВыберите блок для замены")) {
+                return;
+            }
+
+            using (Transaction trans = Tools.StartTransaction()) {
+                BlockTable acBlkTbl;
+                acBlkTbl = trans.GetObject(Application.DocumentManager.MdiActiveDocument.Database.BlockTableId,
+                                                OpenMode.ForRead) as BlockTable;
+                BlockTableRecord acBlkTblRec;
+                acBlkTblRec = trans.GetObject(acBlkTbl[BlockTableRecord.ModelSpace],
+                                                OpenMode.ForWrite) as BlockTableRecord;
+
+                BlockReference db_block_src = trans.GetObject(blockOut.Id, OpenMode.ForRead) as BlockReference;
+                foreach (BlockReference block in blocksIn) {
+                    BlockReference db_block = trans.GetObject(block.Id, OpenMode.ForWrite) as BlockReference;
+
+                    var newBlock = db_block_src.Clone() as BlockReference;
+                    newBlock.Position = db_block.Position;
+                    newBlock.SetDatabaseDefaults();
+                    acBlkTblRec.AppendEntity(newBlock);
+                    trans.AddNewlyCreatedDBObject(newBlock, true);
+                    db_block.Erase();
+                }
+
+                trans.Commit();
+
+            }
+        }
     }
 }
