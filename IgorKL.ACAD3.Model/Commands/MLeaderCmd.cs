@@ -109,16 +109,23 @@ namespace IgorKL.ACAD3.Model.Commands {
 
                     Polyline pline = new Polyline(4);
                     pline.AddVertexes(new List<Point3d> {
-                        bounds.Value.LowerLeft.Add(new Vector3d(-offset, -offset, 0)),
-                        bounds.Value.UpperLeft.Add(new Vector3d(-offset, offset, 0)),
-                        bounds.Value.UpperRight.Add(new Vector3d(offset, offset, 0)),
-                        bounds.Value.LowerRight.Add(new Vector3d(offset, -offset, 0))
+                            bounds.Value.LowerLeft,
+                            bounds.Value.UpperLeft,
+                            bounds.Value.UpperRight,
+                            bounds.Value.LowerRight
                         }
                     );
 
                     pline.Closed = true;
                     pline.Layer = layer;
                     pline.Color = color;
+
+                    var offsets = pline.GetOffsetCurves(-offset);
+                    if (offsets.Count == 0 || !(offsets[0] is Polyline)) {
+                        return;
+                    }
+
+                    pline = offsets[0] as Polyline;
 
                     pline.SetDatabaseDefaults();
                     acBlkTblRec.AppendEntity(pline);
