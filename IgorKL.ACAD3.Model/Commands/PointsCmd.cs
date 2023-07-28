@@ -101,7 +101,7 @@ namespace IgorKL.ACAD3.Model.Commands {
 
             }
         }
-        [RibbonCommandButton("Импорт точек Sdr Cogo", RibbonPanelCategories.Points_Coordinates)]
+        [RibbonCommandButton("Импорт точек Cogo из Sdr", RibbonPanelCategories.Points_Coordinates)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_ImportSdrDataCivil", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public void ImportSdrDataCivil() {
             System.Globalization.CultureInfo culture = System.Globalization.CultureInfo.GetCultureInfo("ru-RU");
@@ -165,9 +165,7 @@ namespace IgorKL.ACAD3.Model.Commands {
             PromptKeywordOptions kwOpt = new PromptKeywordOptions("\nSelect");
             kwOpt.AllowNone = false;
             kwOpt.Keywords.Add("FromText");
-            //kwOpt.Keywords.Add("FromExl");
             kwOpt.Keywords.Add("FromAcadText");
-            //kwOpt.Keywords.Add("FromAcadMText");
 
             PromptResult kwRes = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor.GetKeywords(kwOpt);
 
@@ -216,13 +214,6 @@ namespace IgorKL.ACAD3.Model.Commands {
                     data = System.Windows.Forms.Clipboard.GetText();
                     break;
                 }
-                /*case "FromExl":
-                    {
-                        var buff = System.Windows.Forms.Clipboard.GetData(System.Windows.Forms.DataFormats.CommaSeparatedValue.ToString());
-                        if (buff is String)
-                            data = (String)buff;
-                        break;
-                    }*/
                 case "FromAcadText": {
                     data = "\t" + _getDbTextString("\nSelect text", "is't DBText");
                     data += "\t" + _getDbTextString("\nSelect text", "is't DBText");
@@ -358,10 +349,8 @@ namespace IgorKL.ACAD3.Model.Commands {
                 control = (IgorKL.ACAD3.Model.CogoPoints.Views.PointStylesSelectorControl)ps.AddControl("Cogo точки из буфера", control);
                 ps.Show();
                 control.CommandAction = CreateCogoPointsFromBuffer;
-                //control.CommandAction = () => Application.DocumentManager.ExecuteInApplicationContext(x => CreateCogoPointsFromBuffer(), null);
             }
             else
-            //control.CommandAction = () =>
             {
                 ps = IgorKL.ACAD3.Model.MainMenu.MainPaletteSet.CreatedInstance;
                 control = ps.FindVisual("Cogo точки из буфера") as IgorKL.ACAD3.Model.CogoPoints.Views.PointStylesSelectorControl;
@@ -417,60 +406,7 @@ namespace IgorKL.ACAD3.Model.Commands {
                     HostApplicationServices.WorkingDatabase.TransactionManager.QueueForGraphicsFlush();
                     trans.Commit();
                 }
-            };
-
-
-
-            /*
-            string separator = "\t";
-            string data = System.Windows.Forms.Clipboard.GetText();
-            data = data.Replace(',', '.');
-            string[] lines = data.Split(new string[] { System.Environment.NewLine }, StringSplitOptions.None);
-
-            using (Transaction trans = HostApplicationServices.WorkingDatabase.TransactionManager.StartTransaction())
-            {
-
-                foreach (string line in lines)
-                {
-                    if (string.IsNullOrWhiteSpace(line))
-                        continue;
-
-                    string[] fields = line.Split(new[] { separator }, StringSplitOptions.None);
-                    if (fields.Length < 3)
-                        continue;
-
-                    try
-                    {
-                        string name = fields[0];
-                        double north = double.Parse(fields[1], System.Globalization.NumberStyles.Number, Tools.Culture);
-                        double east = double.Parse(fields[2], System.Globalization.NumberStyles.Number, Tools.Culture);
-                        double elevation = 0;
-                        if (fields.Length > 3)
-                            elevation = double.Parse(fields[3], System.Globalization.NumberStyles.Number, Tools.Culture);
-                        string description = "_PointsFromBuffer";
-                        if (fields.Length > 4)
-                            description = fields[4];
-
-                        ObjectId pointId = IgorKL.ACAD3.Model.CogoPoints.CogoPointFactory.CreateCogoPoints(new Point3d(east, north, elevation), name, description);
-                        var point = trans.GetObject(pointId, OpenMode.ForWrite) as CogoPoint;
-
-                        point.SetDatabaseDefaults();
-
-                        point.LabelStyleId = control.SelectedPointLabelStyle.Key;
-                        point.StyleId = control.SelectedPointStyle.Key;
-
-                        /*point.LabelStyleId = control.SelectedPointLabelStyle.Key;
-                        point.StyleId = control.SelectedPointStyle.Key;*/
-
-            /*}
-            catch (System.Exception ex)
-            {
-                Tools.GetAcadEditor().WriteMessage(string.Format("\nCreate point error, message: {0}", ex.Message));
             }
-        }
-        trans.Commit();
-    }*/
-
         }
 
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_EditPointElevation", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
@@ -519,8 +455,9 @@ namespace IgorKL.ACAD3.Model.Commands {
             options.Keywords.Default = keywords.Both;
 
             PromptResult keywordResult = Tools.GetAcadEditor().GetKeywords(options);
-            if (keywordResult.Status != PromptStatus.OK)
+            if (keywordResult.Status != PromptStatus.OK) {
                 return;
+            }
 
             double ratio = keywordResult.StringResult == keywords.Both ? -0.5 : 0d;
             double sign = keywordResult.StringResult == keywords.NegativeOnly ? -1d : 1d;
@@ -564,6 +501,36 @@ namespace IgorKL.ACAD3.Model.Commands {
                     point.SetDatabaseDefaults();
                     acBlkTblRec.AppendEntity(point);
                     trans.AddNewlyCreatedDBObject(point, true);
+                }
+
+                trans.Commit();
+
+            }
+        }
+
+        [RibbonCommandButton("Точки Cogo из блоков", RibbonPanelCategories.Points_Coordinates)]
+        [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_ConvertBlocToCogoPoint", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
+        public static void ConvertBlocToCogoPoint() {
+            if (!TrySelectObjects<BlockReference>(out IList<BlockReference> blocks, OpenMode.ForRead, "\nВыберите блоки")) {
+                return;
+            }
+
+            var stringOption = new PromptStringOptions("\nВведите исходное описание точек") {
+                DefaultValue = "",
+                UseDefaultValue = true,
+                AllowSpaces = true
+            };
+
+            var stringResult = Tools.GetAcadEditor().GetString(stringOption);
+            if (stringResult.Status != PromptStatus.OK) {
+                return;
+            }
+
+            using (Transaction trans = Tools.StartTransaction()) {
+
+                foreach (BlockReference block in blocks) {
+                    BlockReference db_block = trans.GetObject(block.Id, OpenMode.ForRead) as BlockReference;
+                    IgorKL.ACAD3.Model.CogoPoints.CogoPointFactory.CreateCogoPoints(db_block.Position, trans, description: stringResult.Status == PromptStatus.OK ? stringResult.StringResult : null);
                 }
 
                 trans.Commit();
