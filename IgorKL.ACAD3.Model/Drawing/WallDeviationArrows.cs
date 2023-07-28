@@ -82,12 +82,10 @@ namespace IgorKL.ACAD3.Model.Drawing {
             Point3d[] transientPoints = _vectorToScreen(axisVectorPoints[0], axisVector);
 
             using (CustomObjects.EntityDrawer grphic = new WallDeviationArrows()) {
-                //grphic.TrasientDisplay(new[] { new Line(axisVectorPoints[0], axisVectorPoints[1]) });
                 if (transientPoints != null && transientPoints.Length >= 2)
                     grphic.TrasientDisplay(new[] { new Line(transientPoints[0], transientPoints[1]) });
                 DrawWallArrows(axisVector, ucs);
             }
-            //grphic.Dispose();
         }
 
         [RibbonCommandButton("Стрелки рандом", "Стрелки")]
@@ -95,15 +93,10 @@ namespace IgorKL.ACAD3.Model.Drawing {
         public static void DrawWallArrowsRandom() {
             Matrix3d ucs = Tools.GetAcadEditor().CurrentUserCoordinateSystem;
 
-            /////////////////////DATA HOST ADD//////////////////////////////////////////////////////////////////////////////////////////
-            /*double toleranceBottom = 0.005;
-            double toleranceTop = 0.010;
-            bool isTopMaxTolerance = false;
-            bool isWall = false;*/
             double toleranceTop = _dataProvider.Read("toleranceTop", 0.01d);
             double toleranceBottom = _dataProvider.Read("toleranceBottom", 0.005d);
             bool isTopMaxTolerance = _dataProvider.Read("isTopMaxTolerance", false);
-            bool isWall = /*_dataProvider.Read("isWall", false);*/ false;
+            bool isWall = false;
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             CustomObjects.EntityDrawer grphic;
@@ -137,8 +130,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                         axisVector = _calculateVector(axisVector, ucs.Inverse(), false);
                         Point3d[] transientPoints = _vectorToScreen(axisVectorPoints[0], axisVector);
 
-
-                        //grphic.TrasientDisplay(new[] { new Line(axisVectorPoints[0], axisVectorPoints[1]) });
                         if (transientPoints != null && transientPoints.Length >= 2)
                             grphic.TrasientDisplay(new[] { new Line(transientPoints[0], transientPoints[1]) });
 
@@ -237,8 +228,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
                 mainBlock._clearEntities();
                 mainBlock.DisplayLowerArrow(lowerDestPoint);
-                mainBlock._destLowerPointComplete = true;               ////////////////////////////////////////////////////
-                //mainBlock.DisplayRedirectedLowerArrow(insertPoint.CreateRandomCirclePoints(1, 10d).First());
+                mainBlock._destLowerPointComplete = true;
 
                 mainBlock._clearEntities();
                 Point3d upperDestPoint = new Point3d();
@@ -250,12 +240,9 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 mainBlock._destUpperPointComplete = true;
 
                 mainBlock._clearEntities();
-                //mainBlock.DisplayRedirectedUpperArrow(insertPoint.CreateRandomCirclePoints(1, 1d).First());
-                //mainBlock.DisplayRedirectedUpperArrow(!isWall ? upperDestPoint : insertPoint);
 
                 mainBlock.JigDraw();
 
-                //Tools.AppendEntity(mainBlock.Entities.Select(ent => (Entity)ent.Clone()));
                 mainBlock.Entities.Clear();
             } catch (Exception ex) {
                 Tools.GetAcadEditor().WriteMessage(ex.Message);
@@ -364,8 +351,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 if (ppr.Status != PromptStatus.OK)
                     return SamplerStatus.Cancel;
 
-                /*if ((_destLowerPointUcs - ppr.Value.TransformBy(_ucs.Inverse())).Length < 0.00001)
-                    return SamplerStatus.NoChange;*/
                 _destLowerPointUcs = ppr.Value.TransformBy(_ucs.Inverse());
                 return SamplerStatus.OK;
             } else {
@@ -376,8 +361,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                     if (ppr.Status != PromptStatus.OK)
                         return SamplerStatus.Cancel;
 
-                    /*if ((_jigLowerPointUcs - ppr.Value.TransformBy(_ucs.Inverse())).Length < 0.00001)
-                        return SamplerStatus.NoChange;*/
                     _jigLowerPointUcs = ppr.Value.TransformBy(_ucs.Inverse());
                     return SamplerStatus.OK;    ////////////////////////////////////!!!!!!!!!!!!!!!!!!!!!!!////////////////////////
                 } else {
@@ -387,8 +370,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                         if (ppr.Status != PromptStatus.OK)
                             return SamplerStatus.Cancel;
 
-                        /*if ((_destUpperPointUcs - ppr.Value.TransformBy(_ucs.Inverse())).Length < 0.00001)
-                            return SamplerStatus.NoChange;*/
                         _destUpperPointUcs = ppr.Value.TransformBy(_ucs.Inverse());
                         return SamplerStatus.OK;
                     } else {
@@ -398,8 +379,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                             if (ppr.Status != PromptStatus.OK)
                                 return SamplerStatus.Cancel;
 
-                            /*if ((_jigUpperPointUcs - ppr.Value.TransformBy(_ucs.Inverse())).Length < 0.00001)
-                                return SamplerStatus.NoChange;*/
                             _jigUpperPointUcs = ppr.Value.TransformBy(_ucs.Inverse());
                             return SamplerStatus.OK;
                         }
@@ -616,7 +595,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             StopTrasientDisplay();
 #endif
             _arrowUpper.Redirect(jigPointUcs.TransformBy(TransformToArrowBlock));
-            //var symbs = _createAttrute(_arrowUpper.ArrowLine.GetCenterPoint(), "В", _arrowUpper.LineTarnsform).ToList();
             var symbs = _arrowUpper.ArrowSymbols.Select(ent => (Entity)ent.Clone()).ToList();
             symbs.Add((Entity)_arrowUpper.ArrowLine.Clone());
 
@@ -777,6 +755,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
             });
 
         }
+
         private IEnumerable<Entity> _createAttrute(Point3d alignmentPoint, string prefix, Matrix3d transform) {
             alignmentPoint = alignmentPoint.TransformBy(Matrix3d.Displacement(transform.CoordinateSystem3d.Yaxis.MultiplyBy(2.0d * 0.2)));
 
@@ -872,7 +851,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
         [Obsolete("Требует доработки, изменить механизм используя XLine")]
         private static Point3d[] _vectorToScreen(Point3d point, Vector3d vector) {
-            //int nCurVport = System.Convert.ToInt32(Application.GetSystemVariable("CVPORT"));
             Point3d[] res = null;
             Tools.StartTransaction(() => {
                 using (var view = Tools.GetAcadEditor().GetCurrentView()) {
@@ -911,7 +889,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                     var intersects = line.IntersectWith(vpRectg, Intersect.ExtendThis);
                     intersects = intersects.Select(p => p.TransformBy(mat.Inverse()));
                     res = intersects.ToArray();
-                    //Tools.AppendEntity(new[] { vpRectg, line});
                 }
             });
 
@@ -920,7 +897,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             return res;
         }
         private static Point3d[] _vectorToScreen(Vector3d vector) {
-            //int nCurVport = System.Convert.ToInt32(Application.GetSystemVariable("CVPORT"));
             Point3d[] res = null;
             Tools.StartTransaction(() => {
                 using (var view = Tools.GetAcadEditor().GetCurrentView()) {
@@ -942,7 +918,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                     Point2d bottomRight = viewCenter + new Vector2d(viewWidth / 2, -viewHeight / 2);
 
                     Point3d point = bottomLeft.Convert3d().Add((topRight.Convert3d() - bottomLeft.Convert3d()).MultiplyBy(0.1));
-                    //res = _vectorToScreen(point.TransformBy(matDcsToWcs), vector);
 
                     Polyline vpRectg = new Polyline(5);
                     vpRectg.AddVertexAt(0, bottomLeft, 0, 0, 0);
@@ -975,13 +950,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
         }
         #endregion
 
-
-
-
-
-        /// <summary>
-        /// 
-        /// </summary>
         [Serializable]
         internal class Arrow : CustomObjects.Helpers.CustomObjectSerializer {
             private double _length;
@@ -1012,7 +980,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 _lineTarnsform = Matrix3d.Identity;
 
                 Matrix3d rotation = _getMainRotation();
-                //this.LineTarnsform = rotation;
                 _arrowPositionPreprocessor(ArrowActions.Rotation, rotation);
 
                 this.BaseArrow = null;
@@ -1074,12 +1041,11 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 Matrix3d mirror = _lineTarnsform;
 
                 mirror = _mirror(this.ArrowLine, _lineTarnsform);
-                _arrowPositionPreprocessor(ArrowActions.MirrowedLine, mirror);///////////////////////////////////////
+                _arrowPositionPreprocessor(ArrowActions.MirrowedLine, mirror);
 
             }
 
             private Matrix3d _mirror(Entity entity, Matrix3d transform) {
-                //Plane plane = new Plane(Point3d.Origin, transform.CoordinateSystem3d.Yaxis, transform.CoordinateSystem3d.Zaxis);
                 Plane plane = new Plane(Point3d.Origin, Matrix3d.Identity.CoordinateSystem3d.Yaxis, Matrix3d.Identity.CoordinateSystem3d.Zaxis);
                 plane.TransformBy(_lineTarnsform);
                 Matrix3d mat = Matrix3d.Mirroring(plane);
@@ -1120,7 +1086,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 pline.AddVertexAt(0, new Point3d(origin.X + _spaceLength, origin.Y, 0), 0, 0, 0);
                 pline.AddVertexAt(1, new Point2d(pline.GetPoint2dAt(0).X + _length, pline.GetPoint2dAt(0).Y), 0, _arrowBlug, 0);
                 pline.AddVertexAt(2, new Point2d(pline.GetPoint2dAt(1).X + _arrowLength, pline.GetPoint2dAt(1).Y), 0, 0, 0);
-                //pline.AddVertexAt(3, new Point3d(pline.GetPoint2dAt(2).X, pline.GetPoint2dAt(2).Y + 1d, 0), 0, 0, 0);
                 pline.LineWeight = LineWeight.LineWeight020;
 
                 return pline;
@@ -1129,8 +1094,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             private Matrix3d _getMainRotation() {
                 double angle = Matrix3d.Identity.CoordinateSystem3d.Xaxis.GetAngleTo(this.AxisVector.GetPerpendicularVector().Negate(),
                     Matrix3d.Identity.CoordinateSystem3d.Zaxis.Negate());
-                /*double angle = Matrix3d.Identity.CoordinateSystem3d.Yaxis.GetAngleTo(this.AxisVector,
-                    Matrix3d.Identity.CoordinateSystem3d.Zaxis);*/
                 Matrix3d rotation = Matrix3d.Rotation(angle,
                 Matrix3d.Identity.CoordinateSystem3d.Zaxis.Negate(), Point3d.Origin);
 
@@ -1145,23 +1108,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 _arrowPositionPreprocessor(ArrowActions.NaN, Matrix3d.Identity);
 
                 return LastValue.Value;
-            }
-
-            [Obsolete("Неправильно определяет значение, не по нормали. Используй _calculateValue(Point3d destPoint")]
-            private double _calculateValueEx(Point3d destPoint) {
-                Point3d point2d = new Point3d(destPoint.X, destPoint.Y, 0d);
-                Vector3d perp = point2d - point2d.Add(this.AxisVector.GetPerpendicularVector());
-                Vector3d project = perp.ProjectTo(this.AxisVector.GetNormal(), this.AxisVector);
-
-                Line3d line3d = new Line3d(point2d, project);
-                var points = line3d.IntersectWith(new Line3d(Point3d.Origin, this.AxisVector), Tolerance.Global);
-
-                if (points != null && points.Length > 0) {
-                    Line line = new Line(point2d, points[0]);
-                    double res = line.Length * (this.AxisVector.GetPerpendicularVector().IsCodirectionalTo(line.GetFirstDerivative(0d)) ? 1 : -1);
-                    return res;
-                }
-                throw new ArgumentOutOfRangeException();
             }
 
             private double _calculateValue(Point3d destPoint) {
@@ -1233,9 +1179,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             }
 
             private Matrix3d? _movetAtYaxis(int sign) {
-                /*Extents3d? bounds = _getSymbolsBounds(this.ArrowSymbols);
-                if (!bounds.HasValue)
-                    return null;*/
 
                 Vector3d direction = new Vector3d();
                 if (sign < 0)
@@ -1303,21 +1246,12 @@ namespace IgorKL.ACAD3.Model.Drawing {
                         if (!this.BaseArrow.IsSymbolsMirrored)
                             this.BaseArrow.MirrorSymbols();
                     } else {
-                        /*if (this.IsTopDisplacemented)
-                            this.MoveToBottom();
-                        if (this.BaseArrow.IsBottomDisplacemented)
-                            this.BaseArrow.MoveToTop();
-                        if (this.BaseArrow.IsSymbolsMirrored)
-                            this.BaseArrow.MirrorSymbols();*/
 
-                        ///Поворачиваем символы на место
                         if (this.IsSymbolsMirrored)
                             this.MirrorSymbols();
                         if (this.BaseArrow.IsSymbolsMirrored)
                             this.BaseArrow.MirrorSymbols();
-                        ///////////////////////////////////////////////
 
-                        ///Приводим в центр по горизонтали
                         if (this.IsTopDisplacemented)
                             this.MoveToBottom();
                         if (this.IsBottomDisplacemented)
@@ -1326,7 +1260,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
                             this.BaseArrow.MoveToBottom();
                         if (this.BaseArrow.IsBottomDisplacemented)
                             this.BaseArrow.MoveToTop();
-                        //////////////////////////////////////////////
+
                     }
                 }
 
@@ -1338,19 +1272,15 @@ namespace IgorKL.ACAD3.Model.Drawing {
                     return null;
                 Extents3d res = new Extents3d();
                 symbols.ToList().ForEach(ent => {
-                    /*var clone = ent.GetTransformedCopy(_lineTarnsform.Inverse());
-                    if (clone.Bounds.HasValue)
-                        res.AddExtents(ent.Bounds.Value);*/
+
                     if (ent is DBText) {
                         var rectg = ((DBText)ent).GetTextBoxCorners();
                         if (rectg.HasValue) {
                             Point3d lowerLeft = rectg.Value.LowerLeft.TransformBy(_lineTarnsform.Inverse());
                             Point3d upperRight = rectg.Value.UpperRight.TransformBy(_lineTarnsform.Inverse());
 
-                            ///////////////////////////////////////////////////////////!!!!!!!!!!//////////////////////////
                             if (lowerLeft.X > upperRight.X)
                                 lowerLeft = new Point3d(upperRight.X - 1d, lowerLeft.Y, lowerLeft.Z);
-                            ///////////////////////////////////////////////////////////!!!!!!!!!!//////////////////////////
 
                             try {
                                 Extents3d ext = new Extents3d(lowerLeft, upperRight);
@@ -1397,7 +1327,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info,
                 System.Runtime.Serialization.StreamingContext context) {
                 info.AddValue("AxisVector", this.AxisVector.ToArray());
-                //info.AddValue("BaseArrow", this.BaseArrow);
             }
 
             protected Arrow(
@@ -1406,7 +1335,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                     throw new System.ArgumentNullException("info");
 
                 this.AxisVector = new Vector3d((double[])info.GetValue("AxisVector", typeof(double[])));
-                //this.BaseArrow = (Arrow)info.GetValue("BaseArrow", typeof(Arrow));
             }
 
             public override string ApplicationName {
