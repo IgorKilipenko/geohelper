@@ -1,15 +1,6 @@
-﻿/*using w32 = Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System.Reflection;
 
-using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;*/
-
-using Microsoft.Win32;
-using System.Reflection;
-
-//using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 
 namespace IgorKL.ACAD3.Customization
@@ -64,6 +55,7 @@ namespace IgorKL.ACAD3.Customization
 
             // Delete the key for the application
             regAcadAppKey.DeleteSubKeyTree(sAppName);
+
             regAcadAppKey.Close();
         }
     }
