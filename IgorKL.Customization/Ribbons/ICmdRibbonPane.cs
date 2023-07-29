@@ -188,11 +188,8 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
 
         private void wsChangedHandler (object _, Autodesk.AutoCAD.ApplicationServices.SystemVariableChangedEventArgs e) {
             if (e.Name == "WSCURRENT" && _ribbonTab != null) {
-                //_ribbonTab.IsVisible = true;
-                //_ribbonTab.IsActive = true;
                 if (ComponentManager.Ribbon.Tabs.FirstOrDefault(tab => tab == _ribbonTab) == null) {
                     ComponentManager.Ribbon.Tabs.Add(_ribbonTab);
-                    _ribbonTab.IsVisible = true;
                 }
             };
         }
