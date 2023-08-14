@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Colors;
 using Autodesk.Civil.DatabaseServices;
+using CivilSurface = Autodesk.Civil.DatabaseServices.Surface;
 
 using IgorKL.ACAD3.Model.Helpers.SdrFormat;
 using wnd = System.Windows.Forms;
+
+using IgorKL.ACAD3.Model.Extensions;
 
 namespace IgorKL.ACAD3.Model.Commands {
     public partial class PointsCmd {
@@ -574,6 +574,46 @@ namespace IgorKL.ACAD3.Model.Commands {
                 trans.Commit();
 
             }
+        }
+
+
+        [RibbonCommandButton("Метки поверхности из точек", RibbonPanelCategories.Points_Coordinates, true)]
+        [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_SurfaceElevationLabelsFromPoints", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
+        public static void CreateSurfaceElevationLabels() {
+            System.Collections.Generic.List<DBPoint> points;
+            if (!ObjectCollector.TrySelectObjects(out points, "\nВыберите точки")) {
+                return;
+            }
+
+            CivilSurface surface;
+            if (!ObjectCollector.TrySelectAllowedClassObject(out surface, "\nУкажите поверхность"))
+                return;
+
+            TinSurface tinSurface = surface as TinSurface;
+            if (tinSurface == null) {
+                Tools.Write("Ошибка. Поверхность должна быть типа: TinSurface");
+                return;
+            }
+
+            Tools.UseTransaction((trans, _, __) => {
+                var civilDoc = Tools.GetActiveCivilDocument();
+                var surfaceDb = trans.GetObject(surface.ObjectId, OpenMode.ForWrite);
+                points.ForEach(p => {
+                    var pointDb = trans.GetObject(p.ObjectId, OpenMode.ForRead) as DBPoint;
+                    try {
+                        tinSurface.FindElevationAtXY(pointDb.Position.X, pointDb.Position.Y);
+                    } catch (Autodesk.Civil.PointNotOnEntityException) {
+                    } catch {
+                        Tools.Write("Error on get point elevation [CreateSurfaceElevationLabels]");
+                        return;
+                    }
+
+                    var labelId = Autodesk.Civil.DatabaseServices.SurfaceElevationLabel.Create(surfaceDb.ObjectId, pointDb.Position.Convert2d());
+                    System.Diagnostics.Debug.Assert(labelId.IsValid && !labelId.IsNull);
+                });
+
+                trans.Commit();
+            });
         }
     }
 }
