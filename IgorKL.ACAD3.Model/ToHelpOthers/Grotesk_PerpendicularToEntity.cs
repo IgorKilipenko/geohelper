@@ -13,7 +13,6 @@ using IgorKL.ACAD3.Model.Extensions;
 
 namespace IgorKL.ACAD3.Model.ToHelpOthers {
     public class Grotesk_PerpendicularToEntity {
-        [RibbonCommandButton("Пераендикуляр к линии", "Для ГЕОДЕЗИСТ.РУ")]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_GetPerpendicularToEntity")]
         public void iCmd_GetPerpendicularToEntity() {
             Polyline line;
@@ -63,8 +62,6 @@ namespace IgorKL.ACAD3.Model.ToHelpOthers {
                         }
 
                     }
-
-                    //Line resLine = line.GetPerpendicularFromPoint(res.Value);
 
                     if (res.Status == PromptStatus.OK)
                         points.Add(res.Value);
