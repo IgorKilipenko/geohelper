@@ -169,9 +169,8 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
                 Tag = this,
                 Title = AppName,
                 IsContextualTab = false,
-                IsVisible = true
+                IsVisible = true,
             };
-
 
             Application.SystemVariableChanged += new Autodesk.AutoCAD.ApplicationServices.SystemVariableChangedEventHandler(wsChangedHandler);
 
@@ -365,7 +364,7 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
                     foreach (CommandMethodAttribute cmdAttr in attrs)
                     {
                         var objs = mi.GetCustomAttributes(typeof(RibbonCommandButtonAttribute), false);
-                        if (objs == null || objs.Length < 1)
+                        if (objs == null || objs.Length == 0)
                             continue;
                         RibbonCommandButtonAttribute ribbAttr = (RibbonCommandButtonAttribute)objs.First();
 
@@ -378,6 +377,10 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
 
         private void _pastToPanelAtSimpleRow(RibbonCommandButtonAttribute ribbAttr, CommandMethodAttribute cmdAttr, Type type, string id)
         {
+            if (ribbAttr.IsCivilCmd && !Tools.IsCivil3D()) {
+                return;
+            }
+
             RibbonButton button = new RibbonButton();
             button.IsToolTipEnabled = true;
             button.Id = type.FullName + id;
@@ -404,7 +407,6 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
                 //panel.Source.IsSlideOutPanelVisible = true;
                 panel.CanToggleOrientation = true;
                 panel.ResizeStyle = RibbonResizeStyles.NeverHideText;
-
                 //panel.CustomPanelTitleBarBackground = System.Windows.Media.Brushes.LightYellow;
             }
 
@@ -424,9 +426,9 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
             }
 
             ((RibbonRowPanel)row).Items.Add(button);
-            if (row is RibbonRowPanel)
+            if (row is RibbonRowPanel) {
                 ((RibbonRowPanel)row).Items.Add(new RibbonRowBreak());
-
+            }
 
         }
 
