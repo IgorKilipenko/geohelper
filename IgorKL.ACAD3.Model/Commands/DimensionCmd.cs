@@ -154,5 +154,94 @@ namespace IgorKL.ACAD3.Model.Commands {
                 trans.Commit();
             }
         }
+
+        [RibbonCommandButton("Сместить текст размеров", RibbonPanelCategories.Lines_Dimensions)]
+        [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_MoveDimensionTextPosition", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
+        public static void MoveDimensionTextPosition() {
+            List<Dimension> dimensions;
+            if (!ObjectCollector.TrySelectObjects(out dimensions, "\nВыберите редактируемые размеры")) {
+                return;
+            }
+
+            PromptDoubleOptions valueOption = new PromptDoubleOptions("\nУкажите значение смещения");
+            valueOption.AllowNone = false;
+            valueOption.DefaultValue = 0d;
+
+            PromptDoubleResult valueResult = Tools.GetAcadEditor().GetDouble(valueOption);
+            if (valueResult.Status != PromptStatus.OK)
+                return;
+            double offset = valueResult.Value;
+
+            PromptKeywordOptions options = new PromptKeywordOptions("\nУкажите направление смещения");
+            options.AppendKeywordsToMessage = true;
+            options.AllowArbitraryInput = true;
+            options.Keywords.Add("X");
+            options.Keywords.Add("Y");
+            options.AppendKeywordsToMessage = true;
+            options.AllowNone = true;
+            options.Keywords.Default = "X";
+
+            PromptResult keywordResult = Tools.GetAcadEditor().GetKeywords(options);
+            if (keywordResult.Status != PromptStatus.OK)
+                return;
+            string ax = keywordResult.StringResult;
+
+            Tools.UseTransaction((trans, _, __) => {
+                var ucs = CoordinateSystem.CoordinateTools.GetCurrentUcs();
+                dimensions.ForEach(d => {
+                    var demObj = trans.GetObject(d.Id, OpenMode.ForWrite) as Dimension;
+                    var p = demObj.TextPosition.TransformBy(ucs.Inverse());
+                    var newPos = new Point3d(p.X + (ax == "X" ? offset : 0), p.Y + (ax == "Y" ? offset : 0), p.Z);
+                    demObj.TextPosition = newPos.TransformBy(ucs);
+                });
+
+                trans.Commit();
+            });
+        }
+
+        [RibbonCommandButton("Значение в суффикс", RibbonPanelCategories.Lines_Dimensions)]
+        [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_DimensionValueToSuffix", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
+        public static void DimensionValueToSuffix() {
+            List<Dimension> dimensions;
+            if (!ObjectCollector.TrySelectObjects(out dimensions, "\nВыберите редактируемые размеры")) {
+                return;
+            }
+
+            PromptKeywordOptions options = new PromptKeywordOptions("\nУкажите направление смещения");
+            options.AppendKeywordsToMessage = true;
+            options.AllowArbitraryInput = true;
+            options.Keywords.Add("Suffix");
+            options.Keywords.Add("Prefix");
+            options.AppendKeywordsToMessage = true;
+            options.AllowNone = true;
+            options.Keywords.Default = "Suffix";
+
+            PromptResult keywordResult = Tools.GetAcadEditor().GetKeywords(options);
+            if (keywordResult.Status != PromptStatus.OK)
+                return;
+            string kwRes = keywordResult.StringResult;
+
+            Tools.UseTransaction((trans, _, __) => {
+                dimensions.ForEach(d => {
+                    var demObj = trans.GetObject(d.Id, OpenMode.ForWrite) as Dimension;
+                    string format = "#0";
+                    if (demObj.Dimdec > 0) {
+                        format += ".";
+                        for (int i = 0; i < demObj.Dimdec; i++)
+                            format += "0";
+                    }
+
+                    string strVal = Math.Round(demObj.Measurement, demObj.Dimadec).ToString(format);
+
+                    if (kwRes == "Suffix") {
+                        demObj.Suffix = "\\X" + strVal;
+                    } else if (kwRes == "Prefix") {
+                        demObj.Prefix = strVal + "\\X";
+                    }
+                });
+
+                trans.Commit();
+            });
+        }
     }
 }
