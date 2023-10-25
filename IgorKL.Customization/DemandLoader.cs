@@ -1,15 +1,6 @@
-﻿/*using w32 = Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System.Reflection;
 
-using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.ApplicationServices;
-using Autodesk.AutoCAD.DatabaseServices;*/
-
-using Microsoft.Win32;
-using System.Reflection;
-
-//using Autodesk.AutoCAD.Runtime;
-using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 
 namespace IgorKL.ACAD3.Customization
@@ -58,13 +49,16 @@ namespace IgorKL.ACAD3.Customization
             // Get the AutoCAD Applications key
             string sProdKey = HostApplicationServices.Current.MachineRegistryProductRootKey;
             string sAppName = "ICmd_Drawing";
-            
-            RegistryKey regAcadProdKey = Registry.CurrentUser.OpenSubKey(sProdKey);
-            RegistryKey regAcadAppKey = regAcadProdKey.OpenSubKey("Applications", true);
 
-            // Delete the key for the application
-            regAcadAppKey.DeleteSubKeyTree(sAppName);
-            regAcadAppKey.Close();
+            try {
+                RegistryKey regAcadProdKey = Registry.CurrentUser.OpenSubKey(sProdKey);
+                RegistryKey regAcadAppKey = regAcadProdKey.OpenSubKey("Applications", true);
+
+                // Delete the key for the application
+                regAcadAppKey.DeleteSubKeyTree(sAppName);
+
+                regAcadAppKey.Close();
+            } catch { }
         }
     }
 }

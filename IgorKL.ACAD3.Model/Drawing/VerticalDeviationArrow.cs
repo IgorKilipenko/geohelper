@@ -43,33 +43,18 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
             ppo = new PromptPointOptions("\nУкажите проектное положение низа");
 
-            /*ppr = Tools.GetAcadEditor().GetPoint(ppo);
-            if (ppr.Status != PromptStatus.OK)
-                return;*/
 
-            mainMlock._lowerPointUcs = mainMlock._insertPointUcs; /*ppr.Value;*/
+            mainMlock._lowerPointUcs = mainMlock._insertPointUcs;
 
             ppo = new PromptPointOptions("\nУкажите фактическое положение низа");
 
-            /*ppr = Tools.GetAcadEditor().GetPoint(ppo);
-            if (ppr.Status != PromptStatus.OK)
-                return;*/
-
-            /*_lowerDestPointUcs =*/ /*_insertPointUcs.CreateRandomCirclePoints(1, 0.005).ToArray()[0];*/ /*ppr.Value;*/
-
             ppo = new PromptPointOptions("\nУкажите проектное положение верха");
 
-            /*ppr = Tools.GetAcadEditor().GetPoint(ppo);
-            if (ppr.Status != PromptStatus.OK)
-                return;*/
 
-            mainMlock._upperPointUcs = mainMlock._insertPointUcs; /*ppr.Value;*/
+            mainMlock._upperPointUcs = mainMlock._insertPointUcs;
 
             ppo = new PromptPointOptions("\nУкажите фактическое положение верха");
 
-            /*ppr = Tools.GetAcadEditor().GetPoint(ppo);
-            if (ppr.Status != PromptStatus.OK)
-                return;*/
 
             mainMlock._upperDestPointUcs = mainMlock._upperPointUcs.CreateRandomCirclePoints(1, 0.020).ToArray()[0]; /*ppr.Value;*/
 
@@ -105,7 +90,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
         private void _setEntitiesToBlock(IEnumerable<Entity> entities, bool erase) {
             Tools.StartTransaction(() => {
                 var btrId = AcadBlocks.BlockTools.CreateBlockTableRecord("*U", Point3d.Origin, entities, AnnotativeStates.True);
-                //var brId = AcadBlocks.BlockTools.AppendBlockItem(_lowerPointUcs.TransformBy(_ucs.Inverse()), btrId, null, Matrix3d.Identity);
                 var brId = AcadBlocks.BlockTools.AppendBlockItem(_lowerPointUcs, btrId, null, Ucs);
                 BlockReference br = brId.GetObjectForRead<BlockReference>();
                 Entities.Add((Entity)br.Clone());
@@ -128,10 +112,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
             if (ppr.Status != PromptStatus.OK)
                 return SamplerStatus.Cancel;
-            //Tools.GetAcadEditor().DrawVector(ppo.BasePoint, ppr.Value, 1, true);
-
-            /*if (_position == ppr.Value)
-                return SamplerStatus.NoChange;*/
 
             _jigPoint = ppr.Value.TransformBy(_ucs.Inverse());
 
@@ -161,7 +141,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                         var xrecord = CustomObjects.Helpers.XRecordTools.GetSetExtensionDictionaryEntry(brId, "ARROW_JigPosition").GetObjectForRead<Xrecord>();
                         xrecord.UpgradeOpen();
 
-                        //Point3d p = _jigPoint.TransformBy(Arrow.GetToLocalTransform(_lowerPointUcs, _ucs));
                         Point3d p = _jigPoint.TransformBy(_ucs);
 
                         ResultBuffer rb = new ResultBuffer(
@@ -174,11 +153,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
                 }
             }
-
-            /*if ((res = base.JigDraw()) != PromptStatus.OK)
-                return PromptStatus.Cancel;
-            if (!_upperComplite)
-                _upperComplite = true;*/
 
             return res;
         }
@@ -231,7 +205,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                     res.AddRange(_lowerSet.Entities);
                 if (_upperSet != null)
                     res.AddRange(_upperSet.Entities);
-                //res.ForEach(ent => ent = ent.GetTransformedCopy(transform));
                 res = res.Select(ent => ent.GetTransformedCopy(transform)).ToList();
                 return res;
             }
@@ -244,10 +217,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 if (vector.Y < 0d && !arrowSet.IsVerticalMirrored)
                     arrowSet.MirrorVerticalArrow();
             }
-
-
-
-
 
             private class SArrow {
                 private double _length;
@@ -274,8 +243,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                     _horizontalTarnsform = Matrix3d.Identity;
                     _verticalTarnsform = Matrix3d.Identity;
                     VerticalLine.TransformBy(new Matrix3d(new double[] { 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 }));
-                    //VerticalTarnsform = Matrix3d.Identity.PostMultiplyBy(Matrix3d.Rotation(Math.PI/2d, Matrix3d.Identity.CoordinateSystem3d.Zaxis, Point3d.Origin));
-                    //VerticalTarnsform = new Matrix3d(new double[] { 0, -1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 });
                     Vector3d v = Matrix3d.Identity.Translation;
                 }
 

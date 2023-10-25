@@ -275,5 +275,13 @@ namespace IgorKL.ACAD3.Model {
                 config.setHardwareAcceleration(true);
             }
         }*/
+
+        public static bool IsCivil3D() {
+            if (!(Autodesk.AutoCAD.Internal.Utils.IsCommandNameInUse("AeccToolSpace") == Autodesk.AutoCAD.Internal.CommandTypeFlags.NoneCmd)) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 }
