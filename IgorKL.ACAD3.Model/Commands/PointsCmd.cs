@@ -603,6 +603,7 @@ namespace IgorKL.ACAD3.Model.Commands {
                     try {
                         tinSurface.FindElevationAtXY(pointDb.Position.X, pointDb.Position.Y);
                     } catch (Autodesk.Civil.PointNotOnEntityException) {
+                        return;
                     } catch {
                         Tools.Write("Error on get point elevation [CreateSurfaceElevationLabels]");
                         return;
