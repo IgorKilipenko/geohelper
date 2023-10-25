@@ -136,5 +136,74 @@ namespace IgorKL.ACAD3.Model.Commands {
 
             });
         }
+
+        [RibbonCommandButton("Изменить отметку", RibbonPanelCategories.Text_Annotations)]
+        [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_EditTextElevation", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
+        public static void EditTextElevation() {
+            string sep = ".";
+            var culture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
+
+            List<DBText> textItems;
+            if (!ObjectCollector.TrySelectObjects<DBText>(out textItems, "\nВыберите текстовые объекты")) {
+                return;
+            }
+
+            var valueOption = new PromptDoubleOptions("\nВведите значение приращения отметок") {
+                DefaultValue = 0,
+                UseDefaultValue = true,
+            };
+
+            var valueResult = Tools.GetAcadEditor().GetDouble(valueOption);
+            if (valueResult.Status != PromptStatus.OK) {
+                return;
+            }
+            double dh = valueResult.Value;
+
+
+            Tools.UseTransaction((Transaction trans, BlockTable acBlkTbl, BlockTableRecord acBlkTblRec) => {
+
+                foreach (DBText text in textItems) {
+                    DBText db_text = trans.GetObject(text.Id, OpenMode.ForWrite) as DBText;
+                    double textVal;
+                    if (!double.TryParse(db_text.TextString.Replace(",", sep), System.Globalization.NumberStyles.Any, culture, out textVal)) {
+                        continue;
+                    }
+
+                    textVal += dh;
+                    db_text.TextString = Math.Round(textVal, 3).ToString("#0.000", culture);
+                }
+
+                trans.Commit();
+
+            });
+
+            valueOption = new PromptDoubleOptions("\nВведите значение множителя") {
+                DefaultValue = 1000,
+                UseDefaultValue = true,
+            };
+
+            valueResult = Tools.GetAcadEditor().GetDouble(valueOption);
+            if (valueResult.Status != PromptStatus.OK || valueResult.Value == 1) {
+                return;
+            }
+            double xh = valueResult.Value;
+
+            Tools.UseTransaction((Transaction trans, BlockTable acBlkTbl, BlockTableRecord acBlkTblRec) => {
+
+                foreach (DBText text in textItems) {
+                    DBText db_text = trans.GetObject(text.Id, OpenMode.ForWrite) as DBText;
+                    double textVal;
+                    if (!double.TryParse(db_text.TextString, System.Globalization.NumberStyles.Any, culture, out textVal)) {
+                        continue;
+                    }
+
+                    textVal *= xh;
+                    db_text.TextString = textVal.ToString("+#;-#;0", culture);
+                }
+
+                trans.Commit();
+
+            });
+        }
     }
 }
