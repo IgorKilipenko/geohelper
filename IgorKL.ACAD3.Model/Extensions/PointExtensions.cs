@@ -186,8 +186,12 @@ namespace IgorKL.ACAD3.Model.Extensions {
             return v2d.DotProduct(destv2d);
         }
 
-        public static Point3d GetWithNewElevation(this Point3d point, double elevation) {
-            return new Point3d(point.X, point.Y, 0d);
+        public static Point3d GetWithNewElevation(this Point3d point, double elevation = 0d) {
+            return new Point3d(point.X, point.Y, elevation);
+        }
+
+        public static Point2d ProjectToUcs(this Point3d point, CoordinateSystem3d ucs) {
+            return IgorKL.ACAD3.Model.CoordinateSystem.CoordinateTools.ProjectToUcs(point, ucs);
         }
     }
 }

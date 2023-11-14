@@ -91,5 +91,17 @@ namespace IgorKL.ACAD3.Model.CoordinateSystem {
             ent.TransformBy(mat);
             return toPoint;
         }
+
+        public static IEnumerable<Point3d> TransformToUcs(IEnumerable<Point3d> points) {
+            var ucs = GetCurrentUcs().Inverse();
+            foreach (var point in points) {
+                yield return point.TransformBy(ucs);
+            }
+        }
+
+        public static Point2d ProjectToUcs(Point3d point, CoordinateSystem3d ucs) {
+            var pl = new Plane(ucs.Origin, ucs.Zaxis);
+            return pl.ParameterOf(point);
+        }
     }
 }
