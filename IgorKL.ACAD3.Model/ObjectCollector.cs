@@ -2,6 +2,7 @@
 using Autodesk.AutoCAD.EditorInput;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace IgorKL.ACAD3.Model {
     public static class ObjectCollector {
@@ -107,6 +108,60 @@ namespace IgorKL.ACAD3.Model {
             string rejMsg = string.Format("\nThe selected object is not a {0}.", typeof(TAllowedType).Name);
 
             return SelectAllowedClassObject<TAllowedType>(msg, rejMsg);
+        }
+
+
+        public static int ForEachSelectedObject(Func<SelectedObject, Transaction, bool> action, string message = "\nВыберите объект: ") {
+            Editor ed = Tools.GetAcadEditor();
+
+            PromptSelectionOptions pso = new PromptSelectionOptions();
+            pso.MessageForAdding = message;
+            pso.AllowDuplicates = false;
+            pso.AllowSubSelections = true;
+            pso.RejectObjectsFromNonCurrentSpace = true;
+            pso.RejectObjectsOnLockedLayers = false;
+
+            PromptSelectionResult psr = ed.GetSelection(pso);
+            if (psr.Status != PromptStatus.OK)
+                return -1;
+
+            int affectCount = 0;
+            Tools.UseTransaction((trans, _, __) => {
+                foreach (SelectedObject obj in psr.Value) {
+                    bool abort = action(obj, trans);
+                    if (abort) {
+                        return;
+                    }
+                    ++affectCount;
+                }
+            });
+
+            return affectCount;
+        }
+
+        public static List<DBObject> SelectObjects(Func<DBObject, bool> filter, string message = "\nВыберите объект: ") {
+            Editor ed = Tools.GetAcadEditor();
+            var res = new List<DBObject>();
+
+            PromptSelectionOptions pso = new PromptSelectionOptions();
+            pso.MessageForAdding = message;
+            pso.AllowDuplicates = false;
+            pso.AllowSubSelections = true;
+            pso.RejectObjectsFromNonCurrentSpace = true;
+            pso.RejectObjectsOnLockedLayers = false;
+
+            PromptSelectionResult psr = ed.GetSelection(pso);
+            if (psr.Status != PromptStatus.OK)
+                return res;
+
+            using (Transaction trans = Tools.StartTransaction()) {
+                foreach (SelectedObject so in psr.Value) {
+                    var obj = trans.GetObject(so.ObjectId, OpenMode.ForRead);
+                    if (filter(obj))
+                        res.Add(obj);
+                }
+            }
+            return res;
         }
 
         public delegate PromptStatus PromptAction(PromptResult promptResult);
