@@ -85,25 +85,25 @@
     <!--AME Reference End-->
     <Reference Include="accoremgd, Version=21.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\Autodesk\AutoCAD 2021\accoremgd.dll</HintPath>
+      <HintPath>..\reference\acad\accoremgd.dll</HintPath>
     </Reference>
     <Reference Include="AcCui, Version=21.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\Autodesk\AutoCAD 2021\AcCui.dll</HintPath>
+      <HintPath>..\reference\acad\AcCui.dll</HintPath>
     </Reference>
     <Reference Include="acdbmgd">
-      <HintPath>C:\Program Files\Autodesk\AutoCAD 2021\acdbmgd.dll</HintPath>
+      <HintPath>..\reference\acad\acdbmgd.dll</HintPath>
     </Reference>
     <Reference Include="acmgd, Version=21.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\Autodesk\AutoCAD 2021\acmgd.dll</HintPath>
+      <HintPath>..\reference\acad\acmgd.dll</HintPath>
     </Reference>
     <Reference Include="AcWindows, Version=21.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\Autodesk\AutoCAD 2021\AcWindows.dll</HintPath>
+      <HintPath>..\reference\acad\AcWindows.dll</HintPath>
     </Reference>
     <Reference Include="AdWindows">
-      <HintPath>C:\Program Files\Autodesk\AutoCAD 2021\AdWindows.dll</HintPath>
+      <HintPath>..\reference\acad\AdWindows.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
