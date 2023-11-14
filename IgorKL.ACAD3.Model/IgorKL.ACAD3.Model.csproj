@@ -94,6 +94,9 @@
       <HintPath>..\reference\acad\acdbmgd.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="acdbmgdbrep">
+      <HintPath>..\reference\acad\acdbmgdbrep.dll</HintPath>
+    </Reference>
     <Reference Include="acmgd, Version=20.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\reference\acad\acmgd.dll</HintPath>
@@ -219,6 +222,7 @@
     <Compile Include="Extensions\PointExtensions.cs" />
     <Compile Include="Extensions\PolylineExtensions.cs" />
     <Compile Include="Extensions\RectangleExtensions.cs" />
+    <Compile Include="Extensions\RegionExtensions.cs" />
     <Compile Include="Extensions\ToolsExtensions.cs" />
     <Compile Include="CogoPoints\CogoPointEditor.cs" />
     <Compile Include="CogoPoints\CogoPointFactory.cs" />
