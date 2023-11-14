@@ -3,16 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 
 using Autodesk.AutoCAD.DatabaseServices;
-using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Colors;
-using Autodesk.Civil.DatabaseServices;
 
-using IgorKL.ACAD3.Model.Helpers.SdrFormat;
-using wnd = System.Windows.Forms;
 
 namespace IgorKL.ACAD3.Model.Commands {
     public partial class DimensionCmd {
@@ -20,22 +16,23 @@ namespace IgorKL.ACAD3.Model.Commands {
         public void EditDimensionValueRandom() {
             var keywords = new { PositiveOnly = "PositiveOnly", NegativeOnly = "NegativeOnly", Both = "Both" };
 
-            List<Dimension> dimensions;
-            if (!ObjectCollector.TrySelectObjects(out dimensions, "\nУкажите объект размер: "))
+            if (!ObjectCollector.TrySelectObjects(out List<Dimension> dimensions, "\nУкажите объект размер: "))
                 return;
 
-            PromptDoubleOptions valueOption = new PromptDoubleOptions("\nУкажите значение допусуа: ");
-            valueOption.AllowNone = false;
-            valueOption.DefaultValue = 0d;
-            valueOption.AllowNegative = false;
+            PromptDoubleOptions valueOption = new PromptDoubleOptions("\nУкажите значение допуска: ") {
+                AllowNone = false,
+                DefaultValue = 0d,
+                AllowNegative = false
+            };
 
             PromptDoubleResult valueResult = Tools.GetAcadEditor().GetDouble(valueOption);
             if (valueResult.Status != PromptStatus.OK)
                 return;
 
-            PromptKeywordOptions options = new PromptKeywordOptions("\nВыбирите метод: ");
-            options.AppendKeywordsToMessage = true;
-            options.AllowArbitraryInput = true;
+            PromptKeywordOptions options = new PromptKeywordOptions("\nВыберите метод: ") {
+                AppendKeywordsToMessage = true,
+                AllowArbitraryInput = true
+            };
             options.Keywords.Add(keywords.PositiveOnly);
             options.Keywords.Add(keywords.NegativeOnly);
             options.Keywords.Add(keywords.Both);
@@ -60,17 +57,6 @@ namespace IgorKL.ACAD3.Model.Commands {
                     if (dbObj == null)
                         continue;
 
-                    /*var pInf = dbObj.GetType().GetProperties();
-                    
-                    foreach (var p in pInf)
-                    {
-                        try
-                        {
-                            Tools.Write(p.Name + "\t" + p.GetValue(dbObj).ToString() + "\n");
-                        }
-                        catch (Exception) { }
-                    }*/
-
                     string format = "#0";
                     if (dbObj.Dimdec > 0) {
                         format += ".";
@@ -91,22 +77,23 @@ namespace IgorKL.ACAD3.Model.Commands {
         public void AddDimensionValueRandom() {
             var keywords = new { PositiveOnly = "PositiveOnly", NegativeOnly = "NegativeOnly", Both = "Both" };
 
-            List<Dimension> dimensions;
-            if (!ObjectCollector.TrySelectObjects(out dimensions, "\nSelect dimensions"))
+            if (!ObjectCollector.TrySelectObjects(out List<Dimension> dimensions, "\nSelect dimensions"))
                 return;
 
-            PromptDoubleOptions valueOption = new PromptDoubleOptions("\nEnter value");
-            valueOption.AllowNone = false;
-            valueOption.DefaultValue = 0d;
-            valueOption.AllowNegative = false;
+            PromptDoubleOptions valueOption = new PromptDoubleOptions("\nEnter value") {
+                AllowNone = false,
+                DefaultValue = 0d,
+                AllowNegative = false
+            };
 
             PromptDoubleResult valueResult = Tools.GetAcadEditor().GetDouble(valueOption);
             if (valueResult.Status != PromptStatus.OK)
                 return;
 
-            PromptKeywordOptions options = new PromptKeywordOptions("\nEnter method");
-            options.AppendKeywordsToMessage = true;
-            options.AllowArbitraryInput = true;
+            PromptKeywordOptions options = new PromptKeywordOptions("\nEnter method") {
+                AppendKeywordsToMessage = true,
+                AllowArbitraryInput = true
+            };
             options.Keywords.Add(keywords.PositiveOnly);
             options.Keywords.Add(keywords.NegativeOnly);
             options.Keywords.Add(keywords.Both);
@@ -135,8 +122,7 @@ namespace IgorKL.ACAD3.Model.Commands {
                         continue;
                     if (!dbObj.Suffix.StartsWith("\\X"))
                         continue;
-                    double val;
-                    if (!double.TryParse(dbObj.Suffix.Replace("\\X", ""), out val))
+                    if (!double.TryParse(dbObj.Suffix.Replace("\\X", ""), out double val))
                         continue;
 
                     string format = "#0";
@@ -158,23 +144,24 @@ namespace IgorKL.ACAD3.Model.Commands {
         [RibbonCommandButton("Сместить текст размеров", RibbonPanelCategories.Lines_Dimensions)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_MoveDimensionTextPosition", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public static void MoveDimensionTextPosition() {
-            List<Dimension> dimensions;
-            if (!ObjectCollector.TrySelectObjects(out dimensions, "\nВыберите редактируемые размеры")) {
+            if (!ObjectCollector.TrySelectObjects(out List<Dimension> dimensions, "\nВыберите редактируемые размеры")) {
                 return;
             }
 
-            PromptDoubleOptions valueOption = new PromptDoubleOptions("\nУкажите значение смещения");
-            valueOption.AllowNone = false;
-            valueOption.DefaultValue = 0d;
+            PromptDoubleOptions valueOption = new PromptDoubleOptions("\nУкажите значение смещения") {
+                AllowNone = false,
+                DefaultValue = 0d
+            };
 
             PromptDoubleResult valueResult = Tools.GetAcadEditor().GetDouble(valueOption);
             if (valueResult.Status != PromptStatus.OK)
                 return;
             double offset = valueResult.Value;
 
-            PromptKeywordOptions options = new PromptKeywordOptions("\nУкажите направление смещения");
-            options.AppendKeywordsToMessage = true;
-            options.AllowArbitraryInput = true;
+            PromptKeywordOptions options = new PromptKeywordOptions("\nУкажите направление смещения") {
+                AppendKeywordsToMessage = true,
+                AllowArbitraryInput = true
+            };
             options.Keywords.Add("X");
             options.Keywords.Add("Y");
             options.AppendKeywordsToMessage = true;
@@ -202,14 +189,14 @@ namespace IgorKL.ACAD3.Model.Commands {
         [RibbonCommandButton("Значение в суффикс", RibbonPanelCategories.Lines_Dimensions)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_DimensionValueToSuffix", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public static void DimensionValueToSuffix() {
-            List<Dimension> dimensions;
-            if (!ObjectCollector.TrySelectObjects(out dimensions, "\nВыберите редактируемые размеры")) {
+            if (!ObjectCollector.TrySelectObjects(out List<Dimension> dimensions, "\nВыберите редактируемые размеры")) {
                 return;
             }
 
-            PromptKeywordOptions options = new PromptKeywordOptions("\nУкажите направление смещения");
-            options.AppendKeywordsToMessage = true;
-            options.AllowArbitraryInput = true;
+            PromptKeywordOptions options = new PromptKeywordOptions("\nУкажите направление смещения") {
+                AppendKeywordsToMessage = true,
+                AllowArbitraryInput = true
+            };
             options.Keywords.Add("Suffix");
             options.Keywords.Add("Prefix");
             options.AppendKeywordsToMessage = true;
@@ -242,6 +229,25 @@ namespace IgorKL.ACAD3.Model.Commands {
 
                 trans.Commit();
             });
+        }
+
+        [RibbonCommandButton("Сумма длин элементов", RibbonPanelCategories.Lines_Dimensions)]
+        [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_EntityLengthSum", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
+        public static void EntityLengthSum() {
+            double sum = 0;
+            ObjectCollector.ForEachSelectedObject((selectedObj, trans) => {
+                var dbObj = trans.GetObject(selectedObj.ObjectId, OpenMode.ForRead);
+
+                var prop = dbObj.GetType().GetRuntimeProperty("Length");
+                if (prop == null) {
+                    return true;
+                }
+
+                sum = prop == null ? sum : sum + (double)(prop.GetValue(dbObj) ?? 0);
+                return false;
+            });
+
+            Tools.Write(msg: $"Сумма длин линий = {sum:#.000}\n");
         }
     }
 }
