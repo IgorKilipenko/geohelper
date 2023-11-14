@@ -56,13 +56,12 @@ namespace IgorKL.ACAD3.Model.Drawing {
             axisVector = _calculateVector(axisVector, ucs.Inverse(), false);
             Point3d[] transientPoints = _vectorToScreen(axisVectorPoints[0], axisVector);
 
-            CustomObjects.EntityDrawer grphic = new WallDeviationArrows();
-            //grphic.TrasientDisplay(new[] { new Line(axisVectorPoints[0], axisVectorPoints[1]) });
+            CustomObjects.EntityDrawer graphic = new WallDeviationArrows();
             if (transientPoints != null && transientPoints.Length >= 2)
-                grphic.TrasientDisplay(new[] { new Line(transientPoints[0], transientPoints[1]) });
+                graphic.TransientDisplay(new[] { new Line(transientPoints[0], transientPoints[1]) });
             DrawWallArrows(axisVector, ucs);
 
-            grphic.Dispose();
+            graphic.Dispose();
         }
 #endif
 
@@ -98,7 +97,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
         }
 
         /// <summary>
-        /// Включает/выключает механизм аввтоматического преобразовании текста при зеркальном отражении (0 - вкл / 1 - выкл)
+        /// Включает/выключает механизм автоматического преобразовании текста при зеркальном отражении (0 - вкл / 1 - выкл)
         /// </summary>
         /// <param name="value">0 - вкл / 1 - выкл</param>
         /// <returns>значение предопределенное в среде</returns>
@@ -265,7 +264,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
         public void DisplayLowerArrow(Point3d destationPointUcs) {
             _arrowLower = new Arrow(_axisVector);
             double value = _arrowLower.Calculate(destationPointUcs.TransformBy(TransformToArrowBlock));
-            var symbs = _createAttrute(_arrowLower.ArrowLine.GetCenterPoint(), "Н", _arrowLower.LineTarnsform).ToList();
+            var symbs = _createAttribute(_arrowLower.ArrowLine.GetCenterPoint(), "Н", _arrowLower.LineTarnsform).ToList();
 
             _arrowLower.AppendArrowSymbols(symbs);
 
@@ -280,7 +279,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
             _arrowUpper = new Arrow(_arrowLower);
             double value = _arrowUpper.Calculate(destationPointUcs.TransformBy(TransformToArrowBlock));
 
-            var symbs = _createAttrute(_arrowUpper.ArrowLine.GetCenterPoint(), "В", _arrowUpper.LineTarnsform).ToList();
+            var symbs = _createAttribute(_arrowUpper.ArrowLine.GetCenterPoint(), "В", _arrowUpper.LineTarnsform).ToList();
             symbs.Add((Entity)_arrowUpper.ArrowLine.Clone());
 
             symbs.AddRange(_arrowLower.ArrowSymbols.Select(ent => (Entity)ent.Clone()));
@@ -293,7 +292,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
         }
         public void DisplayRedirectedUpperArrow(Point3d jigPointUcs) {
             _arrowUpper.Redirect(jigPointUcs.TransformBy(TransformToArrowBlock));
-            var symbs = _createAttrute(_arrowUpper.ArrowLine.GetCenterPoint(), "В", _arrowUpper.LineTarnsform).ToList();
+            var symbs = _createAttribute(_arrowUpper.ArrowLine.GetCenterPoint(), "В", _arrowUpper.LineTarnsform).ToList();
             symbs.Add((Entity)_arrowUpper.ArrowLine.Clone());
 
             symbs.AddRange(_arrowUpper.BaseArrow.ArrowSymbols.Select(ent => (Entity)ent.Clone()));
@@ -348,7 +347,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
             });
 
         }
-        private IEnumerable<Entity> _createAttrute(Point3d alignmentPoint, string prefix, Matrix3d transform) {
+        private IEnumerable<Entity> _createAttribute(Point3d alignmentPoint, string prefix, Matrix3d transform) {
             alignmentPoint = alignmentPoint.TransformBy(Matrix3d.Displacement(transform.CoordinateSystem3d.Yaxis.MultiplyBy(2.0d * 0.2)));
 
             AttributeDefinition ad = new AttributeDefinition();

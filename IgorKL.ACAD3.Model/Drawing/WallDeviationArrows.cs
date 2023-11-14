@@ -81,9 +81,9 @@ namespace IgorKL.ACAD3.Model.Drawing {
             axisVector = _calculateVector(axisVector, ucs.Inverse(), false);
             Point3d[] transientPoints = _vectorToScreen(axisVectorPoints[0], axisVector);
 
-            using (CustomObjects.EntityDrawer grphic = new WallDeviationArrows()) {
+            using (CustomObjects.EntityDrawer graphic = new WallDeviationArrows()) {
                 if (transientPoints != null && transientPoints.Length >= 2)
-                    grphic.TrasientDisplay(new[] { new Line(transientPoints[0], transientPoints[1]) });
+                    graphic.TransientDisplay(new[] { new Line(transientPoints[0], transientPoints[1]) });
                 DrawWallArrows(axisVector, ucs);
             }
         }
@@ -131,7 +131,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
                         Point3d[] transientPoints = _vectorToScreen(axisVectorPoints[0], axisVector);
 
                         if (transientPoints != null && transientPoints.Length >= 2)
-                            grphic.TrasientDisplay(new[] { new Line(transientPoints[0], transientPoints[1]) });
+                            grphic.TransientDisplay(new[] { new Line(transientPoints[0], transientPoints[1]) });
 
                         isWall = true;
                         verticalVector = axisVector;
@@ -159,23 +159,23 @@ namespace IgorKL.ACAD3.Model.Drawing {
                     if (ppr.Status == PromptStatus.Keyword) {
                         switch (ppr.StringResult) {
                             case "ToleranceBottom": {
-                                double? toleranse = _promptTolerance("\nУкажите допуск по низу от оси, м", toleranceBottom);
-                                if (toleranse.HasValue)
-                                    toleranceBottom = toleranse.Value;
+                                double? tolerance = _promptTolerance("\nУкажите допуск по низу от оси, м", toleranceBottom);
+                                if (tolerance.HasValue)
+                                    toleranceBottom = tolerance.Value;
                                 break;
                             }
                             case "ToleranceTop": {
-                                double? toleranse = _promptTolerance("\nУкажите допуск отклонения от вертикальности, м", toleranceTop);
-                                if (toleranse.HasValue) {
-                                    toleranceTop = toleranse.Value;
+                                double? tolerance = _promptTolerance("\nУкажите допуск отклонения от вертикальности, м", toleranceTop);
+                                if (tolerance.HasValue) {
+                                    toleranceTop = tolerance.Value;
                                     isTopMaxTolerance = false;
                                 }
                                 break;
                             }
                             case "ToleranceTopMax": {
-                                double? toleranse = _promptTolerance("\nУкажите допуск по верху от оси, м", toleranceTop);
-                                if (toleranse.HasValue) {
-                                    toleranceTop = toleranse.Value;
+                                double? tolerance = _promptTolerance("\nУкажите допуск по верху от оси, м", toleranceTop);
+                                if (tolerance.HasValue) {
+                                    toleranceTop = tolerance.Value;
                                     isTopMaxTolerance = true;
                                 }
                                 break;
@@ -196,7 +196,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
                         _dataProvider.Write("isTopMaxTolerance", isTopMaxTolerance);
                     }
                 }
-                grphic.StopTrasientDisplay();
+                grphic.StopTransientDisplay();
             }
         }
         #endregion
@@ -444,7 +444,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
             resVector = new Vector3d(resVector.X, resVector.Y, 0d);
 
             Line line = new Line(ppr.Value, ppo.BasePoint);
-            base.TrasientDisplay(new[] { line });
+            base.TransientDisplay(new[] { line });
             return resVector;
         }
 

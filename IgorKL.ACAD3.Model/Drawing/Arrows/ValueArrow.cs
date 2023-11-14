@@ -79,7 +79,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows {
             using (CustomObjects.EntityDrawer grphic = new ValueArrow()) {
                 //grphic.TrasientDisplay(new[] { new Line(axisVectorPoints[0], axisVectorPoints[1]) });
                 if (transientPoints != null && transientPoints.Length >= 2)
-                    grphic.TrasientDisplay(new[] { new Line(transientPoints[0], transientPoints[1]) });
+                    grphic.TransientDisplay(new[] { new Line(transientPoints[0], transientPoints[1]) });
                 DrawWallArrows(axisVector, ucs);
             }
             //grphic.Dispose();

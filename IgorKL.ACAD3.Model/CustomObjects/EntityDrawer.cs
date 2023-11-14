@@ -18,7 +18,7 @@ namespace IgorKL.ACAD3.Model.CustomObjects {
         private Database _db;
         private AnnotativeStates _annotative;
 
-        protected Object _thisLock = new Object();
+        protected object _thisLock = new Object();
         protected Matrix3d _ucs;
         protected IgorKL.ACAD3.Model.Helpers.Display.DynamicTransient _transient;
 
@@ -37,7 +37,7 @@ namespace IgorKL.ACAD3.Model.CustomObjects {
             _entities = entities;
         }
 
-        public void TrasientDisplay() {
+        public void TransientDisplay() {
             if (_transient == null)
                 _transient = new IgorKL.ACAD3.Model.Helpers.Display.DynamicTransient();
 
@@ -48,7 +48,7 @@ namespace IgorKL.ACAD3.Model.CustomObjects {
             _transient.Display();
         }
 
-        public void TrasientDisplay(IEnumerable<Entity> entities) {
+        public void TransientDisplay(IEnumerable<Entity> entities) {
             if (_transient == null)
                 _transient = new IgorKL.ACAD3.Model.Helpers.Display.DynamicTransient();
 
@@ -59,11 +59,11 @@ namespace IgorKL.ACAD3.Model.CustomObjects {
             _transient.Display();
         }
 
-        public virtual void TrasientDisplayAtBlock(Point3d insertPoint) {
-            TrasientDisplayAtBlock(insertPoint, _entities);
+        public virtual void TransientDisplayAtBlock(Point3d insertPoint) {
+            TransientDisplayAtBlock(insertPoint, _entities);
         }
 
-        public virtual void TrasientDisplayAtBlock(Point3d insertPoint, IEnumerable<Entity> entities) {
+        public virtual void TransientDisplayAtBlock(Point3d insertPoint, IEnumerable<Entity> entities) {
             if (_transient == null)
                 _transient = new IgorKL.ACAD3.Model.Helpers.Display.DynamicTransient();
 
@@ -87,10 +87,8 @@ namespace IgorKL.ACAD3.Model.CustomObjects {
 
         public abstract void Calculate();
 
-        public virtual void StopTrasientDisplay() {
-            if (_transient != null) {
-                _transient.ClearTransientGraphics();
-            }
+        public virtual void StopTransientDisplay() {
+            _transient?.ClearTransientGraphics();
         }
 
         public void InnerUpgradeOpen() {
