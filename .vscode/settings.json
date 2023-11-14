@@ -1,3 +1,7 @@
 {
     "omnisharp.enableEditorConfigSupport": true,
+    "cSpell.words": [
+        "Acad",
+        "Polyline"
+    ],
 }

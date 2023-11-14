@@ -24,7 +24,7 @@ namespace IgorKL.ACAD3.Model.Commands {
                 return;
 
             Polyline border;
-            if (!ObjectCollector.TrySelectAllowedClassObject(out border, "\nВыбирите ограничивающею полилинию"))
+            if (!ObjectCollector.TrySelectAllowedClassObject(out border, "\nВыберите ограничивающею полилинию"))
                 return;
 
             var volumeInfo = CivilSurfaces.SurfaceTools.GetVolumeInfo(tinVolumeSurface, border);

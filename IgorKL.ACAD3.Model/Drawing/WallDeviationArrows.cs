@@ -108,7 +108,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
             Vector3d valueVector = new Vector3d(0, 0, 0);
             Random random = new Random(DateTime.Now.Millisecond);
 
-            PromptKeywordOptions pko = new PromptKeywordOptions("\nВыбирите вид [Стены/Колонны/ВЫХод] <Стены>:");
+            PromptKeywordOptions pko = new PromptKeywordOptions("\nВыберите вид [Стены/Колонны/ВЫХод] <Стены>:");
             pko.Keywords.Add("Walls", "Стены", "Стены", true, true);
             pko.Keywords.Add("Columns", "Колонны", "Колонны", true, true);
             pko.Keywords.Add("Exit", "ВЫХод", "ВЫХод", true, true);
