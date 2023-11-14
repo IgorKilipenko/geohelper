@@ -135,6 +135,15 @@ namespace IgorKL.ACAD3.Model.Extensions {
                 return res;
             }
         }
+
+        public static bool PointContainment(this CivilSurface surface, Point2d point) {
+            try {
+                surface.FindElevationAtXY(point.X, point.Y);
+            } catch (Autodesk.Civil.PointNotOnEntityException) {
+                return false;
+            }
+            return false;
+        }
     }
 
 
