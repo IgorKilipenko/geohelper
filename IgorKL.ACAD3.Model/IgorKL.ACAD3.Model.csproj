@@ -153,6 +153,7 @@
     <Compile Include="Commands\ToolsCmd.cs" />
     <Compile Include="Commands\VectorsTestCmd.cs" />
     <Compile Include="CoordinateGeometry\AllowableTolerance.cs" />
+    <Compile Include="CoordinateGeometry\Grid.cs" />
     <Compile Include="CoordinateGeometry\Helper.cs" />
     <Compile Include="CoordinateSystem\CoordinateTools.cs" />
     <Compile Include="CustomObjects\EntityDrawer.cs" />
