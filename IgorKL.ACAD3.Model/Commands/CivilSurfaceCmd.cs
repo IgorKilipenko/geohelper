@@ -1,7 +1,6 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.Civil.DatabaseServices;
-
 using CivilSurface = Autodesk.Civil.DatabaseServices.Surface;
 
 namespace IgorKL.ACAD3.Model.Commands {
@@ -10,21 +9,18 @@ namespace IgorKL.ACAD3.Model.Commands {
 #if DEBUG
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_TEST_ExtractSurfaceBorder", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public void TEST_ExtractSurfaceBorder() {
-            CivilSurface surface;
-            if (!ObjectCollector.TrySelectAllowedClassObject(out surface, "\nSelect a Surface: "))
+            if (!ObjectCollector.TrySelectAllowedClassObject(out CivilSurface surface, "\nSelect a Surface: "))
                 return;
             CivilSurfaces.SurfaceTools.ExtractBorder((ITerrainSurface)surface);
         }
 
-        [RibbonCommandButton("Ограниченный объем", "Тест (Поверхности)")]
+        [RibbonCommandButton("Ограниченный объем", "Тест (Поверхности)", true)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_TEST_GetVolume", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public void TEST_GetVolume() {
-            TinVolumeSurface tinVolumeSurface;
-            if (!ObjectCollector.TrySelectAllowedClassObject(out tinVolumeSurface, "\nВыберить поверхность для вычисления объема"))
+            if (!ObjectCollector.TrySelectAllowedClassObject(out TinVolumeSurface tinVolumeSurface, "\nВыберить поверхность для вычисления объема"))
                 return;
 
-            Polyline border;
-            if (!ObjectCollector.TrySelectAllowedClassObject(out border, "\nВыберите ограничивающею полилинию"))
+            if (!ObjectCollector.TrySelectAllowedClassObject(out Polyline border, "\nВыберите ограничивающею полилинию"))
                 return;
 
             var volumeInfo = CivilSurfaces.SurfaceTools.GetVolumeInfo(tinVolumeSurface, border);
@@ -42,11 +38,9 @@ namespace IgorKL.ACAD3.Model.Commands {
 
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_TEST_GetCroppingSurface", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public void TEST_GetCroppingSurface() {
-            TinSurface surface;
-            if (!ObjectCollector.TrySelectAllowedClassObject(out surface))
+            if (!ObjectCollector.TrySelectAllowedClassObject(out TinSurface surface))
                 return;
-            Polyline border;
-            if (!ObjectCollector.TrySelectAllowedClassObject(out border))
+            if (!ObjectCollector.TrySelectAllowedClassObject(out Polyline border))
                 return;
 
             CivilSurfaces.SurfaceTools.CroppingSurface5(surface, border);
@@ -54,9 +48,9 @@ namespace IgorKL.ACAD3.Model.Commands {
 
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_TEST_CloningSurface", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public void TEST_CloningSurface() {
-            TinSurface surface;
-            if (!ObjectCollector.TrySelectAllowedClassObject(out surface))
+            if (!ObjectCollector.TrySelectAllowedClassObject(out TinSurface surface))
                 return;
+                
             TinSurface newSurface = surface.Clone() as TinSurface;
             newSurface.Name = "Clone_" + surface.Name;
             using (Transaction trans = Tools.StartTransaction()) {
@@ -64,12 +58,12 @@ namespace IgorKL.ACAD3.Model.Commands {
             }
         }
 
-        [RibbonCommandButton("Выбрать поверхность", "Тест (Поверхности)")]
+        [RibbonCommandButton("Выбрать поверхность", "Тест (Поверхности)", true)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iGuid_GetSelectSurfaceForm")]
         public void GetSelectSurfaceForm() {
-            IgorKL.ACAD3.Model.CivilSurfaces.Views.FormSelect form = new CivilSurfaces.Views.FormSelect();
+            CivilSurfaces.Views.FormSelect form = new CivilSurfaces.Views.FormSelect();
 
-            var names = IgorKL.ACAD3.Model.CivilSurfaces.SurfaceTools.GetAllSurfaceNames();
+            var names = Model.CivilSurfaces.SurfaceTools.GetAllSurfaceNames();
             foreach (var n in names) {
                 form.AddSurfaceName(n);
             }
