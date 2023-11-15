@@ -6,17 +6,18 @@ using System.Linq;
 
 namespace IgorKL.ACAD3.Model {
     public static class ObjectCollector {
-        public static bool TrySelectObjects<T>(out List<T> selectedSet, string message = "\nВыберите объект: ")
-            where T : DBObject {
-            selectedSet = new List<T>();
+        public static bool TrySelectObjects<AllowedType>(out List<AllowedType> selectedSet, string message = "\nВыберите объект: ")
+            where AllowedType : DBObject {
+            selectedSet = new List<AllowedType>();
             Editor ed = Tools.GetAcadEditor();
 
-            PromptSelectionOptions pso = new PromptSelectionOptions();
-            pso.MessageForAdding = message;
-            pso.AllowDuplicates = false;
-            pso.AllowSubSelections = true;
-            pso.RejectObjectsFromNonCurrentSpace = true;
-            pso.RejectObjectsOnLockedLayers = false;
+            PromptSelectionOptions pso = new PromptSelectionOptions {
+                MessageForAdding = message,
+                AllowDuplicates = false,
+                AllowSubSelections = true,
+                RejectObjectsFromNonCurrentSpace = true,
+                RejectObjectsOnLockedLayers = false
+            };
 
             PromptSelectionResult psr = ed.GetSelection(pso);
             if (psr.Status != PromptStatus.OK)
@@ -24,7 +25,7 @@ namespace IgorKL.ACAD3.Model {
 
             using (Transaction trans = Tools.StartTransaction()) {
                 foreach (SelectedObject so in psr.Value) {
-                    T obj = trans.GetObject(so.ObjectId, OpenMode.ForRead) as T;
+                    AllowedType obj = trans.GetObject(so.ObjectId, OpenMode.ForRead) as AllowedType;
                     if (obj != null)
                         selectedSet.Add(obj);
                 }
@@ -52,14 +53,14 @@ namespace IgorKL.ACAD3.Model {
             }
         }
 
-        public static bool TrySelectAllowedClassObject<TAllowedType>(out TAllowedType result, KeywordCollection keys, Func<PromptEntityResult, PromptStatus> keywordCollBack, string message = "\nВыберите объект: ")
-            where TAllowedType : DBObject {
+        public static bool TrySelectAllowedClassObject<AllowedType>(out AllowedType result, KeywordCollection keys, Func<PromptEntityResult, PromptStatus> keywordCollBack, string message = "\nВыберите объект: ")
+            where AllowedType : DBObject {
             result = null;
 
             Editor ed = Tools.GetAcadEditor();
             var peo = new PromptEntityOptions(message);
-            peo.SetRejectMessage(string.Format("\nДолжен быть {0}.", typeof(TAllowedType).Name));
-            peo.AddAllowedClass(typeof(TAllowedType), false);
+            peo.SetRejectMessage(string.Format("\nДолжен быть {0}.", typeof(AllowedType).Name));
+            peo.AddAllowedClass(typeof(AllowedType), false);
             peo.AllowNone = false;
             if (keys != null && keys.Count > 0)
                 foreach (Keyword key in keys)
@@ -83,17 +84,17 @@ namespace IgorKL.ACAD3.Model {
             }
 
             using (Transaction trans = Tools.StartTransaction()) {
-                result = (TAllowedType)trans.GetObject(per.ObjectId, OpenMode.ForRead);
+                result = (AllowedType)trans.GetObject(per.ObjectId, OpenMode.ForRead);
                 return true;
             }
         }
 
-        public static ObjectId SelectAllowedClassObject<TAllowedType>(string message, string rejectMessage)
-            where TAllowedType : DBObject {
+        public static ObjectId SelectAllowedClassObject<AllowedType>(string message, string rejectMessage)
+            where AllowedType : DBObject {
             Editor ed = Tools.GetAcadEditor();
             var peo = new PromptEntityOptions(message);
             peo.SetRejectMessage(rejectMessage);
-            peo.AddAllowedClass(typeof(TAllowedType), false);
+            peo.AddAllowedClass(typeof(AllowedType), false);
             peo.AllowNone = false;
             var per = ed.GetEntity(peo);
 
@@ -102,24 +103,25 @@ namespace IgorKL.ACAD3.Model {
             else
                 return per.ObjectId;
         }
-        public static ObjectId SelectAllowedClassObject<TAllowedType>()
-            where TAllowedType : DBObject {
-            string msg = string.Format("\nSelect a {0}: ", typeof(TAllowedType).Name);
-            string rejMsg = string.Format("\nThe selected object is not a {0}.", typeof(TAllowedType).Name);
+        public static ObjectId SelectAllowedClassObject<AllowedType>()
+            where AllowedType : DBObject {
+            string msg = string.Format("\nSelect a {0}: ", typeof(AllowedType).Name);
+            string rejMsg = string.Format("\nThe selected object is not a {0}.", typeof(AllowedType).Name);
 
-            return SelectAllowedClassObject<TAllowedType>(msg, rejMsg);
+            return SelectAllowedClassObject<AllowedType>(msg, rejMsg);
         }
 
 
         public static int ForEachSelectedObject(Func<SelectedObject, Transaction, bool> action, string message = "\nВыберите объект: ") {
             Editor ed = Tools.GetAcadEditor();
 
-            PromptSelectionOptions pso = new PromptSelectionOptions();
-            pso.MessageForAdding = message;
-            pso.AllowDuplicates = false;
-            pso.AllowSubSelections = true;
-            pso.RejectObjectsFromNonCurrentSpace = true;
-            pso.RejectObjectsOnLockedLayers = false;
+            PromptSelectionOptions pso = new PromptSelectionOptions {
+                MessageForAdding = message,
+                AllowDuplicates = false,
+                AllowSubSelections = true,
+                RejectObjectsFromNonCurrentSpace = true,
+                RejectObjectsOnLockedLayers = false
+            };
 
             PromptSelectionResult psr = ed.GetSelection(pso);
             if (psr.Status != PromptStatus.OK)
@@ -139,16 +141,17 @@ namespace IgorKL.ACAD3.Model {
             return affectCount;
         }
 
-        public static List<DBObject> SelectObjects(Func<DBObject, bool> filter, string message = "\nВыберите объект: ") {
+        public static List<DBObject> SelectObjects(Func<DBObject, bool> filter, string message = "\nВыберите объекты: ", OpenMode openMode = OpenMode.ForRead) {
             Editor ed = Tools.GetAcadEditor();
             var res = new List<DBObject>();
 
-            PromptSelectionOptions pso = new PromptSelectionOptions();
-            pso.MessageForAdding = message;
-            pso.AllowDuplicates = false;
-            pso.AllowSubSelections = true;
-            pso.RejectObjectsFromNonCurrentSpace = true;
-            pso.RejectObjectsOnLockedLayers = false;
+            PromptSelectionOptions pso = new PromptSelectionOptions {
+                MessageForAdding = message,
+                AllowDuplicates = false,
+                AllowSubSelections = true,
+                RejectObjectsFromNonCurrentSpace = true,
+                RejectObjectsOnLockedLayers = false
+            };
 
             PromptSelectionResult psr = ed.GetSelection(pso);
             if (psr.Status != PromptStatus.OK)
@@ -156,12 +159,31 @@ namespace IgorKL.ACAD3.Model {
 
             using (Transaction trans = Tools.StartTransaction()) {
                 foreach (SelectedObject so in psr.Value) {
-                    var obj = trans.GetObject(so.ObjectId, OpenMode.ForRead);
+                    var obj = trans.GetObject(so.ObjectId, openMode);
                     if (filter(obj))
                         res.Add(obj);
                 }
             }
             return res;
+        }
+
+        public static AllowedType SelectSingleObject<AllowedType>(string message = "\nВыберите объект: ", bool allowObjectOnLockedLayer = true)
+            where AllowedType : DBObject {
+            Editor editor = Tools.GetAcadEditor();
+
+            PromptEntityOptions options = new PromptEntityOptions(message) {
+                AllowObjectOnLockedLayer = allowObjectOnLockedLayer,
+                AllowNone = false
+            };
+            options.AddAllowedClass(typeof(AllowedType), false);
+
+            PromptEntityResult promptResult = editor.GetEntity(options);
+            if (promptResult.Status != PromptStatus.OK)
+                return null;
+
+            using (Transaction trans = Tools.StartTransaction()) {
+                return trans.GetObject(promptResult.ObjectId, OpenMode.ForRead) as AllowedType;
+            }
         }
 
         public delegate PromptStatus PromptAction(PromptResult promptResult);

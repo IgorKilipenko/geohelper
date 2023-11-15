@@ -21,26 +21,29 @@ namespace IgorKL.ACAD3.Model.Commands {
         public void ImportSdrData() {
             System.Globalization.CultureInfo culture = System.Globalization.CultureInfo.GetCultureInfo("ru-RU");
             SdrReader rd = new SdrReader();
-            wnd.OpenFileDialog opfWndDia = new wnd.OpenFileDialog();
-            opfWndDia.AddExtension = true;
-            opfWndDia.Filter = "Text files (*.txt)|*.txt|Sdr files (*.sdr)|*.sdr|All files (*.*)|*.*";
-            opfWndDia.FilterIndex = 2;
+            wnd.OpenFileDialog opfWndDia = new wnd.OpenFileDialog {
+                AddExtension = true,
+                Filter = "Text files (*.txt)|*.txt|Sdr files (*.sdr)|*.sdr|All files (*.*)|*.*",
+                FilterIndex = 2
+            };
             if (opfWndDia.ShowDialog() == wnd.DialogResult.OK) {
-                PromptIntegerOptions scaleOpt = new PromptIntegerOptions("\nУкажите маштаб, 1:");
-                scaleOpt.UseDefaultValue = true;
-                scaleOpt.DefaultValue = 1000;
-                scaleOpt.AllowNegative = false;
-                scaleOpt.AllowZero = false;
-                scaleOpt.AllowNone = false;
+                PromptIntegerOptions scaleOpt = new PromptIntegerOptions("\nУкажите маштаб, 1:") {
+                    UseDefaultValue = true,
+                    DefaultValue = 1000,
+                    AllowNegative = false,
+                    AllowZero = false,
+                    AllowNone = false
+                };
                 PromptIntegerResult scaleRes = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor.GetInteger(scaleOpt);
                 if (scaleRes.Status != PromptStatus.OK)
                     return;
                 double scale = scaleRes.Value / 1000d;
 
-                PromptIntegerOptions digCountOpt = new PromptIntegerOptions("\nЗнаков после запятой");
-                digCountOpt.UseDefaultValue = true;
-                digCountOpt.DefaultValue = 2;
-                digCountOpt.AllowNegative = false;
+                PromptIntegerOptions digCountOpt = new PromptIntegerOptions("\nЗнаков после запятой") {
+                    UseDefaultValue = true,
+                    DefaultValue = 2,
+                    AllowNegative = false
+                };
                 PromptIntegerResult digCountRes = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor.GetInteger(digCountOpt);
                 if (digCountRes.Status != PromptStatus.OK)
                     return;
@@ -57,17 +60,17 @@ namespace IgorKL.ACAD3.Model.Commands {
                 Layers.LayerTools.CreateHiddenLayer(lnameName);
 
                 using (Transaction trans = Tools.StartTransaction()) {
-                    BlockTable acBlkTbl;
-                    acBlkTbl = trans.GetObject(Application.DocumentManager.MdiActiveDocument.Database.BlockTableId,
+                    BlockTable acBlkTbl = trans.GetObject(Application.DocumentManager.MdiActiveDocument.Database.BlockTableId,
                                                  OpenMode.ForRead) as BlockTable;
-                    BlockTableRecord acBlkTblRec;
-                    acBlkTblRec = trans.GetObject(acBlkTbl[BlockTableRecord.ModelSpace],
+
+                    BlockTableRecord acBlkTblRec = trans.GetObject(acBlkTbl[BlockTableRecord.ModelSpace],
                                                     OpenMode.ForWrite) as BlockTableRecord;
 
                     foreach (var p in points) {
 
-                        DBPoint acPoint = new DBPoint(new Point3d(p.y, p.x, p.h));
-                        acPoint.Layer = lname;
+                        DBPoint acPoint = new DBPoint(new Point3d(p.y, p.x, p.h)) {
+                            Layer = lname
+                        };
                         acPoint.SetDatabaseDefaults();
                         Group gr = new Group();
 
@@ -94,22 +97,26 @@ namespace IgorKL.ACAD3.Model.Commands {
                         trans.AddNewlyCreatedDBObject(gr, true);
 
                     }
-                    Application.DocumentManager.MdiActiveDocument.Database.Pdmode = 32;
-                    Application.DocumentManager.MdiActiveDocument.Database.Pdsize = 2 * scale;
+                    
+                    //~ Application.DocumentManager.MdiActiveDocument.Database.Pdmode = 32;
+                    //~ Application.DocumentManager.MdiActiveDocument.Database.Pdsize = 2 * scale;
+                    
                     trans.Commit();
                 }
 
             }
         }
-        [RibbonCommandButton("Импорт точек Cogo из Sdr", RibbonPanelCategories.Points_Coordinates)]
+
+        [RibbonCommandButton("Импорт точек Cogo из Sdr", RibbonPanelCategories.Points_Coordinates, true)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_ImportSdrDataCivil", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public void ImportSdrDataCivil() {
             System.Globalization.CultureInfo culture = System.Globalization.CultureInfo.GetCultureInfo("ru-RU");
             SdrReader rd = new SdrReader();
-            wnd.OpenFileDialog opfWndDia = new wnd.OpenFileDialog();
-            opfWndDia.AddExtension = true;
-            opfWndDia.Filter = "Text files (*.txt)|*.txt|Sdr files (*.sdr)|*.sdr|All files (*.*)|*.*";
-            opfWndDia.FilterIndex = 2;
+            wnd.OpenFileDialog opfWndDia = new wnd.OpenFileDialog {
+                AddExtension = true,
+                Filter = "Text files (*.txt)|*.txt|Sdr files (*.sdr)|*.sdr|All files (*.*)|*.*",
+                FilterIndex = 2
+            };
 
             if (opfWndDia.ShowDialog() == wnd.DialogResult.OK) {
                 string path = opfWndDia.FileName;
@@ -126,8 +133,7 @@ namespace IgorKL.ACAD3.Model.Commands {
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_ExportSdrData", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public void ExportSdrData() {
 
-            IList<DBPoint> points;
-            if (!TrySelectObjects<DBPoint>(out points, OpenMode.ForRead, "\nВыберите точки"))
+            if (!TrySelectObjects<DBPoint>(out IList<DBPoint> points, OpenMode.ForRead, "\nВыберите точки"))
                 return;
             System.Globalization.CultureInfo culture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
             System.Windows.Forms.SaveFileDialog saveFileDialog1 = new wnd.SaveFileDialog();
@@ -161,44 +167,48 @@ namespace IgorKL.ACAD3.Model.Commands {
 
         [RibbonCommandButton("Точки из буфера", RibbonPanelCategories.Points_Coordinates)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_CreateAcadPointsFromBuffer")]
-        public void iCmd_CreateAcadPointsFromBuffer() {
-            PromptKeywordOptions kwOpt = new PromptKeywordOptions("\nSelect");
-            kwOpt.AllowNone = false;
+        public void CreateAcadPointsFromBuffer() {
+            var editor = Tools.GetAcadEditor();
+
+            PromptKeywordOptions kwOpt = new PromptKeywordOptions("\nSelect") {
+                AllowNone = false
+            };
             kwOpt.Keywords.Add("FromText");
             kwOpt.Keywords.Add("FromAcadText");
 
-            PromptResult kwRes = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor.GetKeywords(kwOpt);
-
-            string data = "";
+            PromptResult kwRes = editor.GetKeywords(kwOpt);
 
             if (kwRes.Status != PromptStatus.OK)
                 return;
 
-            PromptIntegerOptions scaleOpt = new PromptIntegerOptions("\nSpecify the scale, 1: ");
-            scaleOpt.UseDefaultValue = true;
-            scaleOpt.DefaultValue = 1000;
-            scaleOpt.AllowNegative = false;
-            scaleOpt.AllowZero = false;
-            scaleOpt.AllowNone = false;
-            PromptIntegerResult scaleRes = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor.GetInteger(scaleOpt);
+            PromptIntegerOptions scaleOpt = new PromptIntegerOptions("\nSpecify the scale, 1: ") {
+                UseDefaultValue = true,
+                DefaultValue = 1000,
+                AllowNegative = false,
+                AllowZero = false,
+                AllowNone = false
+            };
+            PromptIntegerResult scaleRes = editor.GetInteger(scaleOpt);
             if (scaleRes.Status != PromptStatus.OK)
                 return;
             double scale = scaleRes.Value / 1000d;
 
-            PromptIntegerOptions digCountOpt = new PromptIntegerOptions("\nNumber of decimal places: ");
-            digCountOpt.UseDefaultValue = true;
-            digCountOpt.DefaultValue = 2;
-            digCountOpt.AllowNegative = false;
-            PromptIntegerResult digCountRes = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor.GetInteger(digCountOpt);
+            PromptIntegerOptions digCountOpt = new PromptIntegerOptions("\nNumber of decimal places: ") {
+                UseDefaultValue = true,
+                DefaultValue = 2,
+                AllowNegative = false
+            };
+            PromptIntegerResult digCountRes = editor.GetInteger(digCountOpt);
             if (digCountRes.Status != PromptStatus.OK)
                 return;
 
-            PromptKeywordOptions groupingOpt = new PromptKeywordOptions("\nGroup data? : ");
-            groupingOpt.AllowNone = false;
+            PromptKeywordOptions groupingOpt = new PromptKeywordOptions("\nGroup data? : ") {
+                AllowNone = false
+            };
             groupingOpt.Keywords.Add("Yes");
             groupingOpt.Keywords.Add("No");
             groupingOpt.Keywords.Default = "Yes";
-            PromptResult groupingRes = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor.GetKeywords(groupingOpt);
+            PromptResult groupingRes = editor.GetKeywords(groupingOpt);
             if (groupingRes.Status != PromptStatus.OK)
                 return;
 
@@ -209,6 +219,7 @@ namespace IgorKL.ACAD3.Model.Commands {
             Layers.LayerTools.CreateHiddenLayer(lnameElev);
             Layers.LayerTools.CreateHiddenLayer(lnameName);
 
+            string data;
             switch (kwRes.StringResult) {
                 case "FromText": {
                     data = System.Windows.Forms.Clipboard.GetText();
@@ -224,15 +235,14 @@ namespace IgorKL.ACAD3.Model.Commands {
             }
 
             data = data.Replace(',', '.');
-            Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage(data);
+            editor.WriteMessage(data);
             string[] lines = data.Split(new string[] { System.Environment.NewLine }, StringSplitOptions.None);
             System.Globalization.CultureInfo culture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
             using (Transaction trans = Tools.StartTransaction()) {
-                BlockTable acBlkTbl;
-                acBlkTbl = trans.GetObject(Application.DocumentManager.MdiActiveDocument.Database.BlockTableId,
+                BlockTable acBlkTbl = trans.GetObject(Application.DocumentManager.MdiActiveDocument.Database.BlockTableId,
                                                 OpenMode.ForRead) as BlockTable;
-                BlockTableRecord acBlkTblRec;
-                acBlkTblRec = trans.GetObject(acBlkTbl[BlockTableRecord.ModelSpace],
+
+                BlockTableRecord acBlkTblRec = trans.GetObject(acBlkTbl[BlockTableRecord.ModelSpace],
                                                 OpenMode.ForWrite) as BlockTableRecord;
                 int count = lines.Length;
                 foreach (string l in lines) {
@@ -245,6 +255,7 @@ namespace IgorKL.ACAD3.Model.Commands {
                         ObjectId nameId = ObjectId.Null;
                         ObjectId pointId = ObjectId.Null;
                         ObjectId elevId = ObjectId.Null;
+
                         if (coords.Length > 3) {
                             try {
                                 h = double.Parse(coords[3], culture);
@@ -259,6 +270,7 @@ namespace IgorKL.ACAD3.Model.Commands {
                                 trans.AddNewlyCreatedDBObject(text, true);
                             }
                         }
+
                         DBPoint point = new DBPoint(new Point3d(x, y, h));
                         point.SetDatabaseDefaults();
                         point.Layer = lname;
@@ -283,37 +295,40 @@ namespace IgorKL.ACAD3.Model.Commands {
                     }
                     catch { count -= 1; }
                 }
-                Application.DocumentManager.MdiActiveDocument.Database.Pdmode = 32;
-                Application.DocumentManager.MdiActiveDocument.Database.Pdsize = 2 * scale;
-                trans.Commit();
 
+                //~ Application.DocumentManager.MdiActiveDocument.Database.Pdmode = 32;
+                //~ Application.DocumentManager.MdiActiveDocument.Database.Pdsize = 2 * scale;
+                 
+                trans.Commit();
             }
         }
+
         [RibbonCommandButton("Текст в буфер", RibbonPanelCategories.Text_Annotations)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_SetTextDataToBuffer", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public void SetTextDataToBuffer() {
             const string sep = "\t";
-            List<DBText> data;
-            if (!ObjectCollector.TrySelectObjects(out data, "\nВыберете текстовые объекты для импорта в буфер обмена: "))
+
+            if (!ObjectCollector.TrySelectObjects(out List<DBText> data, "\nВыберете текстовые объекты для импорта в буфер обмена: "))
                 return;
+
             if (data.Count == 0)
                 return;
+
             string res = "";
             using (Transaction trans = Tools.StartTransaction()) {
                 foreach (var text in data) {
                     res += text.TextString + sep;
                 }
             }
+
             res = res.Remove(res.Length - sep.Length);
             System.Windows.Forms.Clipboard.SetText(res);
         }
 
-
         [RibbonCommandButton("Круги в точки", RibbonPanelCategories.Points_Coordinates)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_ConvertCircleToPoint", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public void iCmd_ConvertCircleToPoint() {
-            IList<Circle> circles;
-            if (!TrySelectObjects<Circle>(out circles, OpenMode.ForRead, "\nВыберите круги: "))
+            if (!TrySelectObjects<Circle>(out IList<Circle> circles, OpenMode.ForRead, "\nВыберите круги: "))
                 return;
             try {
 
@@ -337,22 +352,22 @@ namespace IgorKL.ACAD3.Model.Commands {
             catch (Exception ex) { Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor.WriteMessage(ex.Message); }
         }
 
-        [RibbonCommandButton("Cogo точки из буфера", RibbonPanelCategories.Points_Coordinates)]
+        [RibbonCommandButton("Cogo точки из буфера", RibbonPanelCategories.Points_Coordinates, true)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_CreateCogoPointsFromBuffer")]
         public void CreateCogoPointsFromBuffer() {
-            IgorKL.ACAD3.Model.CogoPoints.Views.PointStylesSelectorControl control = null;
-            IgorKL.ACAD3.Model.MainMenu.MainPaletteSet ps = null;
+            CogoPoints.Views.PointStylesSelectorControl control = null;
+            MainMenu.MainPaletteSet ps = null;
 
-            if (IgorKL.ACAD3.Model.MainMenu.MainPaletteSet.CreatedInstance.FindVisual("Cogo точки из буфера") == null) {
+            if (MainMenu.MainPaletteSet.CreatedInstance.FindVisual("Cogo точки из буфера") == null) {
                 control = new CogoPoints.Views.PointStylesSelectorControl();
-                ps = IgorKL.ACAD3.Model.MainMenu.MainPaletteSet.CreatedInstance;
-                control = (IgorKL.ACAD3.Model.CogoPoints.Views.PointStylesSelectorControl)ps.AddControl("Cogo точки из буфера", control);
+                ps = MainMenu.MainPaletteSet.CreatedInstance;
+                control = (CogoPoints.Views.PointStylesSelectorControl)ps.AddControl("Cogo точки из буфера", control);
                 ps.Show();
                 control.CommandAction = CreateCogoPointsFromBuffer;
             }
             else
             {
-                ps = IgorKL.ACAD3.Model.MainMenu.MainPaletteSet.CreatedInstance;
+                ps = Model.MainMenu.MainPaletteSet.CreatedInstance;
                 control = ps.FindVisual("Cogo точки из буфера") as IgorKL.ACAD3.Model.CogoPoints.Views.PointStylesSelectorControl;
                 if (control == null)
                     return;
@@ -394,10 +409,6 @@ namespace IgorKL.ACAD3.Model.Commands {
 
                             point.LabelStyleId = control.SelectedPointLabelStyle.Key;
                             point.StyleId = control.SelectedPointStyle.Key;
-
-                            /*point.LabelStyleId = control.SelectedPointLabelStyle.Key;
-                            point.StyleId = control.SelectedPointStyle.Key;*/
-
                         }
                         catch (System.Exception ex) {
                             Tools.GetAcadEditor().WriteMessage(string.Format("\nCreate point error, message: {0}", ex.Message));
@@ -411,42 +422,43 @@ namespace IgorKL.ACAD3.Model.Commands {
 
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_EditPointElevation", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public void EditPointElevation() {
-            List<CogoPoint> points;
-            if (!ObjectCollector.TrySelectObjects(out points, "\nSelect points"))
+            if (!ObjectCollector.TrySelectObjects(out List<CogoPoint> points, "\nSelect points"))
                 return;
 
-            PromptDoubleOptions valueOption = new PromptDoubleOptions("\nEnter value");
-            valueOption.AllowNone = false;
-            valueOption.DefaultValue = 0d;
+            PromptDoubleOptions valueOption = new PromptDoubleOptions("\nEnter value") {
+                AllowNone = false,
+                DefaultValue = 0d
+            };
 
             PromptDoubleResult valueResult = Tools.GetAcadEditor().GetDouble(valueOption);
             if (valueResult.Status != PromptStatus.OK)
                 return;
 
-            IgorKL.ACAD3.Model.CogoPoints.CogoPointEditor.EditElevation(points, valueResult.Value);
+            Model.CogoPoints.CogoPointEditor.EditElevation(points, valueResult.Value);
         }
 
-        [RibbonCommandButton("Случайная отметка", RibbonPanelCategories.Points_Coordinates)]
+        [RibbonCommandButton("Случайная отметка", RibbonPanelCategories.Points_Coordinates, true)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_EditPointElevationRandom", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public void EditPointElevationRandom() {
             var keywords = new { PositiveOnly = "PositiveOnly", NegativeOnly = "NegativeOnly", Both = "Both" };
 
-            List<CogoPoint> points;
-            if (!ObjectCollector.TrySelectObjects(out points, "\nSelect points"))
+            if (!ObjectCollector.TrySelectObjects(out List<CogoPoint> points, "\nSelect points"))
                 return;
 
-            PromptDoubleOptions valueOption = new PromptDoubleOptions("\nEnter value");
-            valueOption.AllowNone = false;
-            valueOption.DefaultValue = 0d;
-            valueOption.AllowNegative = false;
+            PromptDoubleOptions valueOption = new PromptDoubleOptions("\nEnter value") {
+                AllowNone = false,
+                DefaultValue = 0d,
+                AllowNegative = false
+            };
 
             PromptDoubleResult valueResult = Tools.GetAcadEditor().GetDouble(valueOption);
             if (valueResult.Status != PromptStatus.OK)
                 return;
 
-            PromptKeywordOptions options = new PromptKeywordOptions("\nEnter method");
-            options.AppendKeywordsToMessage = true;
-            options.AllowArbitraryInput = true;
+            PromptKeywordOptions options = new PromptKeywordOptions("\nEnter method") {
+                AppendKeywordsToMessage = true,
+                AllowArbitraryInput = true
+            };
             options.Keywords.Add(keywords.PositiveOnly);
             options.Keywords.Add(keywords.NegativeOnly);
             options.Keywords.Add(keywords.Both);
@@ -470,11 +482,10 @@ namespace IgorKL.ACAD3.Model.Commands {
                 point.Elevation += (random.NextDouble() + ratio) * valueResult.Value * sign;
         }
 
-        [RibbonCommandButton("Описание в Имя Cogo", RibbonPanelCategories.Points_Coordinates)]
+        [RibbonCommandButton("Описание в Имя Cogo", RibbonPanelCategories.Points_Coordinates, true)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_ReplacePointDescriptionToName", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public void ReplacePointDescriptionToName() {
-            List<CogoPoint> points;
-            if (!ObjectCollector.TrySelectObjects(out points, "\nSelect points"))
+            if (!ObjectCollector.TrySelectObjects(out List<CogoPoint> points, "\nSelect points"))
                 return;
             foreach (CogoPoint point in points)
                 point.PointName = point.FullDescription;
@@ -483,8 +494,7 @@ namespace IgorKL.ACAD3.Model.Commands {
         [RibbonCommandButton("Точки из блков", RibbonPanelCategories.Points_Coordinates)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_ConvertBlocToPoint", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public static void ConvertBlocToPoint() {
-            IList<BlockReference> blocks;
-            if (!TrySelectObjects<BlockReference>(out blocks, OpenMode.ForRead, "\nВыберите блоки"))
+            if (!TrySelectObjects(out IList<BlockReference> blocks, OpenMode.ForRead, "\nВыберите блоки"))
                 return;
 
             using (Transaction trans = Tools.StartTransaction()) {
@@ -508,10 +518,10 @@ namespace IgorKL.ACAD3.Model.Commands {
             }
         }
 
-        [RibbonCommandButton("Точки Cogo из блоков", RibbonPanelCategories.Points_Coordinates)]
+        [RibbonCommandButton("Точки Cogo из блоков", RibbonPanelCategories.Points_Coordinates, true)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_ConvertBlocToCogoPoint", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public static void ConvertBlocToCogoPoint() {
-            if (!TrySelectObjects<BlockReference>(out IList<BlockReference> blocks, OpenMode.ForRead, "\nВыберите блоки")) {
+            if (!TrySelectObjects(out IList<BlockReference> blocks, OpenMode.ForRead, "\nВыберите блоки")) {
                 return;
             }
 
@@ -530,7 +540,7 @@ namespace IgorKL.ACAD3.Model.Commands {
 
                 foreach (BlockReference block in blocks) {
                     BlockReference db_block = trans.GetObject(block.Id, OpenMode.ForRead) as BlockReference;
-                    IgorKL.ACAD3.Model.CogoPoints.CogoPointFactory.CreateCogoPoints(db_block.Position, trans, description: stringResult.Status == PromptStatus.OK ? stringResult.StringResult : null);
+                    CogoPoints.CogoPointFactory.CreateCogoPoints(db_block.Position, trans, description: stringResult.Status == PromptStatus.OK ? stringResult.StringResult : null);
                 }
 
                 trans.Commit();
@@ -541,13 +551,11 @@ namespace IgorKL.ACAD3.Model.Commands {
         [RibbonCommandButton("Замена блоков", RibbonPanelCategories.Points_Coordinates)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_BlocChange", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public static void BlocChange() {
-            IList<BlockReference> blocksIn;
-            if (!TrySelectObjects<BlockReference>(out blocksIn, OpenMode.ForRead, "\nВыберите исходные блоки")) {
+            if (!TrySelectObjects(out IList<BlockReference> blocksIn, OpenMode.ForRead, "\nВыберите исходные блоки")) {
                 return;
             }
 
-            BlockReference blockOut;
-            if (!ObjectCollector.TrySelectAllowedClassObject<BlockReference>(out blockOut, "\nВыберите блок для замены")) {
+            if (!ObjectCollector.TrySelectAllowedClassObject(out BlockReference blockOut, "\nВыберите блок для замены")) {
                 return;
             }
 
@@ -580,13 +588,11 @@ namespace IgorKL.ACAD3.Model.Commands {
         [RibbonCommandButton("Метки поверхности из точек", RibbonPanelCategories.Points_Coordinates, true)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_SurfaceElevationLabelsFromPoints", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public static void CreateSurfaceElevationLabels() {
-            System.Collections.Generic.List<DBPoint> points;
-            if (!ObjectCollector.TrySelectObjects(out points, "\nВыберите точки")) {
+            if (!ObjectCollector.TrySelectObjects(out List<DBPoint> points, "\nВыберите точки")) {
                 return;
             }
 
-            CivilSurface surface;
-            if (!ObjectCollector.TrySelectAllowedClassObject(out surface, "\nУкажите поверхность"))
+            if (!ObjectCollector.TrySelectAllowedClassObject(out CivilSurface surface, "\nУкажите поверхность"))
                 return;
 
             TinSurface tinSurface = surface as TinSurface;
@@ -609,7 +615,7 @@ namespace IgorKL.ACAD3.Model.Commands {
                         return;
                     }
 
-                    var labelId = Autodesk.Civil.DatabaseServices.SurfaceElevationLabel.Create(surfaceDb.ObjectId, pointDb.Position.Convert2d());
+                    var labelId = SurfaceElevationLabel.Create(surfaceDb.ObjectId, pointDb.Position.Convert2d());
                     System.Diagnostics.Debug.Assert(labelId.IsValid && !labelId.IsNull);
                 });
 
