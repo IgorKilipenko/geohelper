@@ -57,9 +57,6 @@ namespace IgorKL.ACAD3.Model.Helpers.Math {
 
             return Atan(sin, cos);
         }
-
-
     }
-
 }
 

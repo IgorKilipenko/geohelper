@@ -76,11 +76,10 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
             Entities.ForEach(ent => ent.Dispose());
             Entities.Clear();
-            CoordinateLable lableFactory = new CoordinateLable();
+            CoordinateLabel lableFactory = new CoordinateLabel();
             Tools.StartTransaction(() => {
                 for (int row = 0; row < rowCount; row++) {
                     for (int col = 0; col < columnCount; col++) {
-                        //Entities.Add(new DBPoint(_innerGridUcs.CalculateGridPoint(row, col)));
                         Point3d point = _innerGridUcs.CalculateGridPoint(row, col);
                         BlockReference br = lableFactory.CreateItem(point, Matrix3d.Identity).GetObjectForRead<BlockReference>();
                         Entities.Add((Entity)br.Clone());
@@ -121,7 +120,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
         }
 
 
-        private class CoordinateLable {
+        private class CoordinateLabel {
             private double _size;
             private double _textHeight;
             private string _format;
@@ -137,7 +136,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
             private ObjectId _btrId;
 
 
-            public CoordinateLable(double size = 5d, double textHeight = 2.5d) {
+            public CoordinateLabel(double size = 5d, double textHeight = 2.5d) {
                 _size = size;
                 //_format = "##,#";
                 _format = "#0";
@@ -221,7 +220,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
             }
         }
 
-        private class CoordinateLableEx : CustomObjects.MultiEntity {
+        private class CoordinateLabelEx : CustomObjects.MultiEntity {
             private double _size;
             private double _textHeight;
             private string _format;
@@ -233,7 +232,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
             DBText _eastCoordText;
 
 
-            public CoordinateLableEx(Point3d insertPointUcs, double size = 2d, double textHeight = 2.5d)
+            public CoordinateLabelEx(Point3d insertPointUcs, double size = 2d, double textHeight = 2.5d)
                 : base(Point3d.Origin, Point3d.Origin, new List<Entity>(), AnnotativeStates.True, Matrix3d.Identity) {
                 _size = size;
                 _format = "##,#";

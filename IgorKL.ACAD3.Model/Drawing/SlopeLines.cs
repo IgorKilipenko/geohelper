@@ -19,7 +19,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
         private Point3d _endPoint;
         private Matrix3d _ucs;
         private SlopeModes _slopeMode;
-        private bool _opiMode;  // Для рисования откосв П.И. (двойной штрих)
+        private bool _opiMode;
         private bool _startPointComplete;
         private bool _endPointComplete;
 
@@ -32,7 +32,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
         public SlopeLinesGenerator(bool opiMode)
             : this(Matrix3d.Identity, opiMode) {
-
         }
 
         public SlopeLinesGenerator(Matrix3d ucs, bool opiMode)
@@ -49,7 +48,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             _startPoint = Point3d.Origin;
             _endPoint = Point3d.Origin;
             _entitiesInMemory = new List<Entity>();
-            //_slopeMode = SlopeModes.OwnPerpendicular;
             _startPointComplete = false;
             _endPointComplete = false;
 
@@ -168,10 +166,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
                     case "EditSlope": {
                         while (EditCreatedSlopeLines() == PromptStatus.OK) {
                             Tools.GetAcadDatabase().TransactionManager.QueueForGraphicsFlush();
-                            //Tools.GetAcadDatabase().UpdateExt(true);
                         }
-                        /*if (EditCreatedSlopeLines() != PromptStatus.OK)
-                            return PromptStatus.Cancel;*/
                         break;
                     }
 
@@ -212,7 +207,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             }
         }
         public bool PromptEndPoint() {
-            //SlopeLinesGenerator vectorView = new SlopeLinesGenerator(_ucs);
             if (this.StartJig() == PromptStatus.OK) {
                 _endPointComplete = true;
                 return true;
@@ -222,7 +216,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
         }
 
         public PromptStatus PromptSlopeInsideBlock(out PromptNestedEntityResult res, KeywordCollection keywoeds = null,
-    Func<PromptNestedEntityResult, PromptStatus> promptAction = null, string msg = "\nВыберите линиюю") {
+    Func<PromptNestedEntityResult, PromptStatus> promptAction = null, string msg = "\nВыберите линию") {
             res = null;
 
             PromptNestedEntityOptions pneo = new PromptNestedEntityOptions(msg);
@@ -273,7 +267,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
             if ((centralPoint - destPline.StartPoint).Length < startVector.Length &&
                 (centralPoint - destPline.EndPoint).Length < endVector.Length) {
-                //Vector3d buffVector = startVector;
                 startVector = endVector;
                 endVector = startVector;
                 destPline = ((Polyline)destPline.Clone());
@@ -285,7 +278,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             int sign = endDist >= startDist ? 1 : -1;
             double buffLength = startVector.Length + endVector.Length + basePline.Length + destPline.Length;
             int slopeNumber = 0;
-            //for (double dist = startDist; dist <= endDist && dist <= basePline.Length; dist += _step)
             for (double dist = startDist; sign > 0 ? dist <= endDist : dist >= endDist; dist += _step * sign) {
                 slopeNumber++;
                 Point3d point = basePline.GetPointAtDist(dist);
@@ -295,7 +287,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                         Point3d? destPoint = destPline.GetOrthoNormalPoint(point, null, true);
                         if (destPoint.HasValue) {
                             Line slope = new Line(point, destPoint.Value);
-                            //if ((dist-startDist +_step) % (_step*2d) < Tolerance.Global.EqualPoint)
                             if (this._isSmallLine(slopeNumber, _opiMode))
                                 slope = new Line(slope.StartPoint, slope.StartPoint.Add((slope.EndPoint - slope.StartPoint).MultiplyBy(_smallLineLength)));
                             slopeLines.Add(slope);
@@ -378,27 +369,9 @@ namespace IgorKL.ACAD3.Model.Drawing {
         protected override SamplerStatus Sampler(JigPrompts prompts) {
             var status = base.Sampler(prompts);
 
-
             if (status == SamplerStatus.OK) {
-
                 _endPoint = base.NormalPoint;
                 _endPointComplete = true;
-
-
-                /*_endPoint = base.NormalPoint;
-                var slopeLines = Calculate(_slopeMode);
-                lock (_entitiesInMemory)
-                {
-                    if (slopeLines.Count > 0)
-                    {
-                        foreach (var ent in _entitiesInMemory)
-                            if (!ent.IsDisposed)
-                                ent.Dispose();
-                        _entitiesInMemory.Clear();
-                        _entitiesInMemory = new List<Entity>();
-                        _entitiesInMemory.AddRange(slopeLines);
-                    }
-                }*/
             }
             return status;
         }
@@ -493,8 +466,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 }
                 return res;
             }
-
-
         }
 
         public ObjectId SaveAtBlock() {
@@ -517,7 +488,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             _entitiesInMemory.AddRange(slopeLines);
             return SaveAtBlock();
         }
-
 
         public PromptStatus EditCreatedSlopeLines() {
             KeywordCollection keywords = new KeywordCollection();
@@ -555,14 +525,9 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 if (res.Status == PromptStatus.OK) {
                     slopeLine.TransformBy(brMat.Inverse());
 
-                    // Open each of the containers and set a property so that
-                    // they each get regenerated
                     foreach (var id in conts) {
                         var ent = id.GetObjectForWrite<Entity>();
                         if (ent != null) {
-                            // We might also have called this method:
-                            // ent.RecordGraphicsModified(true);
-                            // but setting a property works better with undo
                             ent.Visible = ent.Visible;
                         }
                     }

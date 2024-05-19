@@ -37,7 +37,7 @@ namespace IgorKL.ACAD3.Model.CoordinateSystem {
                         ucsTblRec = trans.GetObject(ucsTable[ucsName],
                                                         OpenMode.ForWrite) as UcsTableRecord;
                     else
-                        throw new ArgumentException(string.Format("\nA UCS with this name \"{0}\" alredy exists", ucsName));
+                        throw new ArgumentException(string.Format("\nA UCS with this name \"{0}\" already exists", ucsName));
                 }
                 return ucsTblRec.Id;
             }

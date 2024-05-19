@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace IgorKL.ACAD3.Customization.Objects
 {
-    public abstract class CustumObjectFactory
+    public abstract class CustomObjectFactory
     {
-        public abstract CustumObject CreateObject();
+        public abstract CustomObjectObject CreateObject();
     }
 }

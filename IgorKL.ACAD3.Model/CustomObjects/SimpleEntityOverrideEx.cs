@@ -57,15 +57,8 @@ namespace IgorKL.ACAD3.Model.CustomObjects {
                 if (ent.Id == ObjectId.Null)
                     btr.Database.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(ent, true);
             });
-            //_createBlockRecord(_name, _annotativeState, _origin);
             Update();
         }
-
-        /*public void Explode(ObjectIdCollection idSet)
-        {
-            foreach (Entity ent in _entities)
-                idSet.Add(ent.Id);
-        }*/
 
         public virtual void Display() {
             if (_transient == null)
@@ -90,7 +83,7 @@ namespace IgorKL.ACAD3.Model.CustomObjects {
             Tools.StartTransaction(() => {
                 if (_blockRecordId != ObjectId.Null) {
                     BlockTableRecord btr = _blockRecordId.GetObjectForRead<BlockTableRecord>(false);
-                    //btr.UpgradeOpen();
+
                     foreach (ObjectId id in btr.GetBlockReferenceIds(true, true)) {
                         BlockReference br = id.GetObjectForWrite<BlockReference>(false);
                         br.RecordGraphicsModified(true);
@@ -191,15 +184,9 @@ namespace IgorKL.ACAD3.Model.CustomObjects {
                     foreach (AttributeDefinition acAtt in attributes) {
                         if (!acAtt.Constant) {
                             using (AttributeReference acAttRef = new AttributeReference()) {
-                                //acAttRef.RecordGraphicsModified(true);
-
                                 acAttRef.SetAttributeFromBlock(acAtt, br.BlockTransform);
-                                //acAttRef.Position = acAtt.Position.TransformBy(br.BlockTransform);
 
                                 acAttRef.TextString = attrTextValues[i++];
-
-                                //if (acAtt.Annotative == AnnotativeStates.True)
-                                //acAttRef.AddContext(occ.CurrentContext);
 
                                 br.AttributeCollection.AppendAttribute(acAttRef);
                                 _db.TransactionManager.TopTransaction.AddNewlyCreatedDBObject(acAttRef, true);

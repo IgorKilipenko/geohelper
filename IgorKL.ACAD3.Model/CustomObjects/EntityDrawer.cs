@@ -110,7 +110,6 @@ namespace IgorKL.ACAD3.Model.CustomObjects {
             List<Entity> inMemoryEntities = new List<Entity>(Entities.Count);
             lock (Entities) {
                 foreach (Entity ent in Entities.ToArray()) {
-                    //Entity inMemoryEntity = (Entity)ent.GetTransformedCopy(ToWcsTransform);
                     Entity inMemoryEntity = (Entity)ent.Clone();
                     inMemoryEntities.Add(inMemoryEntity);
                     draw.Geometry.Draw(inMemoryEntity);
@@ -145,6 +144,5 @@ namespace IgorKL.ACAD3.Model.CustomObjects {
 
         protected Matrix3d ToUcsTransform { get { return _ucs.Inverse(); } }
         protected Matrix3d ToWcsTransform { get { return _ucs; } }
-
     }
 }

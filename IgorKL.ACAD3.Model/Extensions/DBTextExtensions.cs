@@ -33,7 +33,6 @@ namespace IgorKL.ACAD3.Model.Extensions {
 #endif
             Vector3d diametr = max - min;
 
-            //mat = Matrix3d.Identity.PreMultiplyBy(Matrix3d.Rotation(text.Rotation, text.Normal, text.Position));
             mat = mat.Inverse();
 
             Point3d upperLeft = new Point3d(min.X, min.Y + diametr.Y, min.Z).TransformBy(mat);

@@ -101,7 +101,7 @@ namespace IgorKL.ACAD3.Model.Extensions {
             }
 
             if (param > (double)endIndex)
-                res.AddVertexAt(endIndex + 1 - startIndex, endPoint, /*sourcePline.GetBulgeAt(endIndex)*/sourcePline.GetBulgeAt(param), sourcePline.GetStartWidthAt(endIndex), sourcePline.GetEndWidthAt(endIndex));
+                res.AddVertexAt(endIndex + 1 - startIndex, endPoint, sourcePline.GetBulgeAt(param), sourcePline.GetStartWidthAt(endIndex), sourcePline.GetEndWidthAt(endIndex));
 
             if (copyStyle)
                 res.CopyFrom(sourcePline);
@@ -262,7 +262,6 @@ namespace IgorKL.ACAD3.Model.Extensions {
             return res;
         }
 
-
         public static Line GetPerpendicularFromPoint(this Line line, Point3d point) {
             double k = 0;
             double x1 = line.StartPoint.X;
@@ -278,8 +277,6 @@ namespace IgorKL.ACAD3.Model.Extensions {
 
             return new Line(point, new Point3d(x4, y4, point.Z));
         }
-
-
 
         #region Ortho Normal Methods
         public static Point3d? GetOrthoNormalPointEx(this Polyline pline, Point3d point) {
@@ -341,7 +338,6 @@ namespace IgorKL.ACAD3.Model.Extensions {
                 double length = s.GetLength(s.GetParameterOf(s.StartPoint),
                     s.GetParameterOf(s.EndPoint), Tolerance.Global.EqualPoint);
 
-                ///////////////////////////////////////////////
                 if (!nullForOutOfRange) {
                     if (i == 0 && cos < 0d) {
                         return s.StartPoint;
@@ -351,7 +347,6 @@ namespace IgorKL.ACAD3.Model.Extensions {
                     }
                     i++;
                 }
-                ///////////////////////////////////////////////
 
                 if (cos >= 0d && cos * vector.Length <= segmVector.Length) {
                     if (s is CircularArc3d) {
@@ -376,6 +371,7 @@ namespace IgorKL.ACAD3.Model.Extensions {
                 return res[0];
             }
         }
+
         [Obsolete("use getClosestPoint")]
         public static Line GetOrthoNormalLine(this Polyline pline, Point3d point, Plane plane = null, bool nullForOutOfRange = true) {
             point = point.OrthoProject(pline.GetPlane());
@@ -437,6 +433,7 @@ namespace IgorKL.ACAD3.Model.Extensions {
             }
             return null;
         }
+
         public static Line GetOrthoNormalLine(this Line line, Point3d point, Plane plane = null, bool nullForOutOfRange = true) {
             if (plane == null)
                 plane = new Plane(line.StartPoint, Matrix3d.Identity.CoordinateSystem3d.Zaxis.Negate());
@@ -463,11 +460,7 @@ namespace IgorKL.ACAD3.Model.Extensions {
             return perpendicular;
         }
 
-
         #endregion
-
-
-
 
         #region Edit Elevation
         public static Line GetWithNewElevation(this Line line, double elevation) {
@@ -481,9 +474,6 @@ namespace IgorKL.ACAD3.Model.Extensions {
         }
         #endregion
 
-
-
-
         #region Convertor
         public static Line ConvertToLine(this LineSegment3d line3d) {
             return new Line(line3d.StartPoint, line3d.EndPoint);
@@ -495,22 +485,16 @@ namespace IgorKL.ACAD3.Model.Extensions {
             points.ForEach(p => {
                 pline.AddVertexAt(i++, p);
             });
+
             return pline;
-
-            /*Polyline pline = new Polyline();
-            pline.ConvertFrom(line3d, false);
-            return pline*/
         }
-        public static Polyline ConvertToPolyline(this Polyline2d line2d) {
-            /*Polyline pline = new Polyline();
-            pline.ConvertFrom(line2d, false);
-            return pline;*/
 
+        public static Polyline ConvertToPolyline(this Polyline2d line2d) {
             Polyline pline = new Polyline();
             pline.ConvertFrom(line2d, false);
             return pline;
-
         }
+
         public static Polyline ConvertToPolyline(this Line line) {
             Polyline pline = new Polyline(2);
             pline.AddVertexes(new[] { line.StartPoint, line.EndPoint });
@@ -518,10 +502,6 @@ namespace IgorKL.ACAD3.Model.Extensions {
         }
 
         #endregion
-
-
-
-
 
         #region Helpers
         public struct Point {
@@ -541,11 +521,5 @@ namespace IgorKL.ACAD3.Model.Extensions {
             return (dtheta);
         }
         #endregion
-
-
-
-
     }
-
-
 }

@@ -50,7 +50,6 @@ namespace IgorKL.ACAD3.Model.Helpers.SdrFormat {
                 LTR = 0,
                 RTL
             }
-
         }
 
         public class SdrLine {

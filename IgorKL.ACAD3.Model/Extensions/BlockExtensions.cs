@@ -48,7 +48,7 @@ namespace IgorKL.ACAD3.Model.Extensions {
             return res;
         }
 
-        public static void EraseBolckTableRecord(this BlockTableRecord btr) {
+        public static void EraseBlockTableRecord(this BlockTableRecord btr) {
             Tools.StartTransaction(() => {
                 if (btr.Id != ObjectId.Null) {
                     btr = btr.Id.GetObjectForRead<BlockTableRecord>(false);
@@ -115,7 +115,6 @@ namespace IgorKL.ACAD3.Model.Extensions {
         public static void InnerTransform(this BlockReference br, Matrix3d transform) {
             Tools.StartTransaction(() => {
                 br = br.Id.GetObjectForRead<BlockReference>();
-                //br = br.GetAnonymClone(br.Position).GetObjectForRead<BlockReference>();
                 BlockTableRecord btr = br.BlockTableRecord.GetObjectForRead<BlockTableRecord>();
                 btr.UpgradeOpen();
                 foreach (ObjectId id in btr) {
@@ -157,8 +156,6 @@ namespace IgorKL.ACAD3.Model.Extensions {
             });
         }
 
-
-
         #region Insert AttributeReferance
         /// <summary>
         /// Inserts all attributreferences
@@ -182,6 +179,7 @@ namespace IgorKL.ACAD3.Model.Extensions {
                 tr.Commit();
             }
         }
+
         /// <summary>
         /// Inserts all attributreferences
         /// </summary>
@@ -200,6 +198,7 @@ namespace IgorKL.ACAD3.Model.Extensions {
                 }
             }
         }
+
         /// <summary>
         /// Inserts all attributreferences
         /// </summary>
@@ -224,6 +223,7 @@ namespace IgorKL.ACAD3.Model.Extensions {
                 tr.Commit();
             }
         }
+
         /// <summary>
         /// Inserts all attributreferences
         /// </summary>
@@ -244,6 +244,7 @@ namespace IgorKL.ACAD3.Model.Extensions {
                 }
             }
         }
+
         /// <summary>
         /// Inserts all attributreferences
         /// </summary>
@@ -270,6 +271,7 @@ namespace IgorKL.ACAD3.Model.Extensions {
                 tr.Commit();
             }
         }
+        
         /// <summary>
         /// Inserts all attributreferences
         /// </summary>

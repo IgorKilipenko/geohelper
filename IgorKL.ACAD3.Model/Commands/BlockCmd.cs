@@ -47,7 +47,6 @@ namespace IgorKL.ACAD3.Model.Commands {
             }
         }
 
-
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmdTest_TestAnonyBlock2", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public void TestAnonyBlock2() {
 
@@ -99,7 +98,6 @@ namespace IgorKL.ACAD3.Model.Commands {
 
             acAttDef.Verifiable = true;
             acAttDef.Height = 1.8;
-            //acAttDef.Justify = AttachmentPoint.BaseMid;
             acAttDef.Prompt = "arrowPrompt";
             acAttDef.Tag = "arrowTag";
             acAttDef.TextString = "NaN";
@@ -113,7 +111,6 @@ namespace IgorKL.ACAD3.Model.Commands {
 
             return acAttDef;
         }
-
 
         public class ArrowDirectional2 {
             private double defLength = 3d;
@@ -168,24 +165,9 @@ namespace IgorKL.ACAD3.Model.Commands {
 
                 acAttDef.Verifiable = true;
                 acAttDef.Height = 1.8;
-                //acAttDef.Justify = AttachmentPoint.BaseMid;
                 acAttDef.Prompt = anchorTag;
                 acAttDef.Tag = anchorTag;
                 acAttDef.TextString = "0";
-
-                /*if (Mode == DirectionMode.Horizontal)
-                {
-                    acAttDef.HorizontalMode = TextHorizontalMode.TextCenter;
-                    acAttDef.VerticalMode = TextVerticalMode.TextBase;
-                }
-                else
-                {
-                    acAttDef.HorizontalMode = TextHorizontalMode.TextRight;
-                    acAttDef.VerticalMode = TextVerticalMode.TextVerticalMid;
-                }
-                acAttDef.Position = position;
-                acAttDef.AlignmentPoint = acAttDef.Position.TransformBy(Matrix3d.Displacement(ArrowLine.GetPointAtDist(defLength / 2d) - acAttDef.Position));
-                acAttDef.AlignmentPoint = acAttDef.AlignmentPoint.TransformBy(Matrix3d.Displacement((ArrowLine.GetFirstDerivative(acAttDef.AlignmentPoint).GetPerpendicularVector()).MultiplyBy(acAttDef.Height * 0.1)));*/
 
                 acAttDef.Position = position;
                 _appenedAttriuteDef(ref acAttDef);
@@ -196,12 +178,10 @@ namespace IgorKL.ACAD3.Model.Commands {
             }
 
             private ObjectId _createBlockRecord() {
-                this._eraseBolckTableRecord();
+                this._eraseBlockTableRecord();
 
                 this.ArrowLine = _createPLine(new Point3d(this.Origin.X + defSpaceLength, this.Origin.Y, this.Origin.Z));
                 this.BaseAttribute = _createAttribute(this.Origin);
-
-                //List<Entity> ents = new List<Entity>(new[] { ArrowLine, (Entity)this.BaseAttribute });
 
                 this.BlockTableRecordId = BlockTools.CreateBlockTableRecordEx(Point3d.Origin, "*U", _entities, AnnotativeStates.True);
 
@@ -222,33 +202,6 @@ namespace IgorKL.ACAD3.Model.Commands {
 
                 ObjectId brId = BlockTools.AddBlockRefToModelSpace(this.BlockTableRecordId,
                     new List<string>(new[] { Math.Abs(Math.Round(value * 1000d, 0)).ToString() }), position, UcsMatrix);
-
-                /*using (Transaction trans = Tools.StartTransaction())
-                {
-                    if (value < 0)
-                    {
-                        BlockTableRecord btr = this.BlockTableRecordId.GetObjectForRead<BlockTableRecord>();
-                        btr.UpgradeOpen();
-                        //btr.UpdateAnonymousBlocks();
-
-                        _arrowBlockRef = (BlockReference)trans.GetObject(brId, OpenMode.ForRead);
-                        _arrowBlockRef.UpgradeOpen();
-                        _mirror();
-                        _arrowBlockRef.RecordGraphicsModified(true);
-  
-
-                        if (_arrowBlockRef.AttributeCollection != null)
-                        {
-                            foreach (ObjectId arId in _arrowBlockRef.AttributeCollection)
-                            {
-                                AttributeReference ar = (AttributeReference)arId.GetObject(OpenMode.ForRead, false, true);
-                                ar.UpgradeOpen();
-                                ar.RecordGraphicsModified(true);
-                            }
-                        }
-                    }
-                }*/
-
 
                 Tools.GetActiveAcadDocument().TransactionManager.FlushGraphics();
                 this.ArrowId = brId;
@@ -338,24 +291,13 @@ namespace IgorKL.ACAD3.Model.Commands {
                     if (ent is AttributeDefinition) {
                         try {
                             AttributeDefinition ad = (AttributeDefinition)ent;
-                            //_appenedAttriuteDef(ref ad);
                             ad.AdjustAlignment(Tools.GetAcadDatabase());
                         }
                         catch { }
                     }
                 }
                 if (commit) {
-                    /*BlockTableRecord btr = null;
-                    if (this.BlockTableRecordId != ObjectId.Null)
-                    {
-                        btr = (BlockTableRecord)this.BlockTableRecordId.GetObject(OpenMode.ForRead, false, true);
-                    }*/
                     trans.Commit();
-
-                    /*if (btr != null)
-                    {
-                        btr.UpdateAnonymousBlocks();
-                    }*/
                 }
             }
 
@@ -375,7 +317,7 @@ namespace IgorKL.ACAD3.Model.Commands {
                 return mat;
             }
 
-            private void _eraseBolckTableRecord() {
+            private void _eraseBlockTableRecord() {
                 using (Transaction trans = Tools.StartTransaction()) {
                     if (this.BlockTableRecordId != ObjectId.Null) {
                         BlockTableRecord btr = (BlockTableRecord)this.BlockTableRecordId.GetObject(OpenMode.ForRead, true, true);
@@ -405,11 +347,7 @@ namespace IgorKL.ACAD3.Model.Commands {
                 acAttDef.AlignmentPoint = acAttDef.Position.TransformBy(Matrix3d.Displacement(ArrowLine.GetPointAtDist(defLength / 2d) - acAttDef.Position));
                 acAttDef.AlignmentPoint = acAttDef.AlignmentPoint.TransformBy(Matrix3d.Displacement((ArrowLine.GetFirstDerivative(acAttDef.AlignmentPoint).GetPerpendicularVector()).MultiplyBy(acAttDef.Height * 0.1)));
             }
-
         }
-
-
-
 
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmdTest_TransTest1", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public static void TransTest1() {
@@ -445,23 +383,16 @@ namespace IgorKL.ACAD3.Model.Commands {
 
             Matrix3d ucs = CoordinateSystem.CoordinateTools.GetCurrentUcs();
             CustomObjects.SimpleEntityOverrideEx block = new CustomObjects.SimpleEntityOverrideEx(new Point3d(0, 0, 0), AnnotativeStates.True, new[] { (Entity)line }.ToList(), ucs);
-            //block.AppendEntity(line);
             BlockReference br = block.GetObject(startPoint, null);
-            //Tools.AppendEntity(br);
 
             System.Threading.Timer timer = new System.Threading.Timer(
                 delegate (object state) {
                     using (Transaction trans = Tools.StartTransaction()) {
                         lock (trans) {
                             line = line.Id.GetObjectForRead<Line>(false);
-                            /*line.UpgradeOpen();
-                            line.EndPoint = new Point3d(startPoint.X + Helpers.Math.Randoms.RandomGen.Next(20),
-                                startPoint.Y + Helpers.Math.Randoms.RandomGen.Next(20), 0);
-                            block.Update();*/
                             Matrix3d mat = Matrix3d.Displacement(new Point3d(startPoint.X + Helpers.Math.Randoms.RandomGen.Next(20),
                                 startPoint.Y + Helpers.Math.Randoms.RandomGen.Next(20), 0) - line.StartPoint);
                             block.AppendEntity(line.GetTransformedCopy(mat));
-                            //trans.Commit();
                         }
                     }
                 });

@@ -19,18 +19,6 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers {
         }
 
         public string Get(string key, string defVal) {
-            /*using (var stream = System.Reflection.Assembly.GetEntryAssembly().GetManifestResourceStream(Properties.Resources.ResourceManager.BaseName))
-            {
-                System.Resources.IResourceReader reader = new System.Resources.ResourceReader(stream);
-                System.Collections.IDictionaryEnumerator dic = reader.GetEnumerator();
-
-                while (dic.MoveNext())
-                    if ((dic.Key as string) == key)
-                        return dic.Value as string;
-
-                return null;
-            }*/
-
             using (var stream = Properties.Resources.ResourceManager.GetStream(key)) {
                 if (stream != null) {
                     using (System.IO.StreamReader sr = new System.IO.StreamReader(stream)) {

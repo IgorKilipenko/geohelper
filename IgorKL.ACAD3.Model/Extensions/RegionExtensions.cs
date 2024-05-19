@@ -27,13 +27,9 @@ namespace IgorKL.ACAD3.Model.Extensions {
                 var pc = new PointContainment();
 
                 using (var brepEnt = brep.GetPointContainment(point, out pc)) {
-
                     return pc != PointContainment.Outside;
-
                 }
-
             }
-
         }
     }
 }

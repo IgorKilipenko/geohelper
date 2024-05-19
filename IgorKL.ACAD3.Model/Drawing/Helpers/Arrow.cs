@@ -168,7 +168,6 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers {
 
         }
 
-
         private void _transformThisBy(Matrix3d transform) {
             _horizontPline.TransformBy(transform);
             _verticalPline.TransformBy(transform);
@@ -179,7 +178,6 @@ namespace IgorKL.ACAD3.Model.Drawing.Helpers {
             _horizontalText.TransformBy(transform);
             _horizontalText.AdjustAlignment(HostApplicationServices.WorkingDatabase);
         }
-
 
         protected override bool WorldDraw(Autodesk.AutoCAD.GraphicsInterface.WorldDraw draw) {
             List<Entity> inMemorySet = Explode();

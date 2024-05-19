@@ -34,7 +34,7 @@ namespace IgorKL.ACAD3.Model.Commands {
         }
 
 
-        [Obsolete("Не работает")]
+        [Obsolete("Not work")]
         private string _getTextFromEntity<T>(string msg, string rmsg)
             where T : DBObject {
             PromptEntityOptions entOpt = new PromptEntityOptions(msg);
@@ -60,10 +60,8 @@ namespace IgorKL.ACAD3.Model.Commands {
 
         #region Text factory Helpers
         public DBText _CreateText(Point3d position, string data, string lname, double scale) {
-            // Create a single-line text object
             DBText acText = new DBText();
             acText.SetDatabaseDefaults();
-            //acText.Position = position;
             acText.Height = 2.5 * scale;
             acText.TextString = data;
             acText.Annotative = AnnotativeStates.False;
@@ -76,10 +74,8 @@ namespace IgorKL.ACAD3.Model.Commands {
         }
 
         public DBText _CreateText(Point3d position, string data, double scale) {
-            // Create a single-line text object
             DBText acText = new DBText();
             acText.SetDatabaseDefaults();
-            //acText.Position = position;
             acText.Height = 2.5 * scale;
             acText.TextString = data;
             acText.Annotative = AnnotativeStates.False;
@@ -91,10 +87,8 @@ namespace IgorKL.ACAD3.Model.Commands {
         }
 
         public DBText _CreateText(DBText elevation, string data, string lname, double scale) {
-            // Create a single-line text object
             DBText acText = new DBText();
             acText.SetDatabaseDefaults();
-            //acText.Position = position;
             acText.Height = elevation.Height;
             acText.TextString = data;
             acText.Color = Color.FromColor(System.Drawing.Color.Yellow);
@@ -112,7 +106,7 @@ namespace IgorKL.ACAD3.Model.Commands {
         #region Prompt select Helpers
 
         public static bool TrySelectObjects<T>(out IList<T> objCollection, OpenMode openMode, string msg, Transaction transaction)
-where T : DBObject {
+            where T : DBObject {
             Editor ed = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor;
             SelectionSet set = null;
             objCollection = null;
@@ -166,6 +160,7 @@ where T : DBObject {
                     transaction.Dispose();
             }
         }
+
         public static bool TrySelectObjects<T>(out IList<T> objCollection, OpenMode openMode, string msg, out Transaction transaction)
             where T : DBObject {
             Editor ed = Autodesk.AutoCAD.ApplicationServices.Application.DocumentManager.MdiActiveDocument.Editor;
@@ -203,6 +198,4 @@ where T : DBObject {
 
         #endregion
     }
-
-
 }

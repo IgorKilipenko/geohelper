@@ -17,7 +17,7 @@ namespace IgorKL.ACAD3.Model.Commands {
         [RibbonCommandButton("Ограниченный объем", "Тест (Поверхности)", true)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_TEST_GetVolume", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public void TEST_GetVolume() {
-            if (!ObjectCollector.TrySelectAllowedClassObject(out TinVolumeSurface tinVolumeSurface, "\nВыберить поверхность для вычисления объема"))
+            if (!ObjectCollector.TrySelectAllowedClassObject(out TinVolumeSurface tinVolumeSurface, "\nВыбрать поверхность для вычисления объема"))
                 return;
 
             if (!ObjectCollector.TrySelectAllowedClassObject(out Polyline border, "\nВыберите ограничивающею полилинию"))
@@ -50,7 +50,7 @@ namespace IgorKL.ACAD3.Model.Commands {
         public void TEST_CloningSurface() {
             if (!ObjectCollector.TrySelectAllowedClassObject(out TinSurface surface))
                 return;
-                
+
             TinSurface newSurface = surface.Clone() as TinSurface;
             newSurface.Name = "Clone_" + surface.Name;
             using (Transaction trans = Tools.StartTransaction()) {

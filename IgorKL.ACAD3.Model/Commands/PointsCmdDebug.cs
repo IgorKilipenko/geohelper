@@ -16,13 +16,9 @@ namespace IgorKL.ACAD3.Model.Commands {
 #if DEBUG
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_TEST_CreatePointFromText", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public void TEST_CreatePointFromText() {
-            ObjectId id = AcadPoints.PointFactory.CreateFromTxet("100;200;22", ";");
+            ObjectId id = AcadPoints.PointFactory.CreateFromText("100;200;22", ";");
             Tools.GetAcadEditor().WriteMessage("\n" + (id == ObjectId.Null));
         }
-
-
-
-
 #endif
     }
 }

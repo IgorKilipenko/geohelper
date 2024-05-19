@@ -91,11 +91,9 @@ namespace IgorKL.ACAD3.Model.Drawing {
             string valueText = string.Empty;
             string sep = string.Empty;
             string res = TextString;
-            //  "\\d+\\b(<dig>\\.\\d+)?")
             var matches = System.Text.RegularExpressions.Regex.Matches(TextString.Replace(',', '.'), "(?<!\\k<dig>)\\d+(?<dig>\\.\\d+)?");
             if (matches.Count > 0 && matches[matches.Count - 1].Success) {
                 match = matches[matches.Count - 1];
-                //List<System.Text.RegularExpressions.Group> groups = new List<System.Text.RegularExpressions.Group>(match.Groups);
                 valueText = match.Value;
             }
 
@@ -103,7 +101,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 double value;
                 if (double.TryParse(valueText, System.Globalization.NumberStyles.Number, _culture, out value)) {
                     value += _getAllowedToleranceValue(_maxTolerance, _minTolerance);
-                    int ind = match.Index; //text.TextString.Replace(',','.').LastIndexOf(valueText);
+                    int ind = match.Index;
                     if (ind > -1) {
                         string format = "#0";
                         if (match.Groups["dig"].Success) {
@@ -114,7 +112,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
                         }
 
                         res = TextString.Remove(ind, valueText.Length);
-                        res = res.Insert(ind, /*"[" +*/ value.ToString(format, _culture) /*+ "]"*/);
+                        res = res.Insert(ind, value.ToString(format, _culture));
 
                         if (!string.IsNullOrWhiteSpace(sep)) {
                             res = res.Replace(".", sep);
@@ -133,7 +131,5 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
             return flag ? randVal * maxValue : randVal * minValue;
         }
-
-
     }
 }

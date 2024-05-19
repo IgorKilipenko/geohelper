@@ -9,10 +9,6 @@ using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 using AcGi = Autodesk.AutoCAD.GraphicsInterface;
 
-/*[assembly: ExtensionApplication(
-  typeof(IgorKL.ACAD3.Customization.Snap.CustomOSnapApp))
-]*/
-
 namespace IgorKL.ACAD3.Customization.Snap
 {
     /// <summary>
@@ -83,28 +79,16 @@ namespace IgorKL.ACAD3.Customization.Snap
             int glyphPixels = CustomObjectSnapMode.GlyphSize;
             var glyphSize = vd.Viewport.GetNumPixelsInUnitSquare(_pt);
 
-            // Calculate the size of the glyph in WCS
-            //  (use for text height factor)
-
-            // We'll add 10% to the size, as otherwise
-            //  it looks a little too small
-
             double glyphHeight =
               (glyphPixels / glyphSize.Y) * 1.1;
 
             string text = "¼";
-
-            // Translate the X-axis of the DCS to WCS
-            //  (for the text direction) and the snap
-            //  point itself (for the text location)
 
             var dist = -glyphHeight / 2.0;
             var offset = new Vector3d(dist, dist, 0);
             var e2w = vd.Viewport.EyeToWorldTransform;
             var dir = Vector3d.XAxis.TransformBy(e2w);
             var pt = (_pt + offset).TransformBy(e2w);
-
-            //  Draw the centered text representing the glyph
 
             var style = new AcGi.TextStyle();
             var fd =
@@ -132,7 +116,6 @@ namespace IgorKL.ACAD3.Customization.Snap
           ObjectSnapContext context,
           ObjectSnapInfo result)
         {
-            // Nothing here
         }
 
         public void SnapInfoCurve(
@@ -140,8 +123,6 @@ namespace IgorKL.ACAD3.Customization.Snap
           ObjectSnapInfo result
         )
         {
-            // For any curve
-
             var cv = context.PickedObject as Curve;
             if (cv == null)
                 return;
@@ -149,15 +130,11 @@ namespace IgorKL.ACAD3.Customization.Snap
             double startParam = cv.StartParam;
             double endParam = cv.EndParam;
 
-            // Add osnap at first quarter
-
             double param =
               startParam + ((endParam - startParam) * 0.25);
             var pt = cv.GetPointAtParameter(param);
 
             result.SnapPoints.Add(pt);
-
-            // Add osnap at third quarter
 
             param =
               startParam + ((endParam - startParam) * 0.75);
@@ -175,35 +152,23 @@ namespace IgorKL.ACAD3.Customization.Snap
           ObjectSnapContext context,
           ObjectSnapInfo result)
         {
-            // For polylines
-
             var pl = context.PickedObject as Polyline;
             if (pl == null)
                 return;
 
-            // Get the overall start and end parameters
-
             double plStartParam = pl.StartParam;
             double plEndParam = pl.EndParam;
-
-            // Get the local
 
             double startParam = plStartParam;
             double endParam = startParam + 1.0;
 
             while (endParam <= plEndParam)
             {
-                // Calculate the snap point per vertex...
-
-                // Add osnap at first quarter
-
                 double param =
                   startParam + ((endParam - startParam) * 0.25);
                 var pt = pl.GetPointAtParameter(param);
 
                 result.SnapPoints.Add(pt);
-
-                // Add osnap at third quarter
 
                 param =
                   startParam + ((endParam - startParam) * 0.75);

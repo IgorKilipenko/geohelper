@@ -71,9 +71,7 @@ namespace IgorKL.ACAD3.Model.Layers {
                   "a color index of {1}.",
                   layerName, _colorIndex++
                 );
-
             }
-
         }
     }
 }

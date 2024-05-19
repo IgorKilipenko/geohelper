@@ -131,9 +131,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             }
         }
 
-
-
-
         #region Jig Overrides
         protected override SamplerStatus Sampler(JigPrompts prompts) {
             JigPromptPointOptions ppo = new JigPromptPointOptions("\nУкажите фактическое положение низа");
@@ -202,8 +199,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             return PromptStatus.OK;
         }
         #endregion
-
-
 
         #region Acad I/O Methods
 
@@ -304,7 +299,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             _setEntitiesToBlock(_insertPointUcs, symbs, attrInfo, true);
         }
 
-
         public static Point3d? GetInsertPoint(Vector3d axisVector, Matrix3d ucs) {
             PromptPointOptions ppo = new PromptPointOptions("\nУкажите точку вставки/проектное положение");
             ppo.Keywords.Add("Perpendicular", "Перпендикуляр", "Перпендикуляр", true, true);
@@ -325,9 +319,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
         }
 
         #endregion
-
-
-
 
         #region Helpers
         private void _setEntitiesToBlock(Point3d insertPointUcs, IEnumerable<Entity> entities, Dictionary<string, string> attrInfo, bool erase) {
@@ -402,7 +393,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
         }
 
         /// <summary>
-        /// Пересчитвыет вектор оси для только положительных направлений
+        /// Пересчитывает вектор оси для только положительных направлений
         /// </summary>
         /// <param name="vector">Пересчитываемый вектор в системе ucs</param>
         /// <param name="ucs">Система координат определяющая положительные направления осей</param>
@@ -428,7 +419,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             return resVector;
         }
         private static Point3d[] _vectorToScreen(Point3d point, Vector3d vector) {
-            //int nCurVport = System.Convert.ToInt32(Application.GetSystemVariable("CVPORT"));
             Point3d[] res = null;
             Tools.StartTransaction(() => {
                 using (var view = Tools.GetAcadEditor().GetCurrentView()) {
@@ -467,7 +457,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                     var intersects = line.IntersectWith(vpRectg, Intersect.ExtendThis);
                     intersects = intersects.Select(p => p.TransformBy(mat.Inverse()));
                     res = intersects.ToArray();
-                    //Tools.AppendEntity(new[] { vpRectg, line});
                 }
             });
 
@@ -482,7 +471,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         [Serializable]
         private class Arrow : CustomObjects.Helpers.CustomObjectSerializer {
@@ -574,18 +563,15 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 Matrix3d mirror = _lineTarnsform;
 
                 mirror = _mirror(this.ArrowLine, _lineTarnsform);
-                //Matrix3d mirror = _mirror(this.ArrowLine);
 
                 if (IsCodirectional && this.BaseArrow.IsSymbolsMirrored)
                     this.BaseArrow.MirrorSymbols();
 
                 LineTarnsform = mirror;
                 IsMirrored = !IsMirrored;
-
             }
 
             private Matrix3d _mirror(Entity entity, Matrix3d transform) {
-                //Plane plane = new Plane(Point3d.Origin, transform.CoordinateSystem3d.Yaxis, transform.CoordinateSystem3d.Zaxis);
                 Plane plane = new Plane(Point3d.Origin, Matrix3d.Identity.CoordinateSystem3d.Yaxis, Matrix3d.Identity.CoordinateSystem3d.Zaxis);
                 plane.TransformBy(_lineTarnsform);
                 Matrix3d mat = Matrix3d.Mirroring(plane);
@@ -610,10 +596,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 if (vector.X * directionVector.X <= 0)
                     return;
 
-                /*Point3d destPoint = Point3d.Origin.Add(directionVector.MultiplyBy(_spaceLength * 2d + _length + _arrowLength));
-                Matrix3d mat = Matrix3d.Displacement(destPoint.GetAsVector());
-                LineTarnsform = mat;
-                IsRedirected = !IsRedirected;*/
                 Redirect();
             }
 
@@ -637,7 +619,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 pline.AddVertexAt(0, new Point3d(origin.X + _spaceLength, origin.Y, 0), 0, 0, 0);
                 pline.AddVertexAt(1, new Point2d(pline.GetPoint2dAt(0).X + _length, pline.GetPoint2dAt(0).Y), 0, _arrowBlug, 0);
                 pline.AddVertexAt(2, new Point2d(pline.GetPoint2dAt(1).X + _arrowLength, pline.GetPoint2dAt(1).Y), 0, 0, 0);
-                //pline.AddVertexAt(3, new Point3d(pline.GetPoint2dAt(2).X, pline.GetPoint2dAt(2).Y + 1d, 0), 0, 0, 0);
                 pline.LineWeight = LineWeight.LineWeight020;
 
                 return pline;
@@ -646,8 +627,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             private Matrix3d _getMainRotation() {
                 double angle = Matrix3d.Identity.CoordinateSystem3d.Xaxis.GetAngleTo(this.AxisVector.GetPerpendicularVector().Negate(),
                     Matrix3d.Identity.CoordinateSystem3d.Zaxis.Negate());
-                /*double angle = Matrix3d.Identity.CoordinateSystem3d.Yaxis.GetAngleTo(this.AxisVector,
-                    Matrix3d.Identity.CoordinateSystem3d.Zaxis);*/
                 Matrix3d rotation = Matrix3d.Rotation(angle,
                 Matrix3d.Identity.CoordinateSystem3d.Zaxis.Negate(), Point3d.Origin);
 
@@ -768,19 +747,14 @@ namespace IgorKL.ACAD3.Model.Drawing {
                     return null;
                 Extents3d res = new Extents3d();
                 symbols.ToList().ForEach(ent => {
-                    /*var clone = ent.GetTransformedCopy(_lineTarnsform.Inverse());
-                    if (clone.Bounds.HasValue)
-                        res.AddExtents(ent.Bounds.Value);*/
                     if (ent is DBText) {
                         var rectg = ((DBText)ent).GetTextBoxCorners();
                         if (rectg.HasValue) {
                             Point3d lowerLeft = rectg.Value.LowerLeft.TransformBy(_lineTarnsform.Inverse());
                             Point3d upperRight = rectg.Value.UpperRight.TransformBy(_lineTarnsform.Inverse());
 
-                            ///////////////////////////////////////////////////////////!!!!!!!!!!//////////////////////////
                             if (lowerLeft.X > upperRight.X)
                                 lowerLeft = new Point3d(upperRight.X - 1d, lowerLeft.Y, lowerLeft.Z);
-                            ///////////////////////////////////////////////////////////!!!!!!!!!!//////////////////////////
 
                             try {
                                 Extents3d ext = new Extents3d(lowerLeft, upperRight);
@@ -800,7 +774,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info,
                 System.Runtime.Serialization.StreamingContext context) {
                 info.AddValue("AxisVector", this.AxisVector.ToArray());
-                //info.AddValue("BaseArrow", this.BaseArrow);
             }
 
             protected Arrow(
@@ -809,7 +782,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                     throw new System.ArgumentNullException("info");
 
                 this.AxisVector = new Vector3d((double[])info.GetValue("AxisVector", typeof(double[])));
-                //this.BaseArrow = (Arrow)info.GetValue("BaseArrow", typeof(Arrow));
             }
 
             public override string ApplicationName {

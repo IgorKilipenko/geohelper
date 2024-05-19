@@ -54,38 +54,6 @@ namespace IgorKL.ACAD3.Model.Extensions {
             return result;
         }
 
-        /*
-        public static Polyline GetIntersectBorder(this ITerrainSurface surface1, ITerrainSurface surface2)
-        {
-            var borders1 = surface1.ExtractBorders();
-
-            var borders2 = surface2.ExtractBorders();
-            if (borders1 == null || borders2 == null)
-                return null;
-
-            Polyline border1 = borders1.LastOrDefault().ConvertToPolyline();
-            Polyline border2 = borders2.LastOrDefault().ConvertToPolyline();
-
-            HashSet<Point3d> points = new HashSet<Point3d>();
-            for (int i = 0; i < border1.NumberOfVertices; i++)
-            {
-                Point3d p = border1.GetPoint3dAt(i);
-                if (border2.IsInsidePolygon(p))
-                    points.Add(p);
-            }
-            for (int i = 0; i < border2.NumberOfVertices; i++)
-            {
-                Point3d p = border2.GetPoint3dAt(i);
-                if (border1.IsInsidePolygon(p))
-                    if (!points.Contains(p))
-                        points.Add(p);
-            }
-
-            Polyline pline = new Polyline(points.Count);
-            pline.AddVertexes(points);
-            return pline;
-        }*/
-
         [Obsolete("Надо найти другой способ извлечения границы")]
         public static Polyline3d ExtractBorders(this Autodesk.Civil.DatabaseServices.TinVolumeSurface surface) {
             var defBoundaries = surface.GetBoundariesDefinitions();
@@ -118,9 +86,6 @@ namespace IgorKL.ACAD3.Model.Extensions {
                             }
                         }
 
-
-
-                        //lines.Sort((l1, l2) => Comparer<double>.Default.Compare(l1.Area, l2.Area));
                         res = lines.LastOrDefault();
                         break;
                     }
@@ -145,6 +110,4 @@ namespace IgorKL.ACAD3.Model.Extensions {
             return false;
         }
     }
-
-
 }

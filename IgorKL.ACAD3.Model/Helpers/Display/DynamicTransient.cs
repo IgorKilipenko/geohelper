@@ -79,7 +79,6 @@ namespace IgorKL.ACAD3.Model.Helpers.Display {
                 (
                     marker,
                     viewMode,
-                    //128,
                     colorIndex,
                     intCol
                 );
@@ -128,7 +127,6 @@ namespace IgorKL.ACAD3.Model.Helpers.Display {
 
     public class ViewBag : IDisposable {
         public ViewBag() {
-            //this.Color = Autodesk.AutoCAD.Colors.Color.FromColorIndex(Autodesk.AutoCAD.Colors.ColorMethod.None, 128);
         }
 
         public DBObject Element { get; set; }
@@ -142,6 +140,5 @@ namespace IgorKL.ACAD3.Model.Helpers.Display {
                     this.Element.Dispose();
         }
     }
-
 }
 

@@ -166,7 +166,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
                     var btr = br.BlockTableRecord.GetObjectForWrite<BlockTableRecord>();
                     br.Erase();
-                    btr.EraseBolckTableRecord();
+                    btr.EraseBlockTableRecord();
                     inMemoryEntity.Dispose();
                 });
             }

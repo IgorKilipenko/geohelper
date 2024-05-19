@@ -17,7 +17,6 @@ using Autodesk.AutoCAD.EditorInput;
 namespace IgorKL.ACAD3.Model.CustomObjects.Helpers {
     [Serializable]
     public abstract class CustomObjectSerializer : ISerializable {
-        //public const string appName = "MyApp";
         public abstract string ApplicationName { get; }
 
         public CustomObjectSerializer() {
@@ -59,10 +58,6 @@ namespace IgorKL.ACAD3.Model.CustomObjects.Helpers {
         }
 
         public void SaveToEntity(Entity ent) {
-            // Make sure application name is registered
-            // If we were to save the ResultBuffer to an Xrecord.Data,
-            // then we would not need to have a registered application name
-
             Transaction tr =
               ent.Database.TransactionManager.TopTransaction;
 
@@ -85,46 +80,6 @@ namespace IgorKL.ACAD3.Model.CustomObjects.Helpers {
            Flags = SecurityPermissionFlag.SerializationFormatter)]
         public abstract void GetObjectData(
           SerializationInfo info, StreamingContext context);
-
-        /*
-        [Serializable]
-        public class AcadSerializer : CustomObjectSerializer
-        {
-            public string myString;
-            public double myDouble;
-
-            public AcadSerializer()
-            {
-            }
-
-            protected AcadSerializer(
-              SerializationInfo info, StreamingContext context)
-            {
-                if (info == null)
-                    throw new System.ArgumentNullException("info");
-
-                myString = (string)info.GetValue("MyString", typeof(string));
-                myDouble = (double)info.GetValue("MyDouble", typeof(double));
-            }
-
-            [SecurityPermission(SecurityAction.LinkDemand,
-               Flags = SecurityPermissionFlag.SerializationFormatter)]
-            public override void GetObjectData(
-              SerializationInfo info, StreamingContext context)
-            {
-                info.AddValue("MyString", myString);
-                info.AddValue("MyDouble", myDouble);
-            }
-
-            // Just for testing purposes
-
-            public override string ToString()
-            {
-                return base.ToString() + "," +
-                  myString + "," + myDouble.ToString();
-            }
-        }*/
-
     }
 
     public sealed class AcadBinder : SerializationBinder {
@@ -161,8 +116,6 @@ namespace IgorKL.ACAD3.Model.CustomObjects.Helpers {
         public static MemoryStream ResBufToStream(ResultBuffer resBuf) {
             MemoryStream ms = new MemoryStream();
             TypedValue[] values = resBuf.AsArray();
-
-            // Start from 1 to skip application name
 
             for (int i = 1; i < values.Length; i++) {
                 byte[] datachunk = (byte[])values[i].Value;
