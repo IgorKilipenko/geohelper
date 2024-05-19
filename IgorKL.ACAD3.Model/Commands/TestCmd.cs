@@ -223,8 +223,6 @@ namespace IgorKL.ACAD3.Model.Commands {
                         var spres = Tools.GetAcadEditor().SelectWindowPolygon(((Polyline)rectg.GetTransformedCopy(mat)).GetPoints(),
                             new SelectionFilter(tvs));
 
-                        //((Polyline)rectg.GetTransformedCopy(mat)).SaveToDatebase();
-
                         if (spres.Status == PromptStatus.OK) {
                             DBText text = spres.Value.GetSelectedItems<DBText>().FirstOrDefault();
                             if (text != null) {
@@ -233,19 +231,11 @@ namespace IgorKL.ACAD3.Model.Commands {
                                 text.DowngradeOpen();
                             }
                         }
-
-
-                        /*Entity[] marker = new[] { (Entity)new DBPoint(point1), (Entity)new Line(point1, point1.Add(bounds.Value.UpperRight - bounds.Value.LowerLeft)) };
-                        marker.SaveToDatebase<Entity>();*/
                     }
 
                 }
             });
         }
-
-
-
-
 
         [RibbonCommandButton("Выбор текста по границе", RibbonPanelCategories.Test_Text)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("ICmdTest_SelectTextAtBounds")]
@@ -269,7 +259,7 @@ namespace IgorKL.ACAD3.Model.Commands {
 
                 var spres = Tools.GetAcadEditor().SelectWindowPolygon(pline.GetPoints(), new SelectionFilter(tvs));
 
-                pline.SaveToDatebase();
+                pline.SaveToDatabase();
 
                 if (spres.Status == PromptStatus.OK) {
                     DBText text = spres.Value.GetSelectedItems<DBText>().FirstOrDefault();
@@ -281,7 +271,6 @@ namespace IgorKL.ACAD3.Model.Commands {
                 }
             });
         }
-
 
         public enum PropertyTypeCodes : short {
             Mirror = 3
@@ -330,7 +319,6 @@ namespace IgorKL.ACAD3.Model.Commands {
                 Line3d line = new Line3d(_text.Position, _position);
 
                 Matrix3d mat = Matrix3d.Mirroring(line);
-                //mat = mat.PreMultiplyBy(Matrix3d.Mirroring(line));
 
                 DBText res = (DBText)_text.Clone();
                 res.TransformBy(mat);

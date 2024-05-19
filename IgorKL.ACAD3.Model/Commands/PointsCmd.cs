@@ -97,10 +97,7 @@ namespace IgorKL.ACAD3.Model.Commands {
                         trans.AddNewlyCreatedDBObject(gr, true);
 
                     }
-                    
-                    //~ Application.DocumentManager.MdiActiveDocument.Database.Pdmode = 32;
-                    //~ Application.DocumentManager.MdiActiveDocument.Database.Pdsize = 2 * scale;
-                    
+
                     trans.Commit();
                 }
 
@@ -296,9 +293,6 @@ namespace IgorKL.ACAD3.Model.Commands {
                     catch { count -= 1; }
                 }
 
-                //~ Application.DocumentManager.MdiActiveDocument.Database.Pdmode = 32;
-                //~ Application.DocumentManager.MdiActiveDocument.Database.Pdsize = 2 * scale;
-                 
                 trans.Commit();
             }
         }
@@ -544,7 +538,6 @@ namespace IgorKL.ACAD3.Model.Commands {
                 }
 
                 trans.Commit();
-
             }
         }
 
@@ -580,7 +573,6 @@ namespace IgorKL.ACAD3.Model.Commands {
                 }
 
                 trans.Commit();
-
             }
         }
 

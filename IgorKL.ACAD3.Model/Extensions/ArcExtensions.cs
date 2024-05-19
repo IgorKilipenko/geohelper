@@ -26,7 +26,6 @@ namespace IgorKL.ACAD3.Model.Extensions {
             double endAngle = Matrix3d.Identity.CoordinateSystem3d.Xaxis.GetAngle2d(endVector);
             double angle = Matrix3d.Identity.CoordinateSystem3d.Xaxis.GetAngle2d(vector);
 
-
             if (angle < Math.Max(startAngle, endAngle) &&
                 angle > Math.Min(startAngle, endAngle)) {
                 double pointAngle = Math.Abs(startAngle - angle);
@@ -75,8 +74,6 @@ namespace IgorKL.ACAD3.Model.Extensions {
             if (pointOn != null) {
                 return pointOn.Point;
             }
-
-
 
             return null;
         }

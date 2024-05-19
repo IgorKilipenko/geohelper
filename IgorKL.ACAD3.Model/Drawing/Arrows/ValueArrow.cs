@@ -30,8 +30,6 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows {
         private double _toleranceBottom;
         private bool _isToleranceOnly;
 
-        /*private Polyline _baseLine;*/
-
         #region Cotors
         public ValueArrow()
             : this(Matrix3d.Identity.CoordinateSystem3d.Xaxis, Matrix3d.Identity) {
@@ -51,9 +49,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows {
         public Matrix3d TransformToArrowBlock {
             get { return Ucs.PreMultiplyBy(Matrix3d.Displacement(Point3d.Origin - _insertPointUcs.TransformBy(Ucs))); }
         }
-        /// <summary>
-        /// Определяет метод отрисовки стрелок, если значение ИСТИНА величина отклонений будет ограничена допустимым пределом
-        /// </summary>
+
         public bool IsToleranceOnly {
             get { return _isToleranceOnly; }
         }
@@ -77,76 +73,16 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows {
             Point3d[] transientPoints = _vectorToScreen(axisVectorPoints[0], axisVector);
 
             using (CustomObjects.EntityDrawer grphic = new ValueArrow()) {
-                //grphic.TrasientDisplay(new[] { new Line(axisVectorPoints[0], axisVectorPoints[1]) });
                 if (transientPoints != null && transientPoints.Length >= 2)
                     grphic.TransientDisplay(new[] { new Line(transientPoints[0], transientPoints[1]) });
                 DrawWallArrows(axisVector, ucs);
             }
-            //grphic.Dispose();
         }
-        /*Переход на полилинию на перспективу
-        [RibbonCommandButton("Стрелки отклонения", "Стрелки")]
-        [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_DrawValueArrows", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public static void DrawValueArrows()
-        {
-            Matrix3d ucs = CoordinateSystem.CoordinateTools.GetCurrentUcs();
-            double tolerance = _dataProvider.Read("tolerance", 0.005d);
-            bool isToleranceOnly = _dataProvider.Read("isToleranceOnly", false);
-
-            Polyline pline;
-            if (!ObjectCollector.TrySelectAllowedClassObject(out pline))
-                return;
-
-
-            PromptPointOptions ppo = new PromptPointOptions("\nУкажите фактическое положение:");
-            ppo.AllowArbitraryInput = false;
-            ppo.Keywords.Add("Tolerance", "ДОПуск", "ДОПуск", true, true);
-            ppo.Keywords.Add("IsToleranceOnlyTrue", "ТОЛькоВДопуске", "ТОЛько В Допуске", true, true);
-            ppo.Keywords.Add("IsToleranceOnlyFalse", "ФАКТически", "ФАКТические данные", true, true);
-            ppo.Keywords.Add("Exit", "ВЫХод", "ВЫХод", true, true);
-
-            PromptPointResult ppr;
-            while ((ppr = Tools.GetAcadEditor().GetPoint(ppo)).Status == PromptStatus.OK || ppr.Status == PromptStatus.Keyword)
-            {
-                var insertPoint = pline.GetOrthoNormalPoint(ppr.Value, new Plane());
-                if (insertPoint == null || !insertPoint.HasValue)
-                    continue;
-                try
-                {
-                    Vector3d axisVector = pline.GetFirstDerivative(insertPoint.Value);
-                    ValueArrow mainBlock = new ValueArrow(axisVector, ucs);
-                    mainBlock._isToleranceOnly = isToleranceOnly;
-                    mainBlock._toleranceBottom = tolerance;
-                    mainBlock._insertPointUcs = insertPoint.Value;
-
-                    PromptStatus res = PromptStatus.Cancel;
-                    if ((res = mainBlock.JigDraw()) != PromptStatus.OK)
-                        return;
-
-                    _dataProvider.Write("tolerance", mainBlock._toleranceBottom);
-                    _dataProvider.Write("isToleranceOnly", mainBlock._isToleranceOnly);
-                }
-                catch (Exception ex)
-                {
-                    Tools.GetAcadEditor().WriteMessage($"\n\aОшибка \n{ex.Message}");
-                    return;
-                }
-            }
-
-        }
-        */
         #endregion
 
-        /// <summary>
-        /// Основной метод вывода данных. Рисует стрелки по полученным с экрана точкам
-        /// </summary>
-        /// <param name="axisVector">Вектор направления оси/грани (перпендикулярно стрелкам)</param>
-        /// <param name="ucs">Текущая ПСК</param>
-        /// <param name="onlyOnce">ИСТИНА если нужно выполнить только раз, иначе цикл</param>
-        /// <returns></returns>
         public static PromptStatus DrawWallArrows(Vector3d axisVector, Matrix3d ucs, bool onlyOnce = false, bool mirrorText = false) {
-            double toleranceBottom = /*0.005;*/ _dataProvider.Read("tolerance", 0.005d);
-            bool isToleranceOnly = /*false;*/ _dataProvider.Read("isToleranceOnly", false);
+            double toleranceBottom = _dataProvider.Read("tolerance", 0.005d);
+            bool isToleranceOnly = _dataProvider.Read("isToleranceOnly", false);
             object mirrorTextValue = null;
             if (mirrorText)
                 mirrorTextValue = SetMirrorTextValue(1);
@@ -196,10 +132,10 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows {
             }
         }
 
-        public void DisplayArrow(Point3d destationPointUcs) {
+        public void DisplayArrow(Point3d dentationPointUcs) {
             _arrow = new WallDeviationArrows.Arrow(_axisVector, 5, 0.5);
 
-            double value = _arrow.Calculate(destationPointUcs.TransformBy(TransformToArrowBlock));
+            double value = _arrow.Calculate(dentationPointUcs.TransformBy(TransformToArrowBlock));
             var symbs = _createAttribute(_arrow.ArrowLine.GetCenterPoint(), null, _arrow.LineTarnsform).ToList();
 
             _arrow.AppendArrowSymbols(symbs);
@@ -354,12 +290,6 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows {
             PromptPointResult ppr = Tools.GetAcadEditor().GetPoint(ppo);
             while (ppr.Status == PromptStatus.Keyword) {
                 switch (ppr.StringResult) {
-                    /*case "Perpendicular":
-                        {
-                            if (DrawWallArrows(_calculateVector(axisVector, ucs, true), ucs, true) == PromptStatus.OK)
-                                ppr = Tools.GetAcadEditor().GetPoint(ppo);
-                            break;
-                        }*/
                     case "Tolerance": {
                         double? toleranse = _promptTolerance("\nУкажите допуск по низу от оси, м", bottomTolerance);
                         if (toleranse.HasValue)
@@ -388,7 +318,7 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows {
         }
 
         /// <summary>
-        /// Пересчитвыет вектор оси для только положительных направлений
+        /// Пересчитывает вектор оси для только положительных направлений
         /// </summary>
         /// <param name="vector">Пересчитываемый вектор в системе ucs</param>
         /// <param name="ucs">Система координат определяющая положительные направления осей</param>
@@ -414,9 +344,6 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows {
             return resVector;
         }
 
-
-
-
         #region Prompts
         protected static double? _promptTolerance(string msg, double defaultValue) {
             PromptDoubleOptions pdo = new PromptDoubleOptions(msg);
@@ -435,9 +362,8 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows {
 
         #region Helpers
 
-
         /// <summary>
-        /// Включает/выключает механизм аввтоматического преобразовании текста при зеркальном отражении (0 - вкл / 1 - выкл)
+        /// Включает/выключает механизм автоматического преобразовании текста при зеркальном отражении (0 - вкл / 1 - выкл)
         /// </summary>
         /// <param name="value">0 - вкл / 1 - выкл</param>
         /// <returns>значение предопределенное в среде</returns>
@@ -476,7 +402,6 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows {
                     br.Erase(true);
                 }
             });
-
         }
 
         [Obsolete("Требует доработки, изменить механизм используя XLine")]
@@ -520,7 +445,6 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows {
                     var intersects = line.IntersectWith(vpRectg, Intersect.ExtendThis);
                     intersects = intersects.Select(p => p.TransformBy(mat.Inverse()));
                     res = intersects.ToArray();
-                    //Tools.AppendEntity(new[] { vpRectg, line});
                 }
             });
 
@@ -531,7 +455,6 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows {
 
         [Obsolete("Требует доработки, изменить механизм используя XLine")]
         private static Point3d[] _vectorToScreen(Vector3d vector) {
-            //int nCurVport = System.Convert.ToInt32(Application.GetSystemVariable("CVPORT"));
             Point3d[] res = null;
             Tools.StartTransaction(() => {
                 using (var view = Tools.GetAcadEditor().GetCurrentView()) {
@@ -553,7 +476,6 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows {
                     Point2d bottomRight = viewCenter + new Vector2d(viewWidth / 2, -viewHeight / 2);
 
                     Point3d point = bottomLeft.Convert3d().Add((topRight.Convert3d() - bottomLeft.Convert3d()).MultiplyBy(0.1));
-                    //res = _vectorToScreen(point.TransformBy(matDcsToWcs), vector);
 
                     Polyline vpRectg = new Polyline(5);
                     vpRectg.AddVertexAt(0, bottomLeft, 0, 0, 0);
@@ -598,7 +520,6 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows {
             DBText adPrefix = new DBText();
             Polyline bound = new Polyline(5);
             if (!string.IsNullOrWhiteSpace(prefix)) {
-                //DBText adPrefix = new DBText();
                 adPrefix.SetDatabaseDefaults(Tools.GetAcadDatabase());
                 adPrefix.TextString = prefix;
                 adPrefix.Height = 2.0d;
@@ -611,7 +532,6 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows {
                 adPrefix.AdjustAlignment(Tools.GetAcadDatabase());
 
                 Rectangle3d? rectg = adPrefix.GetTextBoxCorners();
-                //Polyline bound = new Polyline(5);
                 bound.AddVertexAt(0, rectg.Value.LowerLeft.Add((rectg.Value.UpperLeft - rectg.Value.LowerLeft).Normalize().Negate().MultiplyBy(adPrefix.Height * 0.1)));
                 bound.AddVertexAt(1, rectg.Value.UpperLeft.Add((rectg.Value.UpperLeft - rectg.Value.LowerLeft).Normalize().MultiplyBy(adPrefix.Height * 0.1)));
                 bound.AddVertexAt(2, rectg.Value.UpperRight.Add((rectg.Value.UpperRight - rectg.Value.LowerRight).Normalize().MultiplyBy(adPrefix.Height * 0.1)));
@@ -645,7 +565,6 @@ namespace IgorKL.ACAD3.Model.Drawing.Arrows {
                 yield return bound;
             }
         }
-
 
         #endregion
     }

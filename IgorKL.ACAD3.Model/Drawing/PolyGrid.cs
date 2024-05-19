@@ -36,17 +36,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
             Drawing.PolyGrid grid = new Drawing.PolyGrid(ppr.Value, 100, 50, ucs);
 
-            /*ppo = new PromptPointOptions("\nУкажите конечную точку");
-            ppo.UseBasePoint = true;
-            ppo.BasePoint = grid.Origin;
-            ppo.UseDashedLine = true;
-
-            ppr = Tools.GetAcadEditor().GetPoint(ppo);
-            if (ppr.Status != PromptStatus.OK)
-                return;*/
-
-            //grid.Display(ppr.Value);
-
             if (grid.JigDraw() == PromptStatus.OK)
                 return;
         }
@@ -55,13 +44,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
         private void _createGrid(Point3d destPoint) {
             Entities.Clear();
 
-
             Vector3d vector = destPoint - Origin;
-
-            /*Point3d leftTop = Origin.Add(_ucs.CoordinateSystem3d.Yaxis.MultiplyBy(vector.Y));
-            Point3d leftLow = Origin;
-            Point3d rightTop = destPoint;
-            Point3d rightLow = Origin.Add(_ucs.CoordinateSystem3d.Xaxis.MultiplyBy(vector.X));*/
 
             Point3d leftTop = Origin.Add(Matrix3d.Identity.CoordinateSystem3d.Yaxis.MultiplyBy(vector.Y));
             Point3d leftLow = Origin;

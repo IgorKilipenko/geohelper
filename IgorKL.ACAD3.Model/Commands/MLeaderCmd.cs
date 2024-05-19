@@ -28,9 +28,7 @@ namespace IgorKL.ACAD3.Model.Commands {
             if (!ObjectCollector.TrySelectAllowedClassObject(out destLeader, "\nВыберите мультивыноску - назначение"))
                 return;
 
-            //destLeader = trans.GetObject(destLeader.Id, OpenMode.ForWrite) as MLeader;
             string res = MLeaders.MLeaderTools.CopyTextContents(sourceLeader, destLeader);
-            //trans.Commit();
             Tools.GetAcadEditor().WriteMessage("\n" + res);
         }
 
@@ -77,7 +75,6 @@ namespace IgorKL.ACAD3.Model.Commands {
 
                     if (dx < tolerance || Math.Abs(dx - vector.Length) < tolerance)
                         if (dy < tolerance || Math.Abs(dy - vector.Length) < tolerance) {
-                            //text.Value.GetObjectForWrite<DBText>(false).ColorIndex = 181;
                             selected.Add(text.Value);
                         }
                 }

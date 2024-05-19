@@ -42,10 +42,8 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
                         _createArrowsRibbonPanel();
                         _createAutoRibbonButtons();
                         _createMangeRibbonPanel();
-                        /// _ribbonTab.IsActive = true;
                     }
                     _ribbonTab.IsVisible = true;
-                    /// ComponentManager.Ribbon.ActiveTab = _ribbonTab;
                 }
                 if (ComponentManager.Ribbon.Tabs.FirstOrDefault(tab => tab == _ribbonTab) == null) {
                     ComponentManager.Ribbon.Tabs.Add(_ribbonTab);
@@ -59,12 +57,8 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
 
         public void Terminate() {
             try {
-                //_ribbonTab.IsActive = false;
-                //ComponentManager.Ribbon.Tabs.Remove(_ribbonTab);
                 Application.SystemVariableChanged -= new Autodesk.AutoCAD.ApplicationServices.SystemVariableChangedEventHandler(wsChangedHandler);
-
             } catch { }
-
         }
 
         [Obsolete("Not impl")]
@@ -84,27 +78,10 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
                 updatetd = true;
             }
 
-            if (updatetd) { 
-                cs.Save(); 
-            }
-
-            /*if (ribbonPanelSourceReference is null) {
-                var panel = homeTab.AddNewPanel(elementId, "TogglePanel");
-                var row = panel.AddNewRibbonRow();
-                row.AddNewToggleButton("XyzToggleButton", "XYZSTATE\nToggle", null, RibbonButtonStyle.LargeWithText);
+            if (updatetd) {
                 cs.Save();
-            }*/
+            }
         }
-
-        /*void DocumentManager_DocumentCreated(object sender, DocumentCollectionEventArgs e)
-        {
-            if (_ribbonTab == null)
-                Application.DocumentManager.DocumentCreated -= DocumentManager_DocumentCreated;
-            this.Initialize();
-            if (!_ribbonTab.IsVisible)
-                _ribbonTab.IsVisible = true;
-            ComponentManager.Ribbon.UpdateLayout();
-        }*/
 
 #if DEBUG1
         void RibbonServices_RibbonPaletteSetCreated(object sender, EventArgs e)
@@ -122,9 +99,6 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
         {
             try
             {
-                /*string asmName = "IgorKL.ACAD3.Model.dll";
-                var asm = LoadAssembly(asmName);*/
-
                 var ribbTab = ComponentManager.Ribbon.Tabs.FirstOrDefault(tab => tab.Id == "ICmd_Drawing_Tab");
                 if (ribbTab == null)
                 {
@@ -137,7 +111,6 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
                 foreach (var tab in ComponentManager.Ribbon.Tabs)
                     if (tab.Id == "CIVIL.ID_Civil3DHome")
                     {
-                        //tab.Panels.Add(panel);
                         if (!tab.IsActive)
                             tab.IsActive = true;
                         foreach (var item in tab.Panels[0].Source.Items)
@@ -173,16 +146,6 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
             };
 
             Application.SystemVariableChanged += new Autodesk.AutoCAD.ApplicationServices.SystemVariableChangedEventHandler(wsChangedHandler);
-
-            /*ComponentManager.Ribbon.Tabs.Add(_ribbonTab);
-            string menuName = (string)Application.GetSystemVariable("MENUNAME");
-            var cs = new Autodesk.AutoCAD.Customization.CustomizationSection(menuName + ".cuix");
-            var ribbonRoot = cs.MenuGroup.RibbonRoot;
-            Autodesk.AutoCAD.Customization.RibbonTabSource ts = new Autodesk.AutoCAD.Customization.RibbonTabSource(ribbonRoot);
-
-            string curWorkspaceName = (string)Application.GetSystemVariable("WSCURRENT");
-            var ws = cs.getWorkspace(curWorkspaceName);*/
-
         }
 
         private void wsChangedHandler (object _, Autodesk.AutoCAD.ApplicationServices.SystemVariableChangedEventArgs e) {
@@ -243,7 +206,6 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
 
                 RibbonPanel mangPanel = new RibbonPanel
                 {
-                    //mangPanel.CustomPanelTitleBarBackground = System.Windows.Media.Brushes.LightYellow;
                     CanToggleOrientation = true,
                     Source = sourceMangPanel,
                     ResizeStyle = RibbonResizeStyles.NeverResizeItemWidth | RibbonResizeStyles.NeverHideText | RibbonResizeStyles.NeverCollapseItem
@@ -251,7 +213,6 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
 
                 mangPanel.Source.Items.Add(buttonRegApp);
                 mangPanel.Source.Items.Add(buttonUnRegApp);
-                //mangPanel.Source.Items.Add(buttonNetload);
 
                 _ribbonTab.Panels.Add(mangPanel);
             }
@@ -259,7 +220,6 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
             {
                 Autodesk.AutoCAD.ApplicationServices.Application.ShowAlertDialog("MangeRibbonPanel creating exception");
             }
-//#endif
         }
 
         private void _createArrowsRibbonPanel()
@@ -268,14 +228,11 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
             source.Title = "Стрелки";
             source.Id = "ICmd_Drawing.Arrows";
 
-
-
             RibbonButton buttonWallArrows = new RibbonButton();
             buttonWallArrows.Text = "Верх/Низ";
             buttonWallArrows.Id = "ICmd_Drawing_DrawWallArrows";
             buttonWallArrows.ShowImage = true;
             buttonWallArrows.ShowText = true;
-            //buttonWallArrows.GroupName = "Стрелки";
             buttonWallArrows.ResizeStyle = RibbonItemResizeStyles.ResizeWidth;
             buttonWallArrows.AllowInToolBar = true;
             buttonWallArrows.Orientation = System.Windows.Controls.Orientation.Vertical;
@@ -290,7 +247,6 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
             buttonArrows.Id = "ICmd_Drawing_DrawArrows";
             buttonArrows.ShowImage = true;
             buttonArrows.ShowText = true;
-            //buttonArrows.GroupName = "Стрелки";
             buttonArrows.ResizeStyle = RibbonItemResizeStyles.ResizeWidth;
             buttonArrows.AllowInToolBar = true;
             buttonArrows.Orientation = System.Windows.Controls.Orientation.Vertical;
@@ -305,7 +261,6 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
             buttonDimensionValueRandom.Id = "ICmd_Drawing_EditDimensionValueRandom";
             buttonDimensionValueRandom.ShowImage = true;
             buttonDimensionValueRandom.ShowText = true;
-            //buttonDimensionValueRandom.GroupName = "Стрелки";
             buttonDimensionValueRandom.ResizeStyle = RibbonItemResizeStyles.ResizeWidth;
             buttonDimensionValueRandom.AllowInToolBar = true;
             buttonDimensionValueRandom.Orientation = System.Windows.Controls.Orientation.Vertical;
@@ -319,12 +274,10 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
             _arrowsPanel.Source = source;
             _arrowsPanel.CanToggleOrientation = true;
             _arrowsPanel.ResizeStyle = RibbonResizeStyles.NeverResizeItemWidth | RibbonResizeStyles.NeverHideText | RibbonResizeStyles.NeverCollapseItem;
-            //_panel.CustomPanelTitleBarBackground = System.Windows.Media.Brushes.LightYellow;
 
             source.Items.Add(buttonWallArrows);
             source.Items.Add(buttonArrows);
             source.Items.Add(buttonDimensionValueRandom);
-            //source.Items.Add(buttonNetload);
 
             _ribbonTab.Panels.Add(_arrowsPanel);
         }
@@ -370,7 +323,6 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
 
                         _pastToPanelAtSimpleRow(ribbAttr, cmdAttr, t, mi.Name);
                     }
-
                 }
             }
         }
@@ -404,10 +356,8 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
                 source.Title = button.GroupName;
                 panel.Source = source;
                 _ribbonTab.Panels.Add(panel);
-                //panel.Source.IsSlideOutPanelVisible = true;
                 panel.CanToggleOrientation = true;
                 panel.ResizeStyle = RibbonResizeStyles.NeverHideText;
-                //panel.CustomPanelTitleBarBackground = System.Windows.Media.Brushes.LightYellow;
             }
 
             RibbonItem row = panel.Source.Items.FirstOrDefault(x =>
@@ -429,7 +379,6 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
             if (row is RibbonRowPanel) {
                 ((RibbonRowPanel)row).Items.Add(new RibbonRowBreak());
             }
-
         }
 
         [LispFunction("ICmd_Netload")]
@@ -471,7 +420,6 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
 
             public bool CanExecute(object parameter)
             {
-                //return parameter is RibbonButton;
                 return true;
             }
 
@@ -481,20 +429,6 @@ namespace IgorKL.ACAD3.Customization.Ribbons {
             {
                 if (parameter is RibbonButton button)
                 {
-                    /*string cmd =button.CommandParameter.ToString();
-                    if (cmd.ToUpper().StartsWith("@@ICmd_Netload".ToUpper()))    
-                    {
-                        try
-                        {
-                            string[] args = cmd.Substring("@@ICmd_Netload".Length).Split(new[] { "\"\\ \\\"" }, StringSplitOptions.RemoveEmptyEntries);
-                            var asm = LoadAssembly(args[0].Trim('\"'));
-                            if (asm == null)
-                                Tools.GetAcadEditor().WriteMessage("\nОшибка загрузки, файл {0} не найден", args[0]);
-                        }
-                        catch (System.Exception ex)
-                        { Tools.GetAcadEditor().WriteMessage("\n" +ex.Message); }
-                    }
-                    else*/
                     string cmd = button.CommandParameter.ToString();
                     Tools.GetActiveAcadDocument().SendStringToExecute(cmd + " ", true, false, true);
                 }

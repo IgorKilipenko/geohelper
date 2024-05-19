@@ -127,14 +127,6 @@ namespace IgorKL.ACAD3.Model {
             return res;
         }
 
-        /*public static ObjectId AppendEntity(Database db, Entity entity)
-        {
-            using (Transaction trans = StartTransaction(db))
-            {
-                return AppendEntity(trans, entity, true);
-            }
-        }*/
-
         public static ObjectId AppendEntityEx(Document doc, Entity entity) {
             Database db = doc.Database;
             return AppendEntityEx(db, entity);
@@ -177,11 +169,9 @@ namespace IgorKL.ACAD3.Model {
             }
         }
 
-
         public static Database GetAcadWorkingDatabase() {
             return HostApplicationServices.WorkingDatabase;
         }
-
 
         public static Database GetAcadDatabase() {
             //return Application.DocumentManager.MdiActiveDocument.Database;
@@ -251,30 +241,6 @@ namespace IgorKL.ACAD3.Model {
         public static Transaction GetTopTransaction() {
             return Tools.GetAcadDatabase().TransactionManager.TopTransaction;
         }
-
-
-        /*public void ToggleHWAcceleration()
-        {
-            using (Autodesk.AutoCAD.GraphicsSystem.Configuration config =
-              new Autodesk.AutoCAD.GraphicsSystem.Configuration())
-            {
-                bool b = config.IsFeatureEnabled(
-                  Autodesk.AutoCAD.GraphicsSystem.HardwareFeature.HardwareAcceleration);
-                config.SetFeatureEnabled(
-                  Autodesk.AutoCAD.GraphicsSystem.
-                  HardwareFeature.HardwareAcceleration, !b);
-                config.SaveSettings();
-            }
-        }
-
-        public void ToggleHWAcceleration()
-        {
-            using (Autodesk.AutoCAD.GraphicsSystem.Configuration config =
-              new Autodesk.AutoCAD.GraphicsSystem.Configuration())
-            {
-                config.setHardwareAcceleration(true);
-            }
-        }*/
 
         public static bool IsCivil3D() {
             if (!(Autodesk.AutoCAD.Internal.Utils.IsCommandNameInUse("AeccToolSpace") == Autodesk.AutoCAD.Internal.CommandTypeFlags.NoneCmd)) {

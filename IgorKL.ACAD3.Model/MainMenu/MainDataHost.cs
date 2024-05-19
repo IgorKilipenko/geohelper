@@ -9,12 +9,9 @@ namespace IgorKL.ACAD3.Model.MainMenu {
     public interface IDataHost {
         void SetData(string name, object value);
         bool TryGetData(string name, out object data);
-
     }
 
     public class HostProvider {
-
-
         private const string resName = "ICmd_Settings.resources";
 
         private System.Collections.Concurrent.ConcurrentDictionary<string, object> _savedIems;
@@ -42,8 +39,6 @@ namespace IgorKL.ACAD3.Model.MainMenu {
 
         }
 
-
-
         public T Read<T>(string key) {
             T value;
             TryRead<T>(key, out value);
@@ -60,19 +55,7 @@ namespace IgorKL.ACAD3.Model.MainMenu {
 
         public bool TryRead<T>(string name, out T value) {
             value = default(T);
-            /*using (var stream = Properties.Resources.ResourceManager.GetStream(_hostName + name))
-            {
-                if (stream != null)
-                {
-                    using (System.IO.StreamReader sr = new System.IO.StreamReader(stream))
-                    {
-                        string xml = sr.ReadToEnd();
-                        value = Deserialize<T>(xml);
-                        return true;
-                    }
-                }
-            }
-            return false;*/
+
             string xml;
             bool res = _readXmlResorce(_hostName + name, out xml);
             if (res)
@@ -81,18 +64,6 @@ namespace IgorKL.ACAD3.Model.MainMenu {
         }
 
         public bool Write<T>(string name, T value) {
-            /*using (var stream = Properties.Resources.ResourceManager.GetStream(_hostName + name))
-            {
-                if (stream != null)
-                {
-                    using (System.IO.StreamWriter sw = new System.IO.StreamWriter(stream))
-                    {
-                        string xml = Serialize<T>(value);
-                        sw.Write(xml);
-                        return true;
-                    }
-                }
-            }*/
             string newXmlValue = Serialize<T>(value);
             _addXmlResource(_hostName + name, newXmlValue);
             On_ValueSaved(new KeyValueEventArgs(name, value, typeof(T)));
@@ -100,8 +71,6 @@ namespace IgorKL.ACAD3.Model.MainMenu {
         }
 
         private void _addXmlResource(string key, string xml) {
-            //string path = System.IO.Path.GetFullPath(@".\" + resName);
-
             using (System.Resources.IResourceWriter writer = new System.Resources.ResourceWriter(/*Properties.Resources.ResourceManager.BaseName*/ _path)) {
                 byte[] buffer = Encoding.Unicode.GetBytes(xml);
                 writer.AddResource(key.ToLower(), buffer);
@@ -115,8 +84,6 @@ namespace IgorKL.ACAD3.Model.MainMenu {
             if (System.IO.File.Exists(_path))
                 using (System.Resources.ResourceReader rdr = new System.Resources.ResourceReader(_path)) {
                     byte[] buffer = null;
-                    /*string typeName;
-                    rdr.GetResourceData(key.ToLower(), out typeName, out buffer);*/
 
                     var dic = rdr.GetEnumerator();
                     while (dic.MoveNext()) {
@@ -145,18 +112,6 @@ namespace IgorKL.ACAD3.Model.MainMenu {
             using (System.Xml.XmlReader xw = System.Xml.XmlReader.Create(new System.IO.StringReader(s_xml)))
                 return (T)new System.Xml.Serialization.XmlSerializer(typeof(T)).Deserialize(xw);
         }
-
-        /*public void Serialize()
-        {
-            foreach (var data in _savedIems)
-            {
-                string sv = Serialize(data.Value);
-                if (TryRead(data.Key))
-                    _addNewResource(data.Key, sv);
-                else
-                    Write(data.Key, sv);
-            }
-        }*/
 
         protected virtual void On_ValueSaved(KeyValueEventArgs e) {
             if (ValueSaved != null)

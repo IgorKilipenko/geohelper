@@ -8,7 +8,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 
 namespace IgorKL.ACAD3.Customization.Objects
 {
-    public abstract class CustumObject
+    public abstract class CustomObject
     {
         public abstract ObjectId BlockId { get; }
     }

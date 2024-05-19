@@ -4,7 +4,7 @@ using System;
 
 namespace IgorKL.ACAD3.Model.AcadPoints {
     public class PointFactory {
-        public static ObjectId CreateFromTxet(string text, string separator) {
+        public static ObjectId CreateFromText(string text, string separator) {
             string[] items = text.Split(new[] { separator }, StringSplitOptions.None);
             try {
                 double north = double.Parse(items[0], System.Globalization.NumberStyles.Number, Tools.Culture);
@@ -19,7 +19,6 @@ namespace IgorKL.ACAD3.Model.AcadPoints {
             } catch (System.Exception) {
                 return ObjectId.Null;
             }
-
         }
     }
 }

@@ -115,8 +115,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
             _jigPoint = ppr.Value.TransformBy(_ucs.Inverse());
 
-
-
             return SamplerStatus.OK;
         }
 
@@ -150,7 +148,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                             );
                         xrecord.Append(rb);
                     });
-
                 }
             }
 
@@ -353,6 +350,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
                     HorizontalTarnsform = mat;
                     IsHorizontalRedirected = !IsHorizontalRedirected;
                 }
+
                 public void RedirectVerticalArrow(Vector3d direction) {
                     double rd = 1;
                     if (IsVerticalRedirected)
@@ -369,9 +367,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
                     VerticalTarnsform = mat;
                     IsVerticalRedirected = !IsVerticalRedirected;
                 }
-
             }
         }
-
     }
 }

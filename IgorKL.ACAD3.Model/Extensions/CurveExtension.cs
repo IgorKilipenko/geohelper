@@ -71,7 +71,6 @@ namespace IgorKL.ACAD3.Model.Extensions {
             } else if (curve is Polyline3d) {
                 return ((Polyline3d)curve).ConvertToPolyline();
             } else {
-                //return curve.ConvertToPolylineEx();
                 Polyline pline = new Polyline();
                 pline.ConvertFrom(curve, false);
                 return pline;
@@ -84,13 +83,9 @@ namespace IgorKL.ACAD3.Model.Extensions {
         // exception
         public static bool IsPointOnCurveGCP(this Curve curve, Point3d point) {
             try {
-                // Return true if operation succeeds
-
                 Point3d p = curve.GetClosestPointTo(point, false);
                 return (p - point).Length <= Tolerance.Global.EqualPoint;
             } catch { }
-
-            // Otherwise we return false
 
             return false;
         }
@@ -100,13 +95,9 @@ namespace IgorKL.ACAD3.Model.Extensions {
         // Exception on failure
         public static bool IsPointOnCurveGDAP(this Curve curve, Point3d point) {
             try {
-                // Return true if operation succeeds
-
                 curve.GetDistAtPoint(point);
                 return true;
             } catch { }
-
-            // Otherwise we return false
 
             return false;
         }

@@ -23,21 +23,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
         public void _drawGridCartogramma() {
             double step = 20d;
 
-
-            //Polyline3d border = null;
-            /*ObjectId surfaceId = CivilSurfaces.SurfaceTools.PromptForTinSurface("\nУкажитье поверхность: ");
-            if (surfaceId.IsNull)
-                return;
-            Tools.StartTransaction(() =>
-            {
-                TinSurface surface = surfaceId.GetObjectForRead<CivilSurface>() as TinSurface;
-                if (surface == null)
-                    return;
-                var borders = surface.ExtractBorders().Select(l => (Polyline3d)l.Clone());
-                //borders.SaveToDatebase();
-                border = borders.First();
-            });*/
-
             Polyline border;
             if (!ObjectCollector.TrySelectAllowedClassObject(out border))
                 return;
@@ -54,9 +39,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
             Vector3d hVector = Matrix3d.Identity.CoordinateSystem3d.Xaxis.MultiplyBy((bounds.MaxPoint - bounds.MinPoint).X);
             Vector3d vVector = Matrix3d.Identity.CoordinateSystem3d.Yaxis.MultiplyBy((bounds.MaxPoint - bounds.MinPoint).Y);
 
-            Polyline polygon = border; /*border.ConvertToPolyline();*/
-
-            //((Entity)polygon.Clone()).SaveToDatebase();
+            Polyline polygon = border;
 
             ObjectId btrId = ObjectId.Null;
             ObjectId brId = ObjectId.Null;
@@ -80,15 +63,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
                             line.TransformBy(ucs.Inverse());
                             rectgs.Add(line);
                         }
-
-                        /*if (r == 0)
-                        {
-                            var labels = labelsFactory.CreateTableColumn(c);
-                            if (labels != null)
-                                rectgs.AddRange(labels.Select(x => (Polyline)x.GetTransformedCopy(ucs.Inverse())));
-                        }*/
                     }
-
                 }
 
                 labelsFactory.CreateTeble(columnCount);
@@ -118,24 +93,13 @@ namespace IgorKL.ACAD3.Model.Drawing {
             transformProcessor(bounds.MinPoint);
 
             var points = labelsFactory._getGridElevationPoints(rectgs.Cast<Polyline>()).Select(x => new DBPoint(x));
-            points.SaveToDatebase();
+            points.SaveToDatabase();
 
             rectgs.AddRange(labelsFactory.Entities.Select(x => x.GetTransformedCopy(ucs.Inverse())));
-
-
 
             btrId = AcadBlocks.BlockTools.CreateBlockTableRecord("*U", bounds.MinPoint.TransformBy(ucs.Inverse()), rectgs.Cast<Entity>(), AnnotativeStates.NotApplicable, false);
             brId = AcadBlocks.BlockTools.AppendBlockItem(bounds.MinPoint.TransformBy(ucs.Inverse()), btrId, null);
 
-            /*Tools.StartTransaction(() =>
-            {
-                BlockReference br = brId.GetObjectForWrite<BlockReference>();
-                CartogrammGride jigGrid = new CartogrammGride(bounds.MinPoint.TransformBy(ucs), br, transformProcessor);
-                jigGrid.StartJig();
-            });*/
-
-
-            //rectgs.Cast<Entity>().SaveToDatebase();
         }
 #endif
 
@@ -143,7 +107,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmdTest_DrawCartogramm", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public void _drawGridCartogramma2() {
             _step = _dataHost.Read("step", 20d);
-
 
             //Создаем представление (форму)
             CivilSurfaces.Views.SurfaceSelectorUserControl control = new CivilSurfaces.Views.SurfaceSelectorUserControl();
@@ -160,9 +123,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 return;
             }
 
-            /*Autodesk.AutoCAD.Windows.PaletteSet acWindow = new Autodesk.AutoCAD.Windows.PaletteSet($"{nameof(_drawGridCartogramma2)}");
-            var palette = acWindow.AddVisual("Картограмма", control, true);
-            acWindow.Visible = true;*/
             var mwin = Autodesk.AutoCAD.ApplicationServices.Application.MainWindow;
             System.Windows.Window acadWin = new CustomWindows.KeywordWindow(mwin, CustomWindows.AcadWindow.Dock.BottomRight);
             acadWin.Content = control;
@@ -171,7 +131,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
             KeywordCollection keywords = new KeywordCollection();
             keywords.Add("Step", "Шаг", "Шаг сетки", true, true);
-            //keywords.Add("View", "Список", "Список поверхностей", true, true);
             Func<PromptEntityResult, PromptStatus> promptStep = per => {
                 switch (per.StringResult) {
                     case "Step": {
@@ -259,22 +218,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
             acadWin.Visibility = System.Windows.Visibility.Hidden;
             acadWin.Close();
-            //acWindow.Close();
         }
-
-        /*private void Button_selectInScreen_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            var control = (CivilSurfaces.Views.SurfaceSelectorUserControl)((System.Windows.Controls.Grid)(((System.Windows.Controls.Button)sender).Parent)).Parent;
-            Autodesk.AutoCAD.Windows.Palette p = (Autodesk.AutoCAD.Windows.Palette)control.Tag;
-            var surfInfos = (Dictionary<string, ObjectId>)control.comboBox_surfaces.Tag;
-            ObjectId sid = ObjectId.Null;
-            if (control.comboBox_surfaces.SelectedItem != null)
-            {
-                sid = surfInfos[control.comboBox_surfaces.SelectedItem.ToString()];
-                control.button.Tag = sid;
-            }
-            p.PaletteSet.Visible = false;
-        }*/
 
         private double? _getElevationAtPoint(Point3d point, CivilSurface surface, Polyline polygon) {
             if (!polygon.IsInsidePolygon(point))
@@ -282,9 +226,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             double res = surface.FindElevationAtXY(point.X, point.Y);
             return res;
         }
-
-
-
     }
 
     public class CartogrammLabels {
@@ -294,7 +235,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
         double _tableRowHeight = 8.0;
         double _firstColumnWidth = 20d;
         double _preOrPostColumnWidth = 5d;
-        string _nullSymbol = "-"; /*'\u2010'.ToString();*/
+        string _nullSymbol = "-";
         System.Globalization.CultureInfo _culture = System.Globalization.CultureInfo.GetCultureInfo("ru-RU");
 
         private SimpleGride _gride;
@@ -420,7 +361,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             Polyline firstTopColumn = TopRow[0].Bounds.ConvertToPolyline();
             Matrix3d mat = Matrix3d.Displacement(TopRow[0].Bounds.GetLowertHorizontalVector().Negate());
             firstTopColumn.TransformBy(mat);
-            //TopRow.Insert(0, new TableField(firstTopColumn.ConvertToRectangle().Value, "(+) Насыпь"));
 
             Matrix3d disp = Matrix3d.Displacement(TopRow[0].Bounds.GetLowertHorizontalVector().Negate().Normalize().MultiplyBy(_firstColumnWidth - TopRow[0].Bounds.GetLowertHorizontalVector().Length));
             firstTopColumn.ReplaceVertexAt(0, firstTopColumn.GetPoint3dAt(0).TransformBy(disp));
@@ -435,9 +375,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
             firstBottomColumn.ReplaceVertexAt(1, firstBottomColumn.GetPoint3dAt(1).TransformBy(disp));
             firstBottomColumn.ReplaceVertexAt(4, firstBottomColumn.GetPoint3dAt(4).TransformBy(disp));
 
-            //BottomRow.Insert(0, new TableField(firsrBottomColumn.ConvertToRectangle().Value, "(-) Выемка"));
             PreBottomRow.Add(new TableField(firstBottomColumn.ConvertToRectangle().Value, "Выемка(-)", _tableTextHeight));
-
 
             disp = Matrix3d.Displacement((firstTopColumn.GetPoint3dAt(0) - firstTopColumn.GetPoint3dAt(3)).Normalize().MultiplyBy(_preOrPostColumnWidth));
             Point3d lowerRight = firstBottomColumn.GetPoint3dAt(0);
@@ -447,7 +385,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             Rectangle3d firstColumn = new Rectangle3d(upperLeft, upperRight, lowerLeft, lowerRight);
 
             PreTopRow.Add(new TableField(firstColumn, "Итого, м3", _tableTextHeight * 0.8, Math.PI / 2d));
-
 
             mat = Matrix3d.Displacement(TopRow.Last().Bounds.GetLowertHorizontalVector());
             mat = mat.PreMultiplyBy(Matrix3d.Displacement(TopRow.Last().Bounds.GetLowertHorizontalVector().Normalize().MultiplyBy(_preOrPostColumnWidth)));
@@ -490,7 +427,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             }
         }
 
-
         private void _setValueToAmount(double value, List<TableField> row) {
 
             int columnNumber = 0;
@@ -509,14 +445,8 @@ namespace IgorKL.ACAD3.Model.Drawing {
             }
         }
 
-
         public IEnumerable<DBText> CreateElevationLabels(Point3d position, double baseElevation, double comparisonElevation) {
-            /*var volProps = surface.GetVolumeProperties();
-            ObjectId baseSurfaceId = volProps.BaseSurface;
-            ObjectId comparisonSurfaceId = volProps.ComparisonSurface;*/
-
             Vector3d yaxis = (this.AmountTopRow[0].Bounds.UpperLeft - this.AmountTopRow[0].Bounds.LowerLeft).Normalize();
-
 
             DBText topRightText = new DBText();
             topRightText.SetDatabaseDefaults();
@@ -526,12 +456,9 @@ namespace IgorKL.ACAD3.Model.Drawing {
             topRightText.HorizontalMode = TextHorizontalMode.TextLeft;
             topRightText.VerticalMode = TextVerticalMode.TextBottom;
             topRightText.Annotative = AnnotativeStates.False;
-            //topRightText.AddContext(_scale);
             topRightText.AlignmentPoint = position;
             topRightText.AdjustAlignment(HostApplicationServices.WorkingDatabase);
-
             topRightText.TextString = comparisonElevation.ToString("#0.00", _culture);
-
 
             DBText bottomRightText = new DBText();
             bottomRightText.SetDatabaseDefaults();
@@ -541,12 +468,9 @@ namespace IgorKL.ACAD3.Model.Drawing {
             bottomRightText.HorizontalMode = TextHorizontalMode.TextLeft;
             bottomRightText.VerticalMode = TextVerticalMode.TextTop;
             bottomRightText.Annotative = AnnotativeStates.False;
-            //bottomRightText.AddContext(_scale);
             bottomRightText.AlignmentPoint = position;
             bottomRightText.AdjustAlignment(HostApplicationServices.WorkingDatabase);
-
             bottomRightText.TextString = baseElevation.ToString("#0.00", _culture);
-
 
             DBText topLeftText = new DBText();
             topLeftText.SetDatabaseDefaults();
@@ -556,12 +480,9 @@ namespace IgorKL.ACAD3.Model.Drawing {
             topLeftText.HorizontalMode = TextHorizontalMode.TextRight;
             topLeftText.VerticalMode = TextVerticalMode.TextBottom;
             topLeftText.Annotative = AnnotativeStates.False;
-            //topLeftText.AddContext(_scale);
             topLeftText.AlignmentPoint = position;
             topLeftText.AdjustAlignment(HostApplicationServices.WorkingDatabase);
-
             topLeftText.TextString = (comparisonElevation - baseElevation).ToString("#0.00", _culture);
-
 
             return new[] { topRightText, bottomRightText, topLeftText };
         }
@@ -597,7 +518,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 topText.HorizontalMode = TextHorizontalMode.TextCenter;
                 topText.VerticalMode = TextVerticalMode.TextVerticalMid;
                 topText.Annotative = AnnotativeStates.False;
-                //topText.AddContext(_scale);
                 topText.AlignmentPoint = topPosition;
                 topText.AdjustAlignment(HostApplicationServices.WorkingDatabase);
 
@@ -615,9 +535,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 bottomText.HorizontalMode = TextHorizontalMode.TextCenter;
                 bottomText.VerticalMode = TextVerticalMode.TextVerticalMid;
                 bottomText.Annotative = AnnotativeStates.False;
-                //bottomText.AddContext(_scale);
                 bottomText.AlignmentPoint = bottomPosition;
-                ;
                 bottomText.AdjustAlignment(HostApplicationServices.WorkingDatabase);
 
                 bottomText.TextString = Math.Round(-volumeInfo.Cut, 1).ToString("#0.0", _culture);
@@ -635,7 +553,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 centralText.HorizontalMode = TextHorizontalMode.TextCenter;
                 centralText.VerticalMode = TextVerticalMode.TextVerticalMid;
                 centralText.Annotative = AnnotativeStates.False;
-                //topText.AddContext(_scale);
                 centralText.AlignmentPoint = topPosition;
                 centralText.AdjustAlignment(HostApplicationServices.WorkingDatabase);
 
@@ -673,7 +590,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
                 double baseElevation = baseSurface.FindElevationAtXY(p.X, p.Y);
                 double comparisonElevation = comparisonSurface.FindElevationAtXY(p.X, p.Y);
-                //double topLeftElevation = surface.FindElevationAtXY(p.X, p.Y);
 
                 var gridLabels = CreateElevationLabels(p, baseElevation, comparisonElevation);
                 res.AddRange(gridLabels);
@@ -762,8 +678,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             Point3d alignment = rectg.LowerLeft.Add(vector.MultiplyBy(0.5d));
             return alignment;
         }
-
-
     }
 
     public class CartogrammGride : DrawJig {
@@ -771,7 +685,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
         Point3d _jigBasePoint;
         BlockReference _br;
         Point3d _jigPoint = new Point3d(0, 0, 0);
-        //bool _isJigComplete;
 
         Action<Point3d> _transformProcessor;
 
@@ -792,8 +705,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             if (_jigPoint.IsEqualTo(_jigBasePoint))
                 return SamplerStatus.NoChange;
             else {
-                //Matrix3d mat = Matrix3d.Displacement(_jigBasePoint.GetVectorTo(_jigPoint));
-                //Entity.TransformBy(mat);
                 _transformProcessor(_jigPoint);
 
                 _br.Position = _jigPoint;
@@ -816,20 +727,15 @@ namespace IgorKL.ACAD3.Model.Drawing {
         }
 
         protected override bool WorldDraw(Autodesk.AutoCAD.GraphicsInterface.WorldDraw draw) {
-            //return draw.Geometry.Draw(_br);
             return true;
         }
     }
-
-
-
 
     public class CartogrammGrideEx : EntityJig {
         Point3d _position;
         Point3d _jigBasePoint;
         BlockReference _br;
         Point3d _jigPoint = new Point3d(0, 0, 0);
-        //bool _isJigComplete;
 
         public CartogrammGrideEx(Point3d position, BlockReference br)
             : base(br) {

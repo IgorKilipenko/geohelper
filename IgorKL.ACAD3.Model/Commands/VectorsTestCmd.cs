@@ -38,7 +38,6 @@ namespace IgorKL.ACAD3.Model.Commands {
             Tools.GetAcadEditor().WriteMessage("\nProject = {0}", project);
         }
 
-
         [RibbonCommandButton("Перпендикуляр", RibbonPanelCategories.Test_Points)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmdTest_TestPerpendicular", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public static void TestPerpendicular() {
@@ -53,30 +52,18 @@ namespace IgorKL.ACAD3.Model.Commands {
                 return;
 
             Tools.StartTransaction(() => {
-                /*Vector3d vector = ppr.Value - line.StartPoint;
-                Vector3d lineVector = line.EndPoint - line.StartPoint;
-
-                double cos = lineVector.GetCos2d(vector);
-                if (cos >=0d && cos*vector.Length <= lineVector.Length)
-                {
-                    Point3d p = line.GetPointAtDist(cos * vector.Length);
-                    Line perpendicular = new Line(ppr.Value, p);
-                    perpendicular.SaveToDatebase();
-                }*/
-
                 if (line is Line) {
                     Line perpendicular = ((Line)line).GetOrthoNormalLine(ppr.Value, null, false);
                     if (perpendicular != null)
-                        perpendicular.SaveToDatebase();
+                        perpendicular.SaveToDatabase();
                 }
                 else if (line is Arc) {
                     Line perpendicular = ((Arc)line).GetOrthoNormalLine(ppr.Value, false);
                     if (perpendicular != null)
-                        perpendicular.SaveToDatebase();
+                        perpendicular.SaveToDatabase();
                 }
             });
         }
-
 
         [RibbonCommandButton("Перпендикуляр к полилинии", RibbonPanelCategories.Test_Points)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmdTest_TestPerpendicularToPolyline", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
@@ -86,19 +73,7 @@ namespace IgorKL.ACAD3.Model.Commands {
             if (!ObjectCollector.TrySelectAllowedClassObject(out pline))
                 return;
 
-            /*PromptPointOptions ppo = new PromptPointOptions("\nУкажите точку: ");
-            PromptPointResult ppr = Tools.GetAcadEditor().GetPoint(ppo);
-            if (ppr.Status != PromptStatus.OK)
-                return;*/
-
             Tools.StartTransaction(() => {
-                /*Point3d? perpendicularPoint = pline.GetNormalPoint(ppr.Value);
-                if (perpendicularPoint.HasValue)
-                {
-                    Line perpendicular = new Line(ppr.Value, perpendicularPoint.Value);
-                    perpendicular.SaveToDatebase();
-                }*/
-
                 Drawing.PerpendicularVectorJigView view = new Drawing.PerpendicularVectorJigView(pline, ucs);
                 view.StartJig();
             });
@@ -137,7 +112,7 @@ namespace IgorKL.ACAD3.Model.Commands {
                 Polyline pline = curve.ConvertToPolyline();
                 var points = pline.GetPoints3d();
                 Line regressTotal = stat.LinearRegression(pline);
-                regressTotal.SaveToDatebase();
+                regressTotal.SaveToDatabase();
 
                 int start = 0;
                 for (int i = 1; i < pline.NumberOfVertices; i++) {
@@ -147,14 +122,13 @@ namespace IgorKL.ACAD3.Model.Commands {
                     if (Math.Abs(r2 - r2Min) < Tolerance.Global.EqualVector) {
                         line = new Line(pline.GetPoint3dAt(start), pline.GetPoint3dAt(i - 1));
                         start = i - 1;
-                        line.SaveToDatebase();
+                        line.SaveToDatabase();
                     }
                 }
                 line = new Line(pline.GetPoint3dAt(start), pline.EndPoint);
-                line.SaveToDatebase();
+                line.SaveToDatabase();
             });
         }
-
     }
 #endif
 }

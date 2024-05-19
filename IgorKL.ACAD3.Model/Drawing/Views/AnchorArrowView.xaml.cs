@@ -28,8 +28,6 @@ namespace IgorKL.ACAD3.Model.Drawing.Views {
         public AnchorArrowView() {
             InitializeComponent();
             _hostProvider = new Helpers.HostProvider();
-
-            //Deserialize();
         }
 
         public Action CommandAction { get; set; }
@@ -59,12 +57,10 @@ namespace IgorKL.ACAD3.Model.Drawing.Views {
             pset.EnableTransparency(true);
             pset.KeepFocus = true;
             pset.Visible = true;
-            //return pset;
         }
 #endif
 
         private void button_Save_Click(object sender, RoutedEventArgs e) {
-            //Serialize();
         }
 
         private void textBox_Tolerance_TextChanged(object sender, TextChangedEventArgs e) {

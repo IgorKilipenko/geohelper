@@ -7,6 +7,5 @@ namespace IgorKL.ACAD3.Model.Drawing {
         public Matrix3d Matrix { get; set; }
         public double StartSpace { get; set; } = 1d;
         public Point3d StartPoint { get; set; } = Point3d.Origin;
-
     }
 }

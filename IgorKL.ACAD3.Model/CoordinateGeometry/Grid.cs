@@ -58,7 +58,6 @@ namespace IgorKL.ACAD3.Model.CoordinateGeometry.Helpers.UnitTests {
             bool condition = rows.Count == expected.Count || rows.SequenceEqual(expected);
             if (!condition) {
                 Tools.Write($"{_prefix}_Test1 -> Failed");
-                //~ System.Diagnostics.Debug.Assert(false);
             } else {
                 Tools.Write($"{_prefix}_Test1 -> Pass");
             }
@@ -91,7 +90,6 @@ namespace IgorKL.ACAD3.Model.CoordinateGeometry.Helpers.UnitTests {
                 foreach (var col in grid.Columns) {
                     Tools.AppendEntity(new List<DBPoint> { new DBPoint(res.Value) });
                 }
-
             }
         }
 

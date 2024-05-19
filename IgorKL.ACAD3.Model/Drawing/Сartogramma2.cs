@@ -103,7 +103,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
             btrId = AcadBlocks.BlockTools.CreateBlockTableRecord("*U", bounds.MinPoint.TransformBy(ucs.Inverse()), rectgs.Cast<Entity>(), AnnotativeStates.NotApplicable, false);
             brId = AcadBlocks.BlockTools.AppendBlockItem(bounds.MinPoint.TransformBy(ucs.Inverse()), btrId, null);
-
         }
 
         private double? _getElevationAtPoint(Point3d point, CivilSurface surface, Polyline polygon) {
@@ -112,9 +111,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             double res = surface.FindElevationAtXY(point.X, point.Y);
             return res;
         }
-
-
-
     }
 
     public class CartogrammLabels2 {
@@ -124,7 +120,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
         double _tableRowHeight = 8.0;
         double _firstColumnWidth = 20d;
         double _preOrPostColumnWidth = 5d;
-        string _nullSymbol = "-"; /*'\u2010'.ToString();*/
+        string _nullSymbol = "-";
         System.Globalization.CultureInfo _culture = System.Globalization.CultureInfo.GetCultureInfo("ru-RU");
 
         private SimpleGride _gride;
@@ -250,7 +246,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             Polyline firstTopColumn = TopRow[0].Bounds.ConvertToPolyline();
             Matrix3d mat = Matrix3d.Displacement(TopRow[0].Bounds.GetLowertHorizontalVector().Negate());
             firstTopColumn.TransformBy(mat);
-            //TopRow.Insert(0, new TableField(firstTopColumn.ConvertToRectangle().Value, "(+) Насыпь"));
 
             Matrix3d disp = Matrix3d.Displacement(TopRow[0].Bounds.GetLowertHorizontalVector().Negate().Normalize().MultiplyBy(_firstColumnWidth - TopRow[0].Bounds.GetLowertHorizontalVector().Length));
             firstTopColumn.ReplaceVertexAt(0, firstTopColumn.GetPoint3dAt(0).TransformBy(disp));
@@ -265,7 +260,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             firstBottomColumn.ReplaceVertexAt(1, firstBottomColumn.GetPoint3dAt(1).TransformBy(disp));
             firstBottomColumn.ReplaceVertexAt(4, firstBottomColumn.GetPoint3dAt(4).TransformBy(disp));
 
-            //BottomRow.Insert(0, new TableField(firsrBottomColumn.ConvertToRectangle().Value, "(-) Выемка"));
             PreBottomRow.Add(new TableField(firstBottomColumn.ConvertToRectangle().Value, "Выемка(-)", _tableTextHeight));
 
 
@@ -341,12 +335,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
 
         public IEnumerable<DBText> CreateElevationLabels(Point3d position, double baseElevation, double comparisonElevation) {
-            /*var volProps = surface.GetVolumeProperties();
-            ObjectId baseSurfaceId = volProps.BaseSurface;
-            ObjectId comparisonSurfaceId = volProps.ComparisonSurface;*/
-
             Vector3d yaxis = (this.AmountTopRow[0].Bounds.UpperLeft - this.AmountTopRow[0].Bounds.LowerLeft).Normalize();
-
 
             DBText topRightText = new DBText();
             topRightText.SetDatabaseDefaults();
@@ -356,7 +345,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             topRightText.HorizontalMode = TextHorizontalMode.TextLeft;
             topRightText.VerticalMode = TextVerticalMode.TextBottom;
             topRightText.Annotative = AnnotativeStates.False;
-            //topRightText.AddContext(_scale);
             topRightText.AlignmentPoint = position;
             topRightText.AdjustAlignment(HostApplicationServices.WorkingDatabase);
 
@@ -371,12 +359,10 @@ namespace IgorKL.ACAD3.Model.Drawing {
             bottomRightText.HorizontalMode = TextHorizontalMode.TextLeft;
             bottomRightText.VerticalMode = TextVerticalMode.TextTop;
             bottomRightText.Annotative = AnnotativeStates.False;
-            //bottomRightText.AddContext(_scale);
             bottomRightText.AlignmentPoint = position;
             bottomRightText.AdjustAlignment(HostApplicationServices.WorkingDatabase);
 
             bottomRightText.TextString = baseElevation.ToString("#0.00", _culture);
-
 
             DBText topLeftText = new DBText();
             topLeftText.SetDatabaseDefaults();
@@ -386,12 +372,10 @@ namespace IgorKL.ACAD3.Model.Drawing {
             topLeftText.HorizontalMode = TextHorizontalMode.TextRight;
             topLeftText.VerticalMode = TextVerticalMode.TextBottom;
             topLeftText.Annotative = AnnotativeStates.False;
-            //topLeftText.AddContext(_scale);
             topLeftText.AlignmentPoint = position;
             topLeftText.AdjustAlignment(HostApplicationServices.WorkingDatabase);
 
             topLeftText.TextString = (comparisonElevation - baseElevation).ToString("#0.00", _culture);
-
 
             return new[] { topRightText, bottomRightText, topLeftText };
         }
@@ -427,7 +411,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 topText.HorizontalMode = TextHorizontalMode.TextCenter;
                 topText.VerticalMode = TextVerticalMode.TextVerticalMid;
                 topText.Annotative = AnnotativeStates.False;
-                //topText.AddContext(_scale);
                 topText.AlignmentPoint = topPosition;
                 topText.AdjustAlignment(HostApplicationServices.WorkingDatabase);
 
@@ -445,7 +428,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 bottomText.HorizontalMode = TextHorizontalMode.TextCenter;
                 bottomText.VerticalMode = TextVerticalMode.TextVerticalMid;
                 bottomText.Annotative = AnnotativeStates.False;
-                //bottomText.AddContext(_scale);
                 bottomText.AlignmentPoint = bottomPosition;
                 ;
                 bottomText.AdjustAlignment(HostApplicationServices.WorkingDatabase);
@@ -465,7 +447,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 centralText.HorizontalMode = TextHorizontalMode.TextCenter;
                 centralText.VerticalMode = TextVerticalMode.TextVerticalMid;
                 centralText.Annotative = AnnotativeStates.False;
-                //topText.AddContext(_scale);
                 centralText.AlignmentPoint = topPosition;
                 centralText.AdjustAlignment(HostApplicationServices.WorkingDatabase);
 
@@ -503,7 +484,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
                 double baseElevation = baseSurface.FindElevationAtXY(p.X, p.Y);
                 double comparisonElevation = comparisonSurface.FindElevationAtXY(p.X, p.Y);
-                //double topLeftElevation = surface.FindElevationAtXY(p.X, p.Y);
 
                 var gridLabels = CreateElevationLabels(p, baseElevation, comparisonElevation);
                 res.AddRange(gridLabels);
@@ -574,14 +554,13 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
             DBText text = new DBText();
             text.SetDatabaseDefaults();
-            text.Height = height; /* * scale.DrawingUnits/ scale.PaperUnits;*/
+            text.Height = height;
             text.Annotative = AnnotativeStates.False;
             text.Rotation = _textRotation;
             text.Position = Point3d.Origin;
             text.HorizontalMode = TextHorizontalMode.TextMid;
             text.VerticalMode = TextVerticalMode.TextVerticalMid;
             text.AlignmentPoint = alignmentPoint;
-            //text.AddContext(occ.CurrentContext);
             text.AdjustAlignment(HostApplicationServices.WorkingDatabase);
 
             return text;
@@ -592,8 +571,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             Point3d alignment = rectg.LowerLeft.Add(vector.MultiplyBy(0.5d));
             return alignment;
         }
-
-
     }
 
     public class CartogrammGride2 : DrawJig {
@@ -601,7 +578,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
         Point3d _jigBasePoint;
         BlockReference _br;
         Point3d _jigPoint = new Point3d(0, 0, 0);
-        //bool _isJigComplete;
 
         Action<Point3d> _transformProcessor;
 
@@ -622,8 +598,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             if (_jigPoint.IsEqualTo(_jigBasePoint))
                 return SamplerStatus.NoChange;
             else {
-                //Matrix3d mat = Matrix3d.Displacement(_jigBasePoint.GetVectorTo(_jigPoint));
-                //Entity.TransformBy(mat);
                 _transformProcessor(_jigPoint);
 
                 _br.Position = _jigPoint;
@@ -646,9 +620,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
         }
 
         protected override bool WorldDraw(Autodesk.AutoCAD.GraphicsInterface.WorldDraw draw) {
-            //return draw.Geometry.Draw(_br);
             return true;
         }
     }
-
 }

@@ -18,7 +18,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
         public PerpendicularVectorJigView(Curve baseCurve, Matrix3d ucs)
             : this(ucs) {
-            //_baseCurve = (Curve)baseCurve.GetTransformedCopy(ucs);
             _baseCurve = baseCurve;
         }
 
@@ -58,22 +57,13 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 if (_entityInMemory != null)
                     if (!_entityInMemory.IsDisposed)
                         _entityInMemory.Dispose();
-                /*if (_jigPoint.IsEqualTo(_jigBasePoint))
-                    return false;*/
 
-                //Polyline pline = _baseCurve.ConvertToPolyline();
-
-                //Line line = pline.GetOrthoNormalLine(_jppr.Value, null, false);
                 Line line = new Line(_jppr.Value, _baseCurve.GetClosestPointTo(_jppr.Value, false));
                 if (line != null) {
                     _jigPoint = line.StartPoint;
                     _jigBasePoint = line.EndPoint;
                 } else
-                    //throw new ArgumentNullException();
                     return false;
-
-                /*_jigBasePoint = _jppr.Value;
-                _jigPoint = _baseCurve.GetClosestPointTo(_jigBasePoint, false);*/
 
                 try {
                     _entityInMemory = new Line(_jigPoint, _jigBasePoint);
@@ -106,59 +96,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             if (_jppr.Value.IsEqualTo(_jigPoint))
                 return SamplerStatus.NoChange;
 
-            /*
-            if (_baseCurve is Polyline)
-            {
-                Polyline pline = (Polyline)_baseCurve;
-                Line line = pline.GetOrthoNormalLine(_jppr.Value);
-                if (line != null)
-                {
-                    _jigBasePoint = line.StartPoint;
-                    _jigPoint = line.EndPoint;
-                    return SamplerStatus.OK;
-                }
-                else
-                    return SamplerStatus.NoChange;
-            }
-            else if (_baseCurve is Arc)
-            {
-                Arc arc = (Arc)_baseCurve;
-                Line normal = arc.GetOrthoNormalLine(_jppr.Value, false);
-                if (normal != null)
-                {
-                    _jigBasePoint = normal.StartPoint;
-                    _jigPoint = normal.EndPoint;
-                    return SamplerStatus.OK;
-                }
-                else
-                    return SamplerStatus.NoChange;
-            }
-            else if (_baseCurve is Line)
-            {
-                Line line = (Line)_baseCurve;
-                Line normal = line.GetOrthoNormalLine(_jppr.Value, null, false);
-                if (normal != null)
-                {
-                    _jigBasePoint = normal.StartPoint;
-                    _jigPoint = normal.EndPoint;
-                    return SamplerStatus.OK;
-                }
-                else
-                    return SamplerStatus.NoChange;
-            }*/
-
-
-            /*Polyline pline = _baseCurve.ConvertToPolyline();
-            Line line = pline.GetOrthoNormalLine(_jppr.Value);
-            if (line != null)
-            {
-                _jigBasePoint = line.StartPoint;
-                _jigPoint = line.EndPoint;
-                return SamplerStatus.OK;
-            }
-            else
-                return SamplerStatus.NoChange;*/
-
             return SamplerStatus.OK;
 
         }
@@ -180,7 +117,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 }
                 if (res == PromptStatus.OK)
                     return res;
-
             }
             return res;
         }

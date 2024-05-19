@@ -144,14 +144,12 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 double ang = Vector3d.YAxis.GetAngle2d(_vector);
 
                 Vector3d vector = destPoint - _position;
-                //vector.TransformBy(_ucs.Inverse());
 
                 Matrix3d hMat = Matrix3d.Identity;
                 hMat = hMat.PreMultiplyBy(Matrix3d.Rotation(ang, Vector3d.ZAxis, Point3d.Origin));
                 vector = vector.TransformBy(hMat.Inverse());
 
                 if (vector.X < 0)
-                    //hMat = hMat.PreMultiplyBy(Matrix3d.Mirroring(new Plane(Point3d.Origin, hMat.CoordinateSystem3d.Yaxis, Matrix3d.Identity.CoordinateSystem3d.Zaxis)));
                     hMat = hMat.PreMultiplyBy(Matrix3d.Mirroring(new Plane(Point3d.Origin, _pline.Normal)));
 
                 _text.TransformBy(hMat);
@@ -160,7 +158,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
                 _text.TextString = Math.Round(Math.Abs(vector.X) * _unitScale, _digitalCount).ToString(_numFormat);
 
-                //_transformThisBy(_ucs.PostMultiplyBy(Matrix3d.Displacement(_position -_origin)));
                 _transformThisBy(Matrix3d.Identity.PostMultiplyBy(Matrix3d.Displacement(_position - Point3d.Origin)));
             }
 
@@ -178,8 +175,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                     hMat = hMat.PreMultiplyBy(Matrix3d.Displacement(_position - _pline.EndPoint.Add(_pline.GetFirstDerivative(0).Normalize().MultiplyBy(_spaceLength))));
                 else
                     hMat = hMat.PreMultiplyBy(Matrix3d.Displacement(_position.Add(_pline.GetFirstDerivative(0).Normalize().MultiplyBy(_spaceLength)) - _pline.StartPoint));
-
-
 
                 _pline.TransformBy(hMat);
 
@@ -216,7 +211,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 }
 
                 foreach (var ent in _inMemorySet) {
-                    /*ent.Dispose();*/
                     var btrId = ((BlockReference)ent).BlockTableRecord;
                     BlockTableRecord btr = btrId.GetObjectForRead<BlockTableRecord>();
                     BlockReference br = ent.Id.GetObjectForRead<BlockReference>();
@@ -224,12 +218,10 @@ namespace IgorKL.ACAD3.Model.Drawing {
                     ent.Erase(true);
                     ent.DowngradeOpen();
 
-                    //btr.UpgradeOpen();
                     foreach (var item in btr) {
                         DBObject obj = item.GetObjectForWrite<DBObject>();
                         obj.Erase(true);
                     }
-                    //btr.DowngradeOpen();
                 }
                 _inMemorySet.Clear();
                 return true;
@@ -257,9 +249,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                     if (ppr.Status != PromptStatus.OK)
                         return SamplerStatus.Cancel;
 
-                    /*if (_position == ppr.Value)
-                        return SamplerStatus.NoChange;*/
-
                     _destPoint = ppr.Value;
 
                     Calculate(_destPoint);
@@ -277,9 +266,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                     if (ppr.Status != PromptStatus.OK)
                         return SamplerStatus.Cancel;
 
-                    /*if (_position == ppr.Value)
-                        return SamplerStatus.NoChange;*/
-
                     _jigPoint = ppr.Value;
 
                     Redirect(_jigPoint);
@@ -295,7 +281,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 if (promptResult.Status == PromptStatus.OK) {
                     _pasted = true;
                     promptResult = Tools.GetAcadEditor().Drag(this);
-
                 }
 
                 return promptResult.Status;
@@ -346,7 +331,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
                 ObjectId btrId = AcadBlocks.BlockTools.CreateBlockTableRecord("*U", _position, ents, AnnotativeStates.True);
                 ObjectId brId = AcadBlocks.BlockTools.AppendBlockItem(_position, btrId, null);
-                //HostApplicationServices.WorkingDatabase.TransactionManager.QueueForGraphicsFlush();
                 return brId.GetObjectForRead<BlockReference>();
             }
         }

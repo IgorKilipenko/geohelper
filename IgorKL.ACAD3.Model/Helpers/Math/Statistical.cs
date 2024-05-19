@@ -95,6 +95,7 @@ namespace IgorKL.ACAD3.Model.Helpers.Math {
                 );
 
             Line line = new Line(sp, ep);
+            
             return line;
         }
     }

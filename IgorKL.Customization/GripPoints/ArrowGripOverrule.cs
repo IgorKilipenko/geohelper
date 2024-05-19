@@ -8,10 +8,6 @@ using Autodesk.AutoCAD.Runtime;
 using IgorKL.ACAD3.Model;
 using helpers = IgorKL.ACAD3.Model.Drawing.Helpers;
 
-/*[assembly: ExtensionApplication(
-  typeof(IgorKL.ACAD3.Customization.GripPoints.ArrowGripOverrule))
-]*/
-
 namespace IgorKL.ACAD3.Customization.GripPoints
 {
     public class ArrowGripOverrule:GripOverrule, IExtensionApplication
@@ -95,7 +91,7 @@ namespace IgorKL.ACAD3.Customization.GripPoints
             grips.Add(gdata);
             base.GetGripPoints(entity, grips, curViewUnitSize, gripSize, curViewDir, bitFlags);
 #if DEBUG
-            helpers.Arrow.SafeObject so = 
+            helpers.Arrow.SafeObject so =
                 (helpers.Arrow.SafeObject)helpers.Arrow.SafeObject.NewFromEntity(entity, helpers.Arrow.SafeObject.AppName);
 
             _entities = so.Object.Explode().Select(x => x.GetTransformedCopy(Tools.GetAcadEditor().CurrentUserCoordinateSystem));

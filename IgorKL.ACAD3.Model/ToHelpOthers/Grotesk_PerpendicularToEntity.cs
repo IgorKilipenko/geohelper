@@ -75,7 +75,6 @@ namespace IgorKL.ACAD3.Model.ToHelpOthers {
                     points.Clear();
                     res = Tools.GetAcadEditor().GetPoint(opt);
                 }
-
             }
         }
     }

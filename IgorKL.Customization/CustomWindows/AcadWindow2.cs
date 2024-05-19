@@ -23,12 +23,9 @@ namespace IgorKL.ACAD3.Customization.CustomWindows
         Autodesk.AutoCAD.Windows.Window _win;
         private Point _start;
 
-
         public bool IsDragging { get; set; } = false;
         public Point CustomPosition { get; set; } = default(Point);
         public Dock DockPosition { get; set; } = default(Dock);
-
-
 
         protected internal AcadWindow2()
         {
@@ -52,7 +49,6 @@ namespace IgorKL.ACAD3.Customization.CustomWindows
             helper.Owner = win.Handle;
 
             this.SizeChanged += OnSizeChanged;
-
         }
 
         private void OnSizeChanged(
@@ -79,7 +75,6 @@ namespace IgorKL.ACAD3.Customization.CustomWindows
             else
                 Autodesk.AutoCAD.ApplicationServices.Application.MainWindow.Focus();
         }
-
 
         protected Point PointOnScreen(Point pt)
         {
@@ -134,17 +129,8 @@ namespace IgorKL.ACAD3.Customization.CustomWindows
 
         private void OnMouseRightClick(object s, MouseButtonEventArgs e)
         {
-            // Swap the cursor (would be nice to get the pan cursor)
-
             this.Cursor = Cursors.ScrollAll;
-
-            // We want to capture mouse input for the whole screen
-
             this.CaptureMouse();
-
-            // Store our initial position with the right-clicked point
-            // subtracted (we can simply add this point to the cursor
-            // location during mouse move to position the dialog)
 
             _start =
               Point.Subtract(
@@ -152,26 +138,15 @@ namespace IgorKL.ACAD3.Customization.CustomWindows
                 (Vector)this.PointToScreen(e.GetPosition(this))
               );
 
-            // Add our event handlers
-
             StartDragging();
         }
 
         private void OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
-            // Reset the cursor
-
             this.Cursor = Cursors.Arrow;
-
-            // No longer need screen-level moude capture
-
             this.ReleaseMouseCapture();
 
-            // Remove our event handlers
-
             StopDragging();
-
-            // And finally set the custom location to the resting place
 
             this.DockPosition = Dock.Custom;
             this.CustomPosition = ScreenToPoint(new Point(this.Left, this.Top));
@@ -179,8 +154,6 @@ namespace IgorKL.ACAD3.Customization.CustomWindows
 
         private void OnMouseMove(object sender, MouseEventArgs e)
         {
-            // Move our dialog relative to the mouse movement
-
             var pos = this.PointToScreen(e.GetPosition(this));
             this.Left = _start.X + pos.X;
             this.Top = _start.Y + pos.Y;
@@ -194,12 +167,8 @@ namespace IgorKL.ACAD3.Customization.CustomWindows
 
         protected Point GetPosition(Size sz)
         {
-            // If at a custom (non-docked) location...
-
             if (DockPosition == Dock.Custom)
                 return PointOnScreen(CustomPosition);
-
-            // Otherwise docked in one of the four corners...
 
             bool right =
               DockPosition == Dock.TopRight || DockPosition == Dock.BottomRight;
@@ -238,16 +207,12 @@ namespace IgorKL.ACAD3.Customization.CustomWindows
             [Flags]
             public enum ExtendedWindowStyles
             {
-                // ...
                 WS_EX_TOOLWINDOW = 0x00000080,
-                // ...
             }
 
             public enum GetWindowLongFields
             {
-                // ...
                 GWL_EXSTYLE = (-20),
-                // ...
             }
 
             [DllImport("user32.dll")]
@@ -263,13 +228,11 @@ namespace IgorKL.ACAD3.Customization.CustomWindows
                 IntPtr result = IntPtr.Zero;
 
                 // Win32 SetWindowLong doesn't clear error on success
-
                 SetLastError(0);
 
                 if (IntPtr.Size == 4)
                 {
                     // Use SetWindowLong
-
                     Int32 tempResult =
                       IntSetWindowLong(hWnd, nIndex, IntPtrToInt32(dwNewLong));
                     error = Marshal.GetLastWin32Error();
@@ -311,7 +274,6 @@ namespace IgorKL.ACAD3.Customization.CustomWindows
 
             [DllImport("kernel32.dll", EntryPoint = "SetLastError")]
             public static extern void SetLastError(int dwErrorCode);
-
         }
     }
 }

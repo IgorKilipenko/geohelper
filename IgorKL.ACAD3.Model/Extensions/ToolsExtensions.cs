@@ -4,7 +4,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 
 namespace IgorKL.ACAD3.Model.Extensions {
     public static class ToolsExtensions {
-        public static ObjectId SaveToDatebase<T>(this T obj, Transaction trans, bool comit = true)
+        public static ObjectId SaveToDatabase<T>(this T obj, Transaction trans, bool comit = true)
             where T : Entity {
             var btr = Tools.GetAcadBlockTableRecordCurrentSpace(trans);
             var id = btr.AppendEntity(obj);
@@ -14,26 +14,26 @@ namespace IgorKL.ACAD3.Model.Extensions {
             return id;
         }
 
-        public static ObjectId SaveToDatebase<T>(this T obj)
+        public static ObjectId SaveToDatabase<T>(this T obj)
             where T : Entity {
             using (Transaction trans = Tools.StartTransaction()) {
-                return obj.SaveToDatebase(trans, true);
+                return obj.SaveToDatabase(trans, true);
             }
         }
 
-        public static void SaveToDatebase<T>(this IEnumerable<T> collection, Transaction trans, bool comit = true)
+        public static void SaveToDatabase<T>(this IEnumerable<T> collection, Transaction trans, bool comit = true)
             where T : Entity {
             foreach (var ent in collection) {
-                ent.SaveToDatebase(trans, false);
+                ent.SaveToDatabase(trans, false);
             }
             if (comit)
                 trans.Commit();
         }
 
-        public static void SaveToDatebase<T>(this IEnumerable<T> collection)
+        public static void SaveToDatabase<T>(this IEnumerable<T> collection)
             where T : Entity {
             using (Transaction trans = Tools.StartTransaction()) {
-                collection.SaveToDatebase(trans, true);
+                collection.SaveToDatabase(trans, true);
             }
         }
 

@@ -37,9 +37,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
             _verticalStep = verticalStep;
             _horizontalStep = horizontalStep;
 
-            ///////////////////////////////////////////////////
             _insertPoint = insertPoint;
-            ///////////////////////////////////////////////////
 
             _firstRectg = new Rectangle3d(
                 lowerLeft: _insertPoint,

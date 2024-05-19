@@ -12,10 +12,10 @@ using Autodesk.AutoCAD.Runtime;
 
 namespace IgorKL.ACAD3.Customization
 {
-    
+
     public class ExtensionManager:IExtensionApplication
     {
-        private static System.Collections.Concurrent.ConcurrentBag<IExtensionApplication> _applications = 
+        private static System.Collections.Concurrent.ConcurrentBag<IExtensionApplication> _applications =
             new System.Collections.Concurrent.ConcurrentBag<IExtensionApplication>();
 
         public void Initialize()
@@ -34,7 +34,6 @@ namespace IgorKL.ACAD3.Customization
 #if DEBUG
                 Initialize(new GripPoints.ArrowGripOverrule());
                 Initialize(new GripPoints.AnchorArrowGripOverrule());
-                //Initialize(new Snap.CustomOSnapApp());
 #endif
             }
             catch (System.Exception ex)
@@ -53,8 +52,7 @@ namespace IgorKL.ACAD3.Customization
 #endif
         }
 
-// Добавил 07.08.15 не работал без акад 2015        
-#if ACAD2015 
+#if ACAD2015
         void ribbonPaletteSet_WorkspaceUnloading(object sender, EventArgs e)
         {
             Autodesk.AutoCAD.Ribbon.RibbonPaletteSet pset = (Autodesk.AutoCAD.Ribbon.RibbonPaletteSet)sender;
@@ -90,7 +88,5 @@ namespace IgorKL.ACAD3.Customization
             if (_applications.FirstOrDefault(x => x == application) == null)
                 _applications.Add(application);
         }
-
-
     }
 }

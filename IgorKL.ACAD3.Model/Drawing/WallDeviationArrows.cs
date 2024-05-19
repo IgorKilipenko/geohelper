@@ -97,11 +97,8 @@ namespace IgorKL.ACAD3.Model.Drawing {
             double toleranceBottom = _dataProvider.Read("toleranceBottom", 0.005d);
             bool isTopMaxTolerance = _dataProvider.Read("isTopMaxTolerance", false);
             bool isWall = false;
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             CustomObjects.EntityDrawer grphic;
-
-
 
             Vector3d horizontalVector = ucs.CoordinateSystem3d.Xaxis;
             Vector3d verticalVector = ucs.CoordinateSystem3d.Yaxis;
@@ -203,7 +200,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
         #region Drawing
         /// <summary>
-        /// Основной метод выводв данных. Рисует стрелки в случайном порядке
+        /// Основной метод вывода данных. Рисует стрелки в случайном порядке
         /// </summary>
         /// <param name="insertPoint">Точка вставки стрелок в ПСК</param>
         /// <param name="axisVector">Вектор направления оси/грани (перпендикулярно стрелкам)</param>
@@ -254,7 +251,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
         }
 
         /// <summary>
-        /// Основной метод выводв данных. Рисует стрелки по полученным с экрана точкам
+        /// Основной метод вывода данных. Рисует стрелки по полученным с экрана точкам
         /// </summary>
         /// <param name="axisVector">Вектор направления оси/грани (перпендикулярно стрелкам)</param>
         /// <param name="ucs">Текущая ПСК</param>
@@ -303,7 +300,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
         #endregion
 
         /// <summary>
-        /// Включает/выключает механизм аввтоматического преобразовании текста при зеркальном отражении (0 - вкл / 1 - выкл)
+        /// Включает/выключает механизм автоматического преобразовании текста при зеркальном отражении (0 - вкл / 1 - выкл)
         /// </summary>
         /// <param name="value">0 - вкл / 1 - выкл</param>
         /// <returns>значение предопределенное в среде</returns>
@@ -323,8 +320,8 @@ namespace IgorKL.ACAD3.Model.Drawing {
             if (!_destLowerPointComplete) {
                 DisplayLowerArrow(_destLowerPointUcs);
             } else {
-                if (!_jigLowerPointComplete)                                ///////////////////////!!!!!!!!!!!!!!!!!!!!//////////////
-                    DisplayRedirectedLowerArrow(_jigLowerPointUcs);          ///////////////////////!!!!!!!!!!!!!!!!!!!!//////////////
+                if (!_jigLowerPointComplete)
+                    DisplayRedirectedLowerArrow(_jigLowerPointUcs);
                 else {
                     if (!_destUpperPointComplete)
                         DisplayUpperArrow(_destUpperPointUcs);
@@ -335,9 +332,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 }
             }
         }
-
-
-
 
         #region Jig Overrides
         protected override SamplerStatus Sampler(JigPrompts prompts) {
@@ -354,7 +348,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 _destLowerPointUcs = ppr.Value.TransformBy(_ucs.Inverse());
                 return SamplerStatus.OK;
             } else {
-                if (!_jigLowerPointComplete)     ////////////////////////////////////!!!!!!!!!!!!!!!!!!!!!!!////////////////////////
+                if (!_jigLowerPointComplete)
                 {
                     ppo.Message = "\nУкажите место отрисовки";
                     PromptPointResult ppr = prompts.AcquirePoint(ppo);
@@ -362,7 +356,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
                         return SamplerStatus.Cancel;
 
                     _jigLowerPointUcs = ppr.Value.TransformBy(_ucs.Inverse());
-                    return SamplerStatus.OK;    ////////////////////////////////////!!!!!!!!!!!!!!!!!!!!!!!////////////////////////
+                    return SamplerStatus.OK;
                 } else {
                     if (!_destUpperPointComplete) {
                         ppo.Message = "\nУкажите фактическое положение верха";
@@ -396,11 +390,9 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 _destLowerPointComplete = true;
             }
             if (!_jigLowerPointComplete) {
-                ///////////////////////////////////////////////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!///////////////////////////////
                 if (base.JigDraw() != PromptStatus.OK)
                     return PromptStatus.Cancel;
                 _jigLowerPointComplete = true;
-                ///////////////////////////////////////////////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!/////////////////////////////
             }
             if (!_destUpperPointComplete) {
                 if (base.JigDraw() != PromptStatus.OK)
@@ -408,7 +400,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 _destUpperPointComplete = true;
             }
 
-            //if (_arrowUpper.IsCodirectional)
             {
                 if (base.JigDraw() != PromptStatus.OK)
                     return PromptStatus.Cancel;
@@ -518,7 +509,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             _arrowLower.AppendArrowSymbols(symbs);
 
             symbs.Add((Entity)_arrowLower.ArrowLine.Clone());
-
 
             if (Math.Abs(value) > _toleranceBottom) {
                 if (_isToleranceOnly) {
@@ -820,7 +810,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
         }
 
         /// <summary>
-        /// Пересчитвыет вектор оси для только положительных направлений
+        /// Пересчитывает вектор оси для только положительных направлений
         /// </summary>
         /// <param name="vector">Пересчитываемый вектор в системе ucs</param>
         /// <param name="ucs">Система координат определяющая положительные направления осей</param>
@@ -1304,7 +1294,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             public class ArrowEventArgs : EventArgs {
                 public ArrowEventArgs()
                     : base() {
-
                 }
 
                 public ArrowActions Action { get; set; }
@@ -1343,9 +1332,5 @@ namespace IgorKL.ACAD3.Model.Drawing {
                 }
             }
         }
-
-
-
-
     }
 }

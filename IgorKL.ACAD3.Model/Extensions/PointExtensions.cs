@@ -133,10 +133,6 @@ namespace IgorKL.ACAD3.Model.Extensions {
             double cos = vector.GetCos2d(destanationVector);
             double sin = new Vector3d(vector.X, vector.Y, 0d).GetPerpendicularVector().GetCos2d(destanationVector);
             double ang = Math.Acos(cos);
-            /*if (sin < 0d && cos < 0d)
-                ang += Math.PI / 2;
-            else if (sin < 0d && cos > 0d)
-                ang = Math.PI * 2d - ang;*/
 
             if (sin < 0d)
                 ang = Math.PI * 2d - ang;

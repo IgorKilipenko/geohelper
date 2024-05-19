@@ -7,11 +7,11 @@ namespace IgorKL.ACAD3.Model.Commands {
 #if DEBUG
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_GetObjectTextInfo", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
         public static void GetObjectTextInfo() {
-            PromptEntityOptions optinos = new PromptEntityOptions("\nSelect a object");
-            optinos.AllowNone = false;
-            optinos.AllowObjectOnLockedLayer = true;
+            PromptEntityOptions options = new PromptEntityOptions("\nSelect a object");
+            options.AllowNone = false;
+            options.AllowObjectOnLockedLayer = true;
 
-            PromptEntityResult result = Tools.GetAcadEditor().GetEntity(optinos);
+            PromptEntityResult result = Tools.GetAcadEditor().GetEntity(options);
             if (result.Status != PromptStatus.OK)
                 return;
 

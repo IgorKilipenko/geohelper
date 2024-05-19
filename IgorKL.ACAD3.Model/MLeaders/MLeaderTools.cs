@@ -66,38 +66,7 @@ namespace IgorKL.ACAD3.Model.MLeaders {
             int idx = leader.AddLeaderLine(secondVertex);
             leader.AddFirstVertex(idx, firstVertex);
 
-            //Handle Block Attributes
-            //int AttNumber = 0;
-
-            //Doesn't take in consideration oLeader.BlockRotation
-            /*Matrix3d Transfo = Matrix3d.Displacement(
-                leader.BlockPosition.GetAsVector());*/
             using (Transaction trans = Tools.StartTransaction()) {
-                /*foreach (ObjectId blkEntId in blkLeader)
-                {
-                    AttributeDefinition AttributeDef = trans.GetObject(
-                        blkEntId,
-                        OpenMode.ForRead)
-                            as AttributeDefinition;
-
-                    if (AttributeDef != null)
-                    {
-                        AttributeReference AttributeRef =
-                            new AttributeReference();
-
-                        AttributeRef.SetAttributeFromBlock(
-                            AttributeDef,
-                            Transfo);
-
-                        AttributeRef.Position =
-                            AttributeDef.Position.TransformBy(Transfo);
-
-                        AttributeRef.TextString = "Attrib #" + (++AttNumber);
-
-                        leader.SetBlockAttribute(blkEntId, AttributeRef);
-                    }
-                }*/
-
                 return Tools.AppendEntityEx(trans, leader, true);
             }
         }

@@ -1,8 +1,21 @@
 {
-    "omnisharp.enableEditorConfigSupport": true,
     "cSpell.words": [
         "Acad",
+        "Autocad",
+        "Bbox",
         "Cogo",
-        "Polyline"
+        "pkwopt",
+        "pline",
+        "Polyline",
+        "Xrecord",
+        "мультивыноску",
+        "полилинии",
+        "полилинию",
+        "Промпт"
     ],
+    "omnisharp.enableEditorConfigSupport": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "csharp.format.enable": false,
+    "files.autoSave": "afterDelay"
 }

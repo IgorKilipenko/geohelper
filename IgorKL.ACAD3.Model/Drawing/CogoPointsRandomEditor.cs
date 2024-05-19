@@ -13,7 +13,7 @@ namespace IgorKL.ACAD3.Model.Drawing {
 
         [RibbonCommandButton("Точки COGO случайно", RibbonPanelCategories.Points_Coordinates)]
         [Autodesk.AutoCAD.Runtime.CommandMethod("iCmd_EditCogoPointLocation", Autodesk.AutoCAD.Runtime.CommandFlags.UsePickSet)]
-        public void EditCogoPointLocation() {//SymbolUtilityServices.
+        public void EditCogoPointLocation() {
             MethodOfRandomEdition method = MethodOfRandomEdition.ByCoordinate;
             List<CogoPoint> points;
             if (!ObjectCollector.TrySelectObjects(out points, "\nУкажите точки COGO для редактирования: "))
@@ -150,8 +150,6 @@ namespace IgorKL.ACAD3.Model.Drawing {
             Database db = OpenDestDatabase(path);
             using (db) {
                 List<CogoPoint> points = GetObjectsFromDatabase<CogoPoint>(db);
-
-                //points[0].DeepClone()
             }
         }
 
